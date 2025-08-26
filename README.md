@@ -1,119 +1,81 @@
 <div align="center">
 <h1>Kachina-MD</h1>
-<h2 style="color:#1496DC">by Roy</h2>
+<h2 style="color:#1496DC">Presented By Roy</h2>
 
-![GitHub repo size](https://img.shields.io/github/repo-size/idlanyor/kachina-md)
-![GitHub stars](https://img.shields.io/github/stars/idlanyor/kachina-md?style=social)
-![GitHub license](https://img.shields.io/github/license/idlanyor/kachina-md)
+![Ukuran Repo GitHub](https://img.shields.io/github/repo-size/idlanyor/kachina-md)
+![Bintang GitHub](https://img.shields.io/github/stars/idlanyor/kachina-dd?style=social)
+![Lisensi GitHub](https://img.shields.io/github/license/idlanyor/kachina-md)
 
 ![Kachina](kachina.jpg)
 
 </div>
 
 
-This is a project that demonstrates how to use plugin modular stucture to make a Bot Whatsapp using Baileys
+sebuah bot whatsapp sederhana yang dibangun diatas runtime [Bun](https://bun.sh) menggunakan library [Baileys](https://github.com/WhiskeySockets/Baileys)
 
-## Requirements
+## Fitur
 
-In order to run this project, you will need to have [Bun](https://bun.sh) installed on your system. You can install it by running the following command in your terminal:
+- Pengunduh
+- Stiker
+- AI
+- Bot Chat
+- Permainan
+- Musik
+- Alat
+
+
+## Persyaratan
+
+Untuk menjalankan proyek ini, Anda perlu menginstal [Bun](https://bun.sh) di sistem Anda. Anda dapat menginstalnya dengan menjalankan perintah berikut di terminal:
 
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
-## Installation
+Setelah itu, klon repositori ini ke sistem Anda:
 
-To install the required dependencies, run the following command in your terminal:
+```bash
+git clone https://github.com/idlanyor/kachina-md.git
+```
+
+Lalu, masuk ke direktori proyek:
+
+```bash
+cd kachina-md
+```
+
+Install dependensi:
 
 ```bash
 bun install
 ```
 
-## Usage
+## Cara Menggunakan
 
-To use this project, you will need to set up a Various API key. You can do this by renaming a file called `globalThis.example.js` to `globalThis.js` in the root directory of the project and adding the following code to it:
+salin file `global.example.js` menjadi `global.js`
 
-```javascript
-// variabel dasar
-globalThis.owner = "Roynaldi";
-globalThis.botName = "Kanata Bot";
-globalThis.ownerNumber = ""
-globalThis.botNumber = ""
-globalThis.sessionName = 'kanata-bot'
+edit file `global.js` sesuia kebutuhan
 
-// fungsi dasar
-globalThis.isOwner = (id) => {
-    return id === globalThis.ownerNumber
-}
-globalThis.isBot = async (id) => {
-    return id === botNumber
-}
 
-// variabel apikey
-globalThis.apiKey = {
-    gemini: '',
-    gpt: '',
-    mistral: '',
-    removeBG: '',
-    groq: '',
-    pdf: {
-        secret: '',
-        public: ''
-    }
-}
-
-// variabel paired apikey with baseurl
-globalThis.apiHelper = {
-    medanpedia: {
-        apiId: '',
-        apiKey: ''
-    },
-    lolhuman: {
-
-        apikey: '',
-
-        baseUrl: 'https://api.lolhuman.xyz/api/'
-
-    },
-
-    betabotz: {
-
-        apikey: '',
-
-        baseUrl: 'https://api.betabotz.eu.org/api/'
-
-    },
-
-    skizotech: {
-
-        apikey: '',
-
-        baseUrl: 'https://skizo.tech/api/'
-
-    },
-    nyxs: {
-        apikey: '',
-        baseUrl: 'https://api.nyxs.pw/api/'
-    }
-
-}
-
-```
-
-Replace all value wit your own.
-
-After that, you can start the project by running the following command in your terminal:
+Setelah menginstal dependensi, Anda dapat menjalankan proyek ini dengan menjalankan perintah berikut:
 
 ```bash
 bun .
 ```
 
+## Thanks To 
+### Library
+- [WhiskeySockets](https://github.com/WhiskeySockets)
+- [Bun](https://bun.sh)
+- [Baileys](https://github.com/WhiskeySockets/Baileys)
+- [yt-search](https://www.npmjs.com/package/yt-search)
+- [yt-dlp](https://www.npmjs.com/package/yt-dlp)
+### API Provider
+- [Ryzumi](https://api.ryzumi.vip)
+- [FastURL](https://api.fasturl.link)
+- [SiputZX](https://api.siputzx.my.id)
+- [Nurutomo](https://api.nurutomo.my.id)
 
-## License
+## Lisensi
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-
-## Contributors
-- [Roynaldi](https://github.com/idlanyor)
-- [Puan Mahalini](https://github.com/puanmahalini)
+Proyek ini dilisensikan di bawah [MIT License](LICENSE). Silakan lihat file [LICENSE](LICENSE) untuk informasi lebih lanjut.
