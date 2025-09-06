@@ -1,6 +1,6 @@
 export const handler = {
     command: ['get'],
-    tags: ['tools'],
+    category:'tools',
     help: 'Mengambil data dari URL\n*Contoh:* !get https://api.example.com/data',
     exec: async ({ sock, m, args }) => {
       try {

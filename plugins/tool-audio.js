@@ -9,7 +9,7 @@ const tempDir = './temp';
 export const handler = {
     command: ['bass', 'nightcore', 'slow', 'robot', 'reverse'],
     help: 'Efek audio untuk pesan suara\n\nPerintah:\n!bass - Efek bass boost\n!nightcore - Efek nightcore (pitch up + tempo up)\n!slow - Efek slow motion\n!robot - Efek suara robot\n!reverse - Membalik audio',
-    tags: ['tools'],
+    category:'tools',
     
     async exec({ m,cmd, sock, args }) {
         try {

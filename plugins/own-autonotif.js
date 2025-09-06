@@ -2,7 +2,7 @@ import autoNotification from '../helper/scheduler.js';
 
 export const handler =  {
     command: 'autonotif',
-    category: 'owner',
+    category:'owner',
     desc: 'Mengontrol fitur auto anime notification',
     isOwner: true,
     query: 'Pilih aksi: test, status, restart, stop, preview',
@@ -23,10 +23,10 @@ export const handler =  {
         }
         
         switch (action) {
-            case 'test':
+            case 'send':
                 try {
                     m.reply('🧪 Mengirim test anime notification...');
-                    const success = await autoNotification.sendTestNotification();
+                    const success = await autoNotification.sendDailyAnimeNotification();
                     if (success) {
                         m.reply('✅ Test anime notification berhasil dikirim!');
                     } else {

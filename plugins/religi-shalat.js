@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export const handler = {
-    command: ['shalat', 'jadwalshalat', 'prayer', 'prayertime'],
-    tags: ['misc'],
+    command: ['jadwalshalat'],
+    category: 'religious',
     help: 'Melihat jadwal shalat untuk kota tertentu. Gunakan !shalat <kota> atau !shalat untuk kota default',
     isAdmin: false,
     isBotAdmin: false,

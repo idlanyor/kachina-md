@@ -2,7 +2,7 @@ import { chatWithAI, analyzeMessage, getAllPluginCommands } from '../helper/gemi
 
 export const handler = {
     command: ['gemini'],
-    tags: ['ai'],
+    category: 'ai',
     help: 'Chat dengan AI Gemini. Gunakan !gemini <pertanyaan> atau reply pesan dengan !gemini',
     isAdmin: false,
     isBotAdmin: false,

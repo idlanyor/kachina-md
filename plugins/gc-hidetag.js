@@ -1,8 +1,7 @@
-import Database from '../helper/database.js'
 
 export const handler = {
     command: 'hidetag',
-    tags: ['admin', 'group'],
+    category:'group',
     help: 'Tag semua anggota group secara tersembunyi',
     isAdmin: true,
     isBotAdmin: false,
@@ -10,12 +9,15 @@ export const handler = {
     isGroup: true,
     exec: async ({ sock, m, id, args }) => {
         try {
-            const group = await m.getGroup()
+            const group = await await m.groupMetadata
+            
+            // Ambil semua participants dari group
+            const participants = group.participants || []
             
             let teks = args || ''
             await sock.sendMessage(id, {
                 text: teks,
-                mentions: group.members
+                mentions: participants.map(a => a.lid)
             }, { quoted: m })
 
         } catch (error) {

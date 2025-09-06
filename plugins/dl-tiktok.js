@@ -1,9 +1,9 @@
 import { tiktokDl } from '../lib/scraper/tiktok.js';
 
 export const handler = {
-    command: ['tiktok', 'tt'],
+    command: ['tt'],
     help: 'Mendownload video TikTok. Gunakan !tiktok <url> atau reply pesan dengan !tiktok\n\nFlag:\n--audio : Download audio saja',
-    tags: ['downloader'],
+    category: 'downloader',
     
     async exec({ m, args, sock }) {
         try {

@@ -2,7 +2,7 @@ import os from 'os';
 
 export const handler = {
     command: 'stats',
-    tags: ['tools'],
+   category:'ingfo',
     help: 'Menampilkan informasi sistem server',
     isAdmin: false,
     isBotAdmin: false, 

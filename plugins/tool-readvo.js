@@ -1,8 +1,8 @@
 import { downloadMediaMessage } from 'baileys'
 
 export const handler = {
-    command: ['readvo', 'rvo'],
-    tags: ['tools'],
+    command: ['rvo'],
+    category: 'tools',
     help: 'Membaca pesan view once\n\nFormat: Reply pesan view once dengan !readvo',
     isAdmin: false,
     isBotAdmin: false,

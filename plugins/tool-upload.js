@@ -5,8 +5,8 @@ import fs from 'fs'
 import { fileTypeFromBuffer } from 'file-type'
 
 export const handler = {
-    command: ['upload', 'tourl'],
-    tags: ['tools'],
+    command: ['upload'],
+   category:'tools',
     help: 'Upload file ke catbox.moe\n\nFormat: Kirim/Reply file dengan caption !upload',
     exec: async ({ sock, m }) => {
         const catbox = new Catbox();

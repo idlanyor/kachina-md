@@ -4,7 +4,7 @@ const groq = new Groq({ apiKey: globalThis.apiKey.groq });
 
 export const handler = {
     command: ['llama'],
-    tags: ['ai'],
+    category: 'ai',
     help: 'Chat dengan Llama AI (Groq). Gunakan !llama <pesan> atau reply pesan dengan !llama',
     isAdmin: false,
     isBotAdmin: false,

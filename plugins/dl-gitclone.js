@@ -11,8 +11,8 @@ const execAsync = promisify(exec)
 const tmpDir = path.join(__dirname, '../../tmp')
 
 export const handler = {
-    command: ['gitclone', 'git'],
-    tags: ['downloader'],
+    command: ['gitclone'],
+    category: 'downloader',
     help: 'Download repository GitHub\nContoh: !gitclone https://github.com/username/repo',
     exec: async ({ sock, m, args }) => {
         try {

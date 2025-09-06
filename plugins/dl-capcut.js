@@ -1,9 +1,9 @@
 import { capcutDl } from '../lib/scraper/capcut.js';
 
 export const handler = {
-    command: ['capcut', 'cc'],
+    command: ['capcut'],
     help: 'Download template CapCut. Gunakan !capcut <url> atau reply pesan dengan !capcut',
-    tags: ['downloader'],
+    category: 'downloader',
 
     async exec({ m, args, sock }) {
         try {

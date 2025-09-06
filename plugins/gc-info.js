@@ -1,9 +1,9 @@
 import Group from '../database/models/Group.js'
 
 export const handler = {
-    command: ['ginfo', 'groupinfo', 'info'],
+    command: ['gcinfo'],
     help: 'Show group and member information',
-    tags: ['moderation'],
+    category: 'group',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
@@ -17,16 +17,16 @@ export const handler = {
             const groupId = m.chat
             const settings = await Group.getSettings(groupId)
             const groupMetadata = await sock.groupMetadata(groupId)
-            
+
             // Get member info if mentioned
             const targetJid = m.mentionedJid?.[0]
             let memberInfo = null
-            
+
             if (targetJid) {
                 const warnings = await Group.getMemberWarnings(groupId, targetJid)
                 const isBanned = await Group.isMemberBanned(groupId, targetJid)
                 const warningCount = warnings.length
-                
+
                 memberInfo = {
                     id: targetJid,
                     name: groupMetadata.participants.find(p => p.id === targetJid)?.name || 'Unknown',
@@ -73,9 +73,9 @@ ${memberInfo ? `
 • Status: ${memberInfo.isBanned ? '🚫 Banned' : '✅ Active'}
 ${memberInfo.warningHistory.length > 0 ? `
 📋 *Recent Warnings:*
-${memberInfo.warningHistory.map((w, i) => 
-    `${i + 1}. ${w.reason} (${new Date(w.warnedAt).toLocaleDateString('id-ID')})`
-).join('\n')}` : ''}` : ''}
+${memberInfo.warningHistory.map((w, i) =>
+                `${i + 1}. ${w.reason} (${new Date(w.warnedAt).toLocaleDateString('id-ID')})`
+            ).join('\n')}` : ''}` : ''}
 
 💡 *Quick Commands:*
 • \`!warn @user\` - Warn a member

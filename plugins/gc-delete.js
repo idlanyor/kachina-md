@@ -1,7 +1,7 @@
 export const handler = {
-    command: ['del', 'delete', 'd'],
+    command: ['del'],
     help: 'Menghapus pesan di grup\n\nCara penggunaan:\nReply pesan dengan !del\n\nNote: Hanya admin & owner yang dapat menggunakan perintah ini',
-    tags: ['moderation'],
+    category: 'group',
     
     isAdmin: true,
     isBotAdmin: true,

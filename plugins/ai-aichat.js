@@ -3,9 +3,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(globalThis.apiKey.gemini);
 
 export const handler = {
-    command: ['ai2'],
-    tags: ['ai'],
-    help: 'Chat sederhana dengan AI. Gunakan .ai2 <pesan> atau reply pesan dengan .ai2',
+    command: ['ai'],
+    category: 'ai',
+    help: 'Chat sederhana dengan AI. Gunakan .ai <pesan> atau reply pesan dengan .ai',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
@@ -31,7 +31,7 @@ export const handler = {
             });
 
             // Proses dengan Gemini AI
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
             const prompt = `Kamu adalah asisten AI yang friendly dan helpful. 
 

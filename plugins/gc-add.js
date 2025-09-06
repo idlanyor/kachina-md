@@ -1,7 +1,7 @@
 
 export const handler = {
     command: 'add',
-    tags: ['admin', 'group'],
+    category: 'group',
     help: 'Menambahkan member ke grup',
     isAdmin: true,
     isBotAdmin: true,

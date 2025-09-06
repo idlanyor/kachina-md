@@ -17,6 +17,11 @@ const CACHE_DURATION = 5 * 60 * 1000;
 const commandCache = new Map();
 const COMMAND_CACHE_DURATION = 5000;
 
+// Memory system untuk menyimpan percakapan
+const conversationMemory = new Map();
+const MEMORY_DURATION = 30 * 60 * 1000; // 30 menit
+const MAX_MEMORY_MESSAGES = 10; // Maksimal 10 pesan terakhir
+
 async function getAllPluginCommands() {
     const now = Date.now();
     if (pluginCache && (now - lastPluginUpdate) < CACHE_DURATION) {
@@ -68,6 +73,57 @@ const messageHistory = new Map();
 const RATE_LIMIT_DURATION = 2000;
 const MAX_RETRIES = 2;
 
+// Fungsi untuk menambah pesan ke memory
+function addToMemory(userId, role, message) {
+    if (!conversationMemory.has(userId)) {
+        conversationMemory.set(userId, {
+            messages: [],
+            lastUpdate: Date.now()
+        });
+    }
+    
+    const userMemory = conversationMemory.get(userId);
+    userMemory.messages.push({
+        role,
+        content: message,
+        timestamp: Date.now()
+    });
+    
+    // Batasi jumlah pesan dalam memory
+    if (userMemory.messages.length > MAX_MEMORY_MESSAGES) {
+        userMemory.messages = userMemory.messages.slice(-MAX_MEMORY_MESSAGES);
+    }
+    
+    userMemory.lastUpdate = Date.now();
+}
+
+// Fungsi untuk mendapatkan riwayat percakapan
+function getConversationHistory(userId) {
+    const userMemory = conversationMemory.get(userId);
+    if (!userMemory) return [];
+    
+    // Cek apakah memory masih valid (belum expired)
+    if (Date.now() - userMemory.lastUpdate > MEMORY_DURATION) {
+        conversationMemory.delete(userId);
+        return [];
+    }
+    
+    return userMemory.messages;
+}
+
+// Fungsi cleanup memory yang sudah expired
+function cleanupExpiredMemory() {
+    const now = Date.now();
+    for (const [userId, memory] of conversationMemory) {
+        if (now - memory.lastUpdate > MEMORY_DURATION) {
+            conversationMemory.delete(userId);
+        }
+    }
+}
+
+// Jalankan cleanup setiap 5 menit
+setInterval(cleanupExpiredMemory, 5 * 60 * 1000);
+
 export async function analyzeMessage(message, plugins, retryCount = 0) {
     const lastCallTime = messageHistory.get(message);
     const now = Date.now();
@@ -90,7 +146,7 @@ export async function analyzeMessage(message, plugins, retryCount = 0) {
     }
 
     try {
-        const analyzeModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const analyzeModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `Lu adalah Kanata, bot WhatsApp yang pinter banget. Lu punya fitur-fitur keren berikut:
 
@@ -182,85 +238,118 @@ PENTING: Confidence harus tinggi (>0.8) kalo mau jalanin command!`;
     }
 }
 
-export async function chatWithAI(message, plugins) {
+export async function chatWithAI(message, plugins, userId) {
     try {
-        const chatModel = genAI.getGenerativeModel({ model: '' });
+        const chatModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        
+        // Ambil riwayat percakapan
+        const history = getConversationHistory(userId);
+        
+        // Buat context dari riwayat percakapan
+        let conversationContext = '';
+        if (history.length > 0) {
+            conversationContext = '\n\nRiwayat percakapan sebelumnya:\n';
+            history.forEach((msg, index) => {
+                const role = msg.role === 'user' ? 'User' : 'Kanata';
+                conversationContext += `${role}: ${msg.content}\n`;
+            });
+            conversationContext += '\nLanjutkan percakapan berdasarkan context di atas.\n';
+        }
 
-        const prompt = `Lu adalah Kanata, bot WhatsApp yang asik dan friendly banget. Lu punya fitur-fitur keren berikut:
+        const prompt = `Lu adalah Kanata, seorang teman yang baik dan bisa dipercaya. Lu adalah sosok yang:
+- Empati dan peduli sama orang lain
+- Bisa dengerin dengan sabar tanpa menghakimi
+- Punya perspektif yang bijak tapi tetep humble
+- Supportive dan selalu ada buat temen-temen
+- Pake bahasa yang santai tapi tetep sopan
 
-${JSON.stringify(plugins, null, 2)}
+${conversationContext}
 
-Info tambahan:
-- Prefix command pake "!"
-- Ada 3 mode: public (semua bisa pake), self-private (cuma private chat & owner di grup), sama self-me (owner doang)
-- Lu punya AI buat ngertiin chat user
-- Banyak plugin keren buat macem-macem keperluan
+Pesan dari temen lu: "${message}"
 
-Pesan user: "${message}"
+Sebagai teman yang baik, tugas lu:
 
-Tugas lu:
-1. Kalo user nanya soal fitur/command:
-   - Jelasin detail tapi santai
-   - Kasih contoh yang gampang
-   - Sebutin prefix yang bener
-   - Jelasin parameter yang dibutuhin
+1. **Kalo temen lu lagi curhat atau sedih:**
+   - Dengerin dengan empati yang tulus
+   - Validasi perasaan mereka ("Wajar kok kalo lu ngerasa gitu")
+   - Jangan langsung kasih solusi, pahamin dulu situasinya
+   - Tunjukkan bahwa lu peduli dan mereka ga sendirian
+   - Kasih semangat yang realistis, bukan yang fake positive
 
-2. Kalo user nanya cara pake bot:
-   - Kasih panduan yang simpel
-   - Jelasin mode-mode yang ada
-   - Kasih contoh command basic
+2. **Kalo temen lu butuh saran:**
+   - Tanya lebih detail buat pahamin masalahnya
+   - Kasih perspektif yang berbeda tapi tetep objektif
+   - Saranin langkah kecil yang bisa diambil
+   - Ingetin kalo mereka punya kekuatan buat ngatasin masalah
 
-3. Kalo user nanya hal lain:
-   - Jawab yang asik & friendly
-   - Kasih info yang berguna
-   - Kalo bisa bantu pake command, saranin commandnya
+3. **Kalo ngobrol santai:**
+   - Jawab dengan antusias dan friendly
+   - Sharing pengalaman atau pemikiran yang relevan
+   - Tanya balik buat keep the conversation going
+   - Tetep jadi pendengar yang baik
 
-4. Kalo ada error/masalah:
-   - Jelasin masalahnya apa
-   - Kasih solusi yang gampang
-   - Saranin alternatif kalo ada
+4. **Style komunikasi lu:**
+   - Pake "gue/gw" buat diri sendiri, "lu/kamu" buat lawan bicara
+   - Bahasa gaul tapi tetep sopan dan respectful
+   - Pake emoji yang pas buat ekspresiin perasaan 😊🤗💪❤️
+   - Jangan terlalu panjang, tapi meaningful
+   - Ingat percakapan sebelumnya buat kasih respon yang personal
 
-5. Style ngobrol:
-   - Pake bahasa gaul yang asik
-   - Pake emoji yang cocok
-   - Jawab singkat tapi jelas
-   - Tetep sopan & helpful
+5. **Yang harus dihindari:**
+   - Jangan minimize perasaan orang ("Ah, biasa aja tuh")
+   - Jangan judge atau nyalahin
+   - Jangan sok tau kalo belum paham situasinya
+   - Jangan terlalu pushy kasih saran
+   - Jangan fake atau terlalu cheesy
 
-PENTING:
-- Selalu sebut diri lu sebagai "gue" atau "gw"
-- Panggil user dengan "lu" atau "kamu"
-- Pake bahasa gaul tapi tetep sopan
-- Jawab to the point, jangan bertele-tele
-- Kalo user mau jalanin command, ingetin prefix "!"
-- Kalo command butuh parameter, jelasin parameternya`;
+**PENTING:**
+- Lu cuma temen biasa, bukan konselor profesional
+- Kalo ada masalah serius (depresi berat, thoughts of self-harm), saranin mereka cari bantuan profesional
+- Fokus jadi pendengar yang baik dan teman yang supportive
+- Tetep jaga boundaries yang sehat dalam pertemanan
+- Ingat bahwa setiap orang punya cara berbeda buat cope dengan masalah`;
 
         const result = await chatModel.generateContent(prompt);
-        return result.response.text().trim();
+        const response = result.response.text().trim();
+        
+        // Simpan pesan user dan response AI ke memory
+        addToMemory(userId, 'user', message);
+        addToMemory(userId, 'assistant', response);
+        
+        return response;
     } catch (error) {
         logger.error("Error in chatWithAI:", error);
-        return "Sori bro, ada error nih. Coba lagi ntar ya!";
+        return "Sori, lagi ada gangguan nih. Coba cerita lagi ntar ya! 😅";
     }
 }
 
-export async function processMessageWithAI(message, sender) {
+export async function processMessageWithAI(message, sender, isGroup = false) {
     try {
+        // Hanya aktif di private chat
+        if (isGroup) {
+            logger.info('AI assistant disabled for group chats');
+            return null;
+        }
+        
         const plugins = await getAllPluginCommands();
        
-        // Skip processing untuk pesan pendek atau dari bot
+        // Skip processing untuk pesan pendek, dari bot, atau command eksplisit
         if (message.startsWith('!') || 
+            message.startsWith('.') ||
             message.length < 3 || 
             sender === globalThis.botNumber) {
             return null;
         }
 
-        // Rate limiting
+        // Rate limiting dengan improved logic
         const now = Date.now();
-        const lastProcessed = commandCache.get(message);
+        const cacheKey = `${sender}_${message.substring(0, 50)}`; // Include sender in cache key
+        const lastProcessed = commandCache.get(cacheKey);
         if (lastProcessed && (now - lastProcessed) < COMMAND_CACHE_DURATION) {
             logger.info("Skipping duplicate message processing");
             return null;
         }
-        commandCache.set(message, now);
+        commandCache.set(cacheKey, now);
 
         // Cleanup old cache
         for (const [key, time] of commandCache) {
@@ -269,43 +358,86 @@ export async function processMessageWithAI(message, sender) {
             }
         }
 
-        // Analisis pesan
-        const analysis = await analyzeMessage(message, plugins);
+        // Analisis pesan dengan timeout
+        const analysisPromise = analyzeMessage(message, plugins);
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('AI analysis timeout')), 10000)
+        );
+        
+        const analysis = await Promise.race([analysisPromise, timeoutPromise]);
         
         // Log untuk debugging
         logger.info(`Message analysis:`, {
-            message,
+            message: message.substring(0, 100),
             analysis
         });
 
-        // Handle hasil analisis
-        if (analysis.command === "NO_COMMAND" || analysis.reason) {
-            logger.info(`Using chat AI: ${analysis.reason || 'Not a command'}`);
-            const aiResponse = await chatWithAI(message, plugins);
+        // Handle hasil analisis dengan improved logic
+        if (analysis.command === "NO_COMMAND" || analysis.reason || analysis.confidence < 0.8) {
+            logger.info(`Using chat AI: ${analysis.reason || 'Not a command or low confidence'}`);
+            const aiResponse = await chatWithAI(message, plugins, sender);
             return {
                 command: "chat",
                 args: aiResponse
             };
         }
 
-        // Jalankan command jika confidence tinggi
-        if (analysis.confidence >= 0.8 && plugins[analysis.command.toLowerCase()]) {
-            logger.info(`Executing command: ${analysis.command}`);
+        // Validasi command exists
+        if (plugins[analysis.command.toLowerCase()]) {
+            logger.info(`Executing AI-detected command: ${analysis.command}`);
             return {
                 command: analysis.command,
                 args: analysis.args
             };
         }
 
-        // Fallback ke chat AI
-        logger.info('Falling back to chat AI');
-        const aiResponse = await chatWithAI(message, plugins);
+        // Fallback ke chat AI jika command tidak ditemukan
+        logger.info('Command not found, falling back to chat AI');
+        const aiResponse = await chatWithAI(message, plugins, sender);
         return {
             command: "chat",
             args: aiResponse
         };
     } catch (error) {
         logger.error("Error in processMessageWithAI:", error);
-        return null;
+        
+        // Fallback ke chat AI untuk error handling
+        try {
+            const plugins = await getAllPluginCommands();
+            const aiResponse = await chatWithAI(message, plugins, sender);
+            return {
+                command: "chat",
+                args: aiResponse
+            };
+        } catch (fallbackError) {
+            logger.error("Fallback chat AI also failed:", fallbackError);
+            return null;
+        }
     }
+}
+
+// Export fungsi untuk mengelola memory
+export function clearUserMemory(userId) {
+    conversationMemory.delete(userId);
+    logger.info(`Cleared conversation memory for user: ${userId}`);
+}
+
+export function getUserMemoryStats(userId) {
+    const userMemory = conversationMemory.get(userId);
+    if (!userMemory) {
+        return { messageCount: 0, lastUpdate: null };
+    }
+    
+    return {
+        messageCount: userMemory.messages.length,
+        lastUpdate: new Date(userMemory.lastUpdate).toLocaleString('id-ID')
+    };
+}
+
+export function getAllMemoryStats() {
+    return {
+        totalUsers: conversationMemory.size,
+        totalMessages: Array.from(conversationMemory.values())
+            .reduce((sum, memory) => sum + memory.messages.length, 0)
+    };
 }

@@ -6,8 +6,8 @@ import { execSync } from 'child_process';
 const groq = new Groq({ apiKey: globalThis.apiKey.groq });
 
 export const handler = {
-    command: ['tts', 'text2speech', 'suara'],
-    tags: ['ai'],
+    command: ['tts'],
+    category: 'ai',
     help: 'Text-to-speech (Groq PlayAI). Gunakan !tts <teks> atau reply pesan dengan !tts',
     isAdmin: false,
     isBotAdmin: false,

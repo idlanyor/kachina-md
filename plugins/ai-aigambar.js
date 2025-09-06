@@ -1,36 +1,37 @@
 import FormData from 'form-data';
 import axios from 'axios';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { fileTypeFromBuffer } from 'file-type';
 
 export const handler = {
     command: ['vision'],
-    tags: ['ai'],
-    help: 'Analisis gambar menggunakan AI\n\nFormat: Kirim/Reply gambar dengan caption !aigambar [pertanyaan]',
+    category: 'ai',
+    help: 'Analisis gambar menggunakan AI Gemini 2.5 Flash.\n\nFormat: Kirim/Reply gambar dengan caption .vision [pertanyaan]',
     
     async exec({ sock, m, args }) {
         try {
+            // Initialize Gemini AI
+            if (!globalThis.apiKey.gemini) {
+                throw new Error('API Key untuk Gemini tidak ditemukan. Silakan atur di globalThis.apiKey.gemini');
+            }
+            const genAI = new GoogleGenerativeAI(globalThis.apiKey.gemini);
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
             let buffer;
-            let question = args || 'gambar apa ini?';
+            let question = args || 'jelaskan gambar ini secara detail dalam bahasa indonesia.';
 
             // Add waiting reaction
             await sock.sendMessage(m.chat, {
                 react: { text: '⏳', key: m.key }
             });
 
-            // Handle different message types
-            if (m.quoted) {
-                const quotedMessage = m.quoted.message;
-                const messageType = Object.keys(quotedMessage)[0];
-                
-                if (messageType === 'imageMessage') {
-                    buffer = await m.quoted.download();
-                } else {
-                    throw new Error('Please reply to an image!');
-                }
+            // Handle different message types to get the image buffer
+            if (m.quoted && m.quoted.message && m.quoted.message.imageMessage) {
+                buffer = await m.quoted.download();
             } else if (m.message && m.message.imageMessage) {
                 buffer = await m.download();
             } else {
-                await m.reply(`🤖 *AI IMAGE ANALYZER*\n\nCara penggunaan:\n1. Kirim gambar dengan caption !aigambar [pertanyaan]\n2. Reply gambar dengan !aigambar [pertanyaan]\n\nContoh:\n!aigambar\n!aigambar apa yang ada di gambar ini?\n!aigambar jelaskan detail gambar ini`);
+                await m.reply(`🤖 *AI Vision (Gemini 2.5 Flash)*\n\nCara penggunaan:\n1. Kirim gambar dengan caption *.vision [pertanyaan]*\n2. Reply gambar dengan *.vision [pertanyaan]*\n\nContoh:\n*.vision*\n*.vision apa yang ada di gambar ini?*`);
                 return;
             }
 
@@ -44,52 +45,21 @@ export const handler = {
                 throw new Error('File harus berupa gambar!');
             }
 
-            // Upload image to catbox.moe first
-            const form = new FormData();
-            form.append('reqtype', 'fileupload');
-            form.append('fileToUpload', buffer, {
-                filename: `image.${fileType.ext}`,
-                contentType: fileType.mime
-            });
-
-            const uploadResponse = await axios.post('https://catbox.moe/user/api.php', form, {
-                headers: {
-                    ...form.getHeaders()
-                }
-            });
-
-            if (!uploadResponse.data.startsWith('https://')) {
-                throw new Error('Gagal upload gambar: ' + uploadResponse.data);
-            }
-
-            const imageUrl = uploadResponse.data;
-
-            // Generate session ID
-            const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-            // Call AI API
-            const apiUrl = 'https://api.fasturl.link/aillm/gpt-4o';
-            const params = {
-                ask: question,
-                imageUrl: imageUrl,
-                style: 'selalu balas percakapan ini dalam bahasa indonesia',
-                sessionId: sessionId
+            // Prepare image for Gemini API
+            const imagePart = {
+                inlineData: {
+                    data: buffer.toString('base64'),
+                    mimeType: fileType.mime,
+                },
             };
 
-            const aiResponse = await axios.get(apiUrl, {
-                params: params,
-                headers: {
-                    'accept': 'application/json',
-                    'x-api-key': globalThis.apiKey.fasturl
-                }
-            });
+            // Call Gemini API
+            const result = await model.generateContent([question, imagePart]);
+            const response = await result.response;
+            const text = response.text();
 
-            if (aiResponse.data.status !== 200) {
-                throw new Error('AI API error: ' + (aiResponse.data.content || 'Unknown error'));
-            }
-
-            // Format response
-            await m.reply(aiResponse.data.result);
+            // Format and send response
+            await m.reply(text);
 
             // Add success reaction
             await sock.sendMessage(m.chat, {
@@ -97,20 +67,19 @@ export const handler = {
             });
 
         } catch (error) {
-            console.error('Error in aigambar:', error);
+            console.error('Error in AI Vision:', error);
             
             let errorMessage = '❌ Gagal menganalisis gambar!';
             
-            if (error.message.includes('reply to an image')) {
-                errorMessage += '\n\n*Penyebab:* Harap reply atau kirim gambar.';
+            if (error.message.includes('reply to an image') || error.message.includes('No image detected')) {
+                errorMessage = '❌ Harap reply atau kirim gambar yang valid.';
             } else if (error.message.includes('File harus berupa gambar')) {
-                errorMessage += '\n\n*Penyebab:* File yang dikirim bukan gambar.';
-            } else if (error.message.includes('Gagal upload gambar')) {
-                errorMessage += '\n\n*Penyebab:* Gagal mengupload gambar ke server.';
-            } else if (error.message.includes('AI API error')) {
-                errorMessage += '\n\n*Penyebab:* Error dari AI service.';
+                errorMessage = '❌ File yang Anda kirim bukan format gambar yang didukung.';
+            } else if (error.message.includes('API Key')) {
+                errorMessage = `❌ ${error.message}`;
             } else {
-                errorMessage += `\n\n*Error:* ${error.message}`;
+                // General error from Gemini or elsewhere
+                errorMessage += `\n\n*Penyebab:* ${error.message || 'Terjadi kesalahan tidak diketahui.'}`;
             }
 
             await sock.sendMessage(m.chat, {

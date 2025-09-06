@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export const handler = {
-    command: ['mediafire', 'mf', 'mfire'],
+    command: ['mediafire'],
     help: 'Mendownload file dari Mediafire. Gunakan !mediafire <url> atau reply pesan dengan !mediafire',
-    tags: ['downloader'],
+    category: 'downloader',
 
     async exec({ m, args, sock }) {
         try {

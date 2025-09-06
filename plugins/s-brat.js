@@ -3,7 +3,7 @@ import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 
 export const handler = {
     command: ['brat'],
-    tags: ['downloader'],
+    category:'sticker',
     help: 'Generate gambar/brat text dengan berbagai template dan style.\nContoh: !brat text=Halo template=matrix style=mirror mode=animated fontPosition=top-center',
     exec: async ({ sock, m, args }) => {
         try {

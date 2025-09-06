@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export const handler = {
-    command: ['chord', 'chords', 'kunci'],
+    command: ['chord'],
+    category:'search',
     help: 'Mencari chord/kunci gitar lagu. Gunakan !chord <judul lagu> atau reply pesan dengan !chord',
-    tags: ['search'],
 
     async exec({ m, args, sock }) {
         try {

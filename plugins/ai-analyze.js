@@ -2,7 +2,7 @@ import { analyzeMessage, getAllPluginCommands } from '../helper/gemini.js';
 
 export const handler = {
     command: ['analyze'],
-    tags: ['ai'],
+    category: 'ai',
     help: 'Analisis pesan dan sarankan command yang tepat. Gunakan !analyze <pesan> atau reply pesan dengan !analyze',
     isAdmin: false,
     isBotAdmin: false,

@@ -1,7 +1,7 @@
 import axios from 'axios'
 export const handler = {
-    command: ['sp', 'spotify'],
-    tags: ['downloader'],
+    command: ['spotify'],
+    category: 'downloader',
     help: 'Mencari dan memutar lagu dari Spotify\n*Contoh:* !play JKT48 Heavy Rotation',
     exec: async ({ sock, m, args }) => {
         try {

@@ -1,25 +1,35 @@
-import Database from '../helper/database.js'
 
 export const handler = {
     command: 'tagall',
-    tags: ['admin', 'group'],
+    category: 'group',
     help: 'Tag semua anggota group',
     isAdmin: true,
-    isBotAdmin: false,
+    isBotAdmin: true,
     isOwner: false,
     isGroup: true,
     exec: async ({ sock, m, id, args }) => {
         try {
-            const group = await m.getGroup()
+            const group = await m.groupMetadata
             
-            let teks = args ? args + '\n\n' : '\n'
-            for (let member of group.members) {
-                teks += `@${member.split('@')[0]}\n`
+            // Ambil semua participants dari group
+            const participants = group.participants || []
+            
+            // Ambil sender info
+            const themeemoji = '🌿' // Default theme emoji
+            
+            let teks = `╚»˙·٠${themeemoji}●♥ Tag All ♥●${themeemoji}٠·˙«╝ \n\n`
+            teks += ` 😶 *penanda :*  ${m.pushName || 'YNTKTS'}\n`
+            teks += ` 🌿 *Isi pesan : ${args ? args : 'tidak ada pesan'}*\n\n`
+            
+            // Loop through participants
+            console.log(group)
+            for (let mem of participants) {
+                teks += `${themeemoji} @${mem.lid.split('@')[0]}\n`
             }
 
             await sock.sendMessage(id, {
                 text: teks,
-                mentions: group.members
+                mentions: participants.map(a => a.lid)
             }, { quoted: m })
 
         } catch (error) {

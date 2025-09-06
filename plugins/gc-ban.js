@@ -1,9 +1,9 @@
 import Group from '../database/models/Group.js'
 
 export const handler = {
-    command: ['ban', 'block'],
+    command: ['ban'],
     help: 'Ban a member from the group',
-    tags: ['moderation'],
+    category: 'group',
     isAdmin: true,
     isBotAdmin: true,
     isOwner: false,

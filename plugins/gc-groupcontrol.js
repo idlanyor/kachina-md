@@ -1,6 +1,6 @@
 export const handler = {
-    command: ['open', 'close', 'buka', 'tutup'],
-    tags: ['group'],
+    command: ['open', 'close'],
+    category:'group',
     help: 'Buka atau tutup grup',
     isGroup: true,
     isAdmin: true,

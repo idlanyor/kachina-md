@@ -1,8 +1,8 @@
 import User from '../database/models/User.js'
 
 export const handler = {
-    command: ['useradmin', 'adminuser', 'usermod'],
-    tags: ['owner'],
+    command: ['adm'],
+    category: 'owner',
     help: 'Admin user management commands',
     isAdmin: false,
     isBotAdmin: false,

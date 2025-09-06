@@ -179,9 +179,9 @@ async function translate(text, targetLang = 'id', sourceLang = 'auto') {
 }
 
 export const handler = {
-    command: ['tr', 'tl', 'translate'],
+    command: ['translate'],
     help: 'Menerjemahkan teks ke berbagai bahasa. Gunakan !tr <kode_bahasa> <teks> atau reply pesan dengan !tr <kode_bahasa>',
-    tags: ['tools'],
+   category:'tools',
 
     async exec({ m, args, sock }) {
         try {

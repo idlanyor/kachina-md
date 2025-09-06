@@ -3,7 +3,7 @@ import util from 'util';
 export const handler = {
     command: ['>'],
     help: 'Evaluasi kode JavaScript (Aman)\n\nCara penggunaan:\n> <kode>\n\nContoh:\n> 1 + 1\n> Math.max(1, 2, 3)',
-    tags: ['owner'],
+   category: 'owner',
     
     isOwner: true,
     

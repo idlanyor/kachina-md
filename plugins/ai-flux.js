@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 export const handler = {
     command: ['flux'],
-    tags: ['ai'],
+    category: 'ai',
     help: 'Generate gambar menggunakan Flux AI. Gunakan !flux <prompt> atau reply pesan dengan !flux',
     isAdmin: false,
     isBotAdmin: false,

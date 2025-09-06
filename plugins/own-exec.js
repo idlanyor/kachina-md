@@ -8,7 +8,7 @@ const isWindows = platform() === 'win32';
 export const handler = {
     command: ['$'],
     help: 'Execute shell commands (Limited)\n\nUsage:\n$ <command>\n\nExamples:\n$ dir\n$ echo Hello\n$ systeminfo',
-    tags: ['owner'],
+    category: 'owner',
     
     isOwner: true,
     

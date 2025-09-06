@@ -2,8 +2,8 @@ import yts from 'yt-search'
 import { proto, prepareWAMessageMedia, generateWAMessageFromContent } from 'baileys'
 
 export const handler = {
-    command: ['yts', 'ytsearch'],
-    tags: ['downloader'],
+    command: ['ytsearch'],
+    category: 'downloader',
     help: 'Mencari video di YouTube\n\nFormat: !yts <query>',
     isAdmin: false,
     isBotAdmin: false,
@@ -61,12 +61,12 @@ export const handler = {
                                 buttonParamsJson: `{"display_text":"🎥 Tonton Video","url":"${videoUrl}"}`
                             },
                             {
-                                name: "quick_reply",
-                                buttonParamsJson: `{"display_text":"📺 Download Video","id":"playv ${videoUrl}"}`
+                                name: "cta_copy",
+                                buttonParamsJson: `{"display_text":"📺 Download Video","id":"playv ${videoUrl}","copy_code":"playv ${videoUrl}"}`
                             },
                             {
-                                name: "quick_reply",
-                                buttonParamsJson: `{"display_text":"🎵 Download Audio","id":"play ${videoUrl}"}`
+                                name: "cta_copy",
+                                buttonParamsJson: `{"display_text":"🎵 Download Audio","id":" ${videoUrl}","copy_code":"play ${videoUrl}"}`
                             }
                         ]
                     })

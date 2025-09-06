@@ -2,7 +2,7 @@ import Database from "../helper/database.js";
 
 export const handler = {
     command: 'setwelcome',
-    tags: ['group'],
+    category: 'group',
     help: 'Set pesan sambutan custom grup',
     isGroup: true,
     isAdmin: true,

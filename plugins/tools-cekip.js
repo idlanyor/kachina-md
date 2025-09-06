@@ -2,7 +2,7 @@ import os from 'os'
 
 export const handler = {
     command: 'cekip',
-    tags: ['hidden'],
+    category:'tools',
     help: 'Cek IP Host',
     isAdmin: false,
     isBotAdmin: false,

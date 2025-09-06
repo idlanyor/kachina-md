@@ -1,0 +1,49 @@
+import { clearUserMemory, getUserMemoryStats, getAllMemoryStats } from '../helper/gemini.js';
+
+export const handler = {
+    command: ['memory', 'ai-memory', 'chat-memory'],
+    tags: ['ai'],
+    help: 'Kelola memory percakapan AI\n\nFormat:\n!memory - Lihat stats memory\n!memory clear - Hapus memory percakapan\n!memory stats - Lihat stats global (owner only)',
+    category: 'ai',
+    isAdmin: false,
+    isBotAdmin: false,
+    isOwner: false,
+    isGroup: false,
+    exec: async ({ m, args, sock }) => {
+        try {
+            const action = args.toLowerCase();
+            
+            if (action === 'clear') {
+                clearUserMemory(m.sender);
+                await m.reply('✅ *Memory Cleared*\n\nRiwayat percakapan AI telah dihapus. Percakapan selanjutnya akan dimulai dari awal.');
+                return;
+            }
+            
+            if (action === 'stats' && await m.isOwner()) {
+                const globalStats = getAllMemoryStats();
+                await m.reply(`📊 *Global Memory Stats*\n\n👥 Total Users: ${globalStats.totalUsers}\n💬 Total Messages: ${globalStats.totalMessages}`);
+                return;
+            }
+            
+            // Default: show user memory stats
+            const userStats = getUserMemoryStats(m.sender);
+            let response = `🧠 *AI Memory Stats*\n\n`;
+            
+            if (userStats.messageCount === 0) {
+                response += `📝 Belum ada riwayat percakapan\n\n💡 Mulai chat dengan AI untuk membangun memory percakapan!`;
+            } else {
+                response += `📝 Pesan tersimpan: ${userStats.messageCount}/10\n`;
+                response += `🕒 Update terakhir: ${userStats.lastUpdate}\n\n`;
+                response += `💡 Tips:\n• Memory akan expired dalam 30 menit jika tidak ada aktivitas\n• Gunakan !memory clear untuk reset percakapan`;
+            }
+            
+            await m.reply(response);
+            
+        } catch (error) {
+            console.error('Error in memory command:', error);
+            await m.reply('❌ Terjadi kesalahan saat mengelola memory.');
+        }
+    }
+};
+
+export default handler;

@@ -2,7 +2,7 @@ import Database from '../helper/database.js'
 
 export const handler = {
     command: ['groupset', 'setgroup', 'settings'],
-    tags: ['group'],
+    category: 'group',
     help: 'Mengatur fitur grup (welcome/leave/antispam/antipromosi/antilink/antitoxic)',
     isGroup: true,
     isAdmin: true,
@@ -10,7 +10,7 @@ export const handler = {
     exec: async ({ sock, m, args }) => {
         try {
             const group = await Database.getGroup(m.chat)
-            
+
             if (!args) {
                 const status = `╭─「 *GROUP SETTINGS* 」
 ├ 👋 *Welcome:* ${group.welcome ? '✅' : '❌'}
@@ -53,7 +53,7 @@ export const handler = {
             }
 
             const [feature, state] = args.toLowerCase().split(' ')
-            
+
             if (!['welcome', 'leave', 'antispam', 'antipromote', 'antilink', 'antitoxic'].includes(feature)) {
                 await m.reply('❌ Fitur tidak valid!')
                 return

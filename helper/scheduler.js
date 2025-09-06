@@ -25,8 +25,8 @@ class AutoNotification {
             this.scheduledJobs.get('daily_12pm').destroy();
         }
 
-        // Cron job untuk jam 01.00 setiap hari (0 01 * * *)
-        const job = cron.schedule('0 01 * * *', async () => {
+        // Cron job untuk jam 06.30 setiap hari (0 07 * * *)
+        const job = cron.schedule('0 07 * * *', async () => {
             await this.sendDailyAnimeNotification();
         }, {
             scheduled: true,

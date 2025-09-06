@@ -2,7 +2,7 @@ import { vcard } from "../lib/owner/ownerContact.js"
 
 export const handler = {
     command: 'owner',
-    tags: ['tools'],
+   category:'ingfo',
     help: 'Menampilkan kontak owner bot',
     isAdmin: false,
     isBotAdmin: false,

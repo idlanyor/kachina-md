@@ -1,9 +1,9 @@
 import { cacheGroupMetadata } from '../helper/caching.js';
 
 export const handler = {
-    command: ['getpp', 'getppgc'],
+    command: ['getpp','getppgc'],
+    category:'tools',
     help: 'Mendapatkan foto profil\n\nPerintah:\n!getpp [@user] - Mendapatkan foto profil user\n!getppgc - Mendapatkan foto profil grup',
-    tags: ['tools'],
     
     async exec({ m, args, sock }) {
         try {

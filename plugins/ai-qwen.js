@@ -1,7 +1,7 @@
 export const handler = {
-    command: ['qw'],
-    help: 'Bertanya ke Qwen AI\n\nCara penggunaan:\n!qw <pertanyaan>\n\nContoh:\n!qw Siapa presiden Indonesia?',
-    tags: ['tools'],
+    command: ['qwenai'],
+    help: 'Bertanya ke Qwen AI\n\nCara penggunaan:\n!qwenai <pertanyaan>\n\nContoh:\n!qwenai Siapa presiden Indonesia?',
+    category: 'ai',
     
     async exec({ m, args, sock }) {
         try {

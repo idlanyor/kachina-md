@@ -1,9 +1,9 @@
 import Group from '../database/models/Group.js'
 
 export const handler = {
-    command: ['unban', 'unblock'],
+    command: ['unban'],
+    category: 'group',
     help: 'Unban a member from the group',
-    tags: ['moderation'],
     isAdmin: true,
     isBotAdmin: true,
     isOwner: false,

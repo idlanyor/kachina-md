@@ -2,7 +2,7 @@ import Database from '../helper/database.js'
 
 export const handler = {
     command: ['self', 'switch'],
-    tags: ['owner'],
+    category: 'owner',
     help: 'Mengubah mode bot (public/self-private/self-me)',
     isOwner: true,
     exec: async ({ sock, m, args }) => {

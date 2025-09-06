@@ -33,14 +33,19 @@ export function addMessageHandler(m, sock) {
     m.isAdmin = m.isGroup ? (
         async () => {
             const metadata = await m.groupMetadata;
-            return metadata?.participants?.find(p => p.id === m.sender)?.admin !== null;
+            // console.log('isAdmin',m.key?.participant)
+
+            return metadata?.participants?.find(p =>{
+                // console.log('isAdmin',p)
+                return p.jid === m.key.participant
+            })?.admin !== null;
+
         }
     )() : false;
 
     m.quoted = null;
     if (m.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
         const quotedMsg = m.message.extendedTextMessage.contextInfo.quotedMessage;
-
         // Cek jika quoted message adalah view once
         const viewOnceMsg = quotedMsg?.viewOnceMessageV2?.message;
         const actualMsg = viewOnceMsg || quotedMsg;

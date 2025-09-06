@@ -1,0 +1,241 @@
+import { downloadMediaMessage } from 'baileys'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+export const handler = {
+    command: ['jadianime', 'anime'],
+    tags: ['ai', 'image'],
+    help: 'Mengkonversi foto menjadi anime\n\nCara pakai:\n1. Reply gambar dengan !jadianime\n2. Kirim gambar dengan caption !jadianime',
+    exec: async ({ sock, m, args }) => {
+        try {
+            let quotedMsg
+            
+            // Check if message is quoted
+            if (m.quoted) {
+                quotedMsg = m.quoted
+            } else if (m.message?.imageMessage) {
+                quotedMsg = m
+            } else {
+                await m.reply('❌ Reply gambar yang ingin dikonversi menjadi anime!')
+                return
+            }
+
+            // Validate if it's an image
+            if (!quotedMsg.message?.imageMessage) {
+                await m.reply('❌ Pesan yang di-reply bukan gambar!')
+                return
+            }
+
+            // Add waiting reaction
+            await sock.sendMessage(m.chat, {
+                react: { text: '⏱️', key: m.key }
+            })
+
+            // Import required modules
+            const axios = (await import('axios')).default
+            const FormData = (await import('form-data')).default
+            const Websocket = (await import('ws')).default
+            const crypto = await import('node:crypto')
+            const mime = (await import('mime-types')).default
+
+            // WebSocket and API configuration
+            const WS_URL = "wss://pixnova.ai/demo-photo2anime/queue/join"
+            const IMAGE_URL = "https://oss-global.pixnova.ai/"
+            const SESSION = crypto.randomBytes(5).toString("hex").slice(0, 9)
+            let wss
+            let promise
+
+            function _connect(log) {
+                return new Promise((resolve, reject) => {
+                    wss = new Websocket(WS_URL)
+                    wss.on("open", () => {
+                        console.log("[ INFO ] Koneksi ke websocket tersambung.")
+                        resolve()
+                    })
+                    wss.on("error", error => {
+                        console.error("[ ERROR ] " + error)
+                        reject(error)
+                    })
+                    wss.on("message", chunk => {
+                        const data = JSON.parse(chunk.toString())
+                        if (promise && promise.once) {
+                            promise.call(data)
+                            promise = null
+                        } else if (promise && !promise.once) {
+                            if (log) {
+                                console.log(data)
+                            }
+                            if (data?.code && data.code == 200 && data?.success && data.success == true) {
+                                let amba = data
+                                amba.output.result.forEach((_, i) => {
+                                    amba.output.result[i] = IMAGE_URL + amba.output.result[i]
+                                })
+                                promise.call(amba)
+                                promise = null
+                            }
+                        }
+                    })
+                })
+            }
+
+            function _send(payload, pr) {
+                return new Promise(resolve => {
+                    wss.send(JSON.stringify(payload))
+                    if (pr) {
+                        promise = {
+                            once: true,
+                            call: resolve
+                        }
+                    } else {
+                        promise = {
+                            once: false,
+                            call: resolve
+                        }
+                    }
+                })
+            }
+
+            async function PixNova(data, image, log) {
+                let base64Image
+                if (/https\:\/\/|http\:\/\//i.test(image)) {
+                    const gs = await fetch(image)
+                    const kb = await gs.arrayBuffer()
+                    base64Image = Buffer.from(kb).toString("base64")
+                } else if (Buffer.isBuffer(image)) {
+                    base64Image = image.toString("base64")
+                } else {
+                    base64Image = image
+                }
+                await _connect(log)
+                let payload = {
+                    session_hash: SESSION
+                }
+                const resp = await _send(payload, true)
+                if (log) {
+                    console.log(`[ ${SESSION} ] Hash: ${JSON.stringify(resp, null, 2)}`)
+                }
+                payload = {
+                    data: {
+                        source_image: `data:image/jpeg;base64,${base64Image}`,
+                        strength: data?.strength || 0.6,
+                        prompt: data.prompt,
+                        negative_prompt: data.negative,
+                        request_from: 2
+                    }
+                }
+                const out = await _send(payload, false)
+                return out
+            }
+
+            async function pomf2(filePath) {
+                try {
+                    if (!fs.existsSync(filePath)) {
+                        throw new Error("File tidak ditemukan")
+                    }
+                    const contentType = mime.lookup(filePath) || "application/octet-stream"
+                    const fileName = path.basename(filePath)
+                    const form = new FormData()
+                    form.append("files[]", fs.createReadStream(filePath), {
+                        contentType,
+                        filename: fileName
+                    })
+                    const response = await axios.post("https://qu.ax/upload.php", form, {
+                        headers: {
+                            ...form.getHeaders()
+                        }
+                    })
+
+                    // Check result
+                    if (!response.data.success || !response.data.files?.length) {
+                        throw new Error("Upload gagal")
+                    }
+                    return response.data.files[0].url
+                } catch (err) {
+                    console.error("Error:", err.message)
+                    return null
+                }
+            }
+
+            // Download and save media
+            const buffer = await downloadMediaMessage(
+                quotedMsg,
+                'buffer',
+                {},
+                { logger: console }
+            )
+
+            if (!buffer) {
+                await sock.sendMessage(m.chat, {
+                    react: { text: '❌', key: m.key }
+                })
+                await m.reply('❌ Gagal download media!')
+                return
+            }
+
+            // Save buffer to temporary file
+            const tempDir = path.join(__dirname, '../temp')
+            if (!fs.existsSync(tempDir)) {
+                fs.mkdirSync(tempDir, { recursive: true })
+            }
+            
+            const tempFile = path.join(tempDir, `jadianime_${Date.now()}.jpg`)
+            fs.writeFileSync(tempFile, buffer)
+
+            // Upload image
+            const IMAGE = await pomf2(tempFile)
+            
+            // Clean up temp file
+            fs.unlinkSync(tempFile)
+            
+            if (!IMAGE) {
+                await sock.sendMessage(m.chat, {
+                    react: { text: '❌', key: m.key }
+                })
+                await m.reply('❌ Gagal upload gambar!')
+                return
+            }
+
+            console.log('Image URL:', IMAGE)
+
+            const LOGGER = true // Show process logs
+            const DATA = {
+                prompt: "(masterpiece), best quality",
+                negative: "(worst quality, low quality:1.4), (greyscale, monochrome:1.1), cropped, lowres , username, blurry, trademark, watermark, title, multiple view, Reference sheet, curvy, plump, fat, strabismus, clothing cutout, side slit,worst hand, (ugly face:1.2), extra leg, extra arm, bad foot, text, name",
+                strength: 0.6
+            }
+
+            const result = await PixNova(DATA, IMAGE, LOGGER)
+            
+            if (result?.output?.result) {
+                await sock.sendMessage(m.chat, {
+                    react: { text: '✅', key: m.key }
+                })
+                
+                await sock.sendMessage(m.chat, {
+                    image: { url: result.output.result },
+                    caption: `✨ *Sukses Membuat Jadianime*\n\n🎨 *Prompt:* ${DATA.prompt}\n⚡ *Strength:* ${DATA.strength}\n🔄 *Session:* ${SESSION}`
+                }, { quoted: m })
+                
+                console.log('Result:', JSON.stringify(result, null, 2))
+            } else {
+                await sock.sendMessage(m.chat, {
+                    react: { text: '❌', key: m.key }
+                })
+                await m.reply('❌ Gagal memproses gambar menjadi anime!')
+            }
+
+        } catch (error) {
+            console.error('Error in jadianime:', error)
+            await sock.sendMessage(m.chat, {
+                react: { text: '❌', key: m.key }
+            })
+            await m.reply(`❌ Terjadi kesalahan: ${error.message}`)
+        }
+    }
+}
+
+export default handler

@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 export const handler = {
-    command: ['threads', 'td'],
-    tags: ['downloader'],
+    command: ['threads'],
+    category: 'downloader',
     help: 'Download video from Threads',
     isAdmin: false,
     isBotAdmin: false,

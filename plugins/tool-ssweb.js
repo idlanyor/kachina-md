@@ -7,9 +7,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export const handler = {
-    command: ['ssweb', 'ss', 'screenshot'],
+    command: ['ssweb'],
     help: 'Screenshot website dengan pilihan tampilan desktop/tablet/mobile. Gunakan !ssweb <url> [device]',
-    tags: ['tools'],
+    category:'tools',
 
     async exec({ m, args, sock }) {
         try {

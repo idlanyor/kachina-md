@@ -1,9 +1,9 @@
 export const handler = {
     command: 'promote',
-    tags: ['admin', 'group'],
+    category: 'group',
     help: 'Menaikkan pangkat anggota grup menjadi Admin',
     isAdmin: true,
-    isBotAdmin: true, 
+    isBotAdmin: true,
     isOwner: false,
     isGroup: true,
     exec: async ({ sock, m, id, args }) => {

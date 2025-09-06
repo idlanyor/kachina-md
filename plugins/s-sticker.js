@@ -2,7 +2,7 @@ import { createSticker, StickerTypes } from "wa-sticker-formatter"
 
 export const handler = {
     command: ['sticker', 's'],
-    tags: ['converter'],
+    category:'sticker',
     help: 'Membuat sticker dari gambar/video',
     exec: async ({ sock, m }) => {
         try {

@@ -2,8 +2,8 @@ import axios from 'axios'
 import yts from 'yt-search'
 
 export const handler = {
-    command: ['play', 'yta','ymd'],
-    tags: ['downloader'],
+    command: ['play'],
+    category:'downloader',
     help: 'Download video YouTube',
     isAdmin: false,
     isBotAdmin: false,

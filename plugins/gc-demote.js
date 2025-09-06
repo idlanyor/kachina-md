@@ -1,6 +1,6 @@
 export const handler = {
     command: 'demote',
-    tags: ['admin', 'group'],
+    category:'group',
     help: 'Menurunkan pangkat anggota grup dari Admin',
     isAdmin: true,
     isBotAdmin: true,

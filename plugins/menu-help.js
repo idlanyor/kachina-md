@@ -1,62 +1,33 @@
 import { fileURLToPath } from 'url'
 import path from 'path'
 import fs from 'fs'
-import pkg from 'baileys'
-const { proto, generateWAMessageFromContent } = pkg
+import { pathToFileURL } from 'url'
+import Database from '../helper/database.js'
+import figlet from 'figlet' // ← tambah impor Figlet
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Fungsi untuk mencari file JS - hanya dari direktori utama
+// Fungsi untuk mencari file JS - hanya di folder plugins
 function findJsFiles(dir) {
     let results = []
     const list = fs.readdirSync(dir)
+
     list.forEach(file => {
         const filePath = path.join(dir, file)
         const stat = fs.statSync(filePath)
 
-        // Hanya ambil file .js dari direktori utama, tidak rekursif ke subfolder
-        if (stat && stat.isFile() && file.endsWith('.js')) {
+        if (stat && stat.isFile() && file.endsWith('.js') && !file.startsWith('menu-help')) {
+            // Hanya ambil file JS, exclude file menu-help.js sendiri
             results.push(filePath)
         }
+        // Hapus bagian rekursif ke subfolder
     })
     return results
 }
 
-// Ambil case dari main.js
-function getMainCases() {
-    try {
-        const mainPath = path.join(__dirname, '../../main.js')
-        const mainContent = fs.readFileSync(mainPath, 'utf8')
-
-        // Cari case dalam switch statement
-        const switchMatch = mainContent.match(/switch\s*\([^)]+\)\s*{([^}]+)}/s)
-        if (!switchMatch) return []
-
-        const caseMatches = switchMatch[1].match(/case\s+['"]([^'"]+)['"]/g)
-        if (!caseMatches) return []
-
-        return caseMatches.map(caseStr => {
-            const cmd = caseStr.match(/case\s+['"]([^'"]+)['"]/)[1]
-            // Cari deskripsi dalam komentar di atas case (jika ada)
-            const caseIndex = mainContent.indexOf(caseStr)
-            const beforeCase = mainContent.substring(0, caseIndex)
-            const commentMatch = beforeCase.match(/\/\/\s*([^\n]+)\s*\n\s*$/);
-            const description = commentMatch ? commentMatch[1] : 'Tidak ada deskripsi'
-
-            return {
-                command: cmd,
-                help: description
-            }
-        })
-    } catch (error) {
-        console.error('Error reading main.js:', error)
-        return []
-    }
-}
-
 export const handler = {
     command: ['help', 'h', 'menu'],
-    tags: ['info'],
+    category: 'info',
     help: 'Menampilkan menu bantuan',
     isAdmin: false,
     isBotAdmin: false,
@@ -64,75 +35,92 @@ export const handler = {
     isGroup: false,
     exec: async ({ sock, m, args, noTel, sender }) => {
         try {
-            const pluginsDir = path.join(__dirname, '../')
-            const categories = {
-                'main': [], // Kategori untuk case dari main.js dan plugin langsung
+            const botName = globalThis.botName || 'Kanata Bot'
+            const owner = globalThis.owner || 'Roy'
+            const prefix = '.'
+            const settings = await Database.getSettings()
+
+            // Emoji dan deskripsi mode
+            const modeEmoji = {
+                'public': '📢',
+                'self-private': '👤',
+                'self-me': '👑'
             }
 
-            // Tambahkan case dari main.js
-            const mainCases = getMainCases()
-            categories['main'] = mainCases.map(c => ({
-                commands: [c.command],
-                help: c.help,
-                tags: ['main'],
-                isAdmin: false,
-                isBotAdmin: false,
-                isOwner: false,
-                isGroup: false
-            }))
+            const modeDesc = {
+                'public': 'Semua bisa menggunakan',
+                'self-private': 'Private chat & owner di grup',
+                'self-me': 'Hanya owner'
+            }
 
-            // Load plugin commands langsung dari folder plugins
+            // Ambil plugin commands - hanya dari folder plugins
+            const pluginsDir = __dirname // Langsung gunakan __dirname karena sudah di folder plugins
+            const categories = {}
+
+            // Load plugin commands
             const pluginFiles = findJsFiles(pluginsDir)
             for (const file of pluginFiles) {
                 try {
-                    const plugin = await import('file://' + file)
+                    const plugin = await import(pathToFileURL(file).href)
                     if (!plugin.handler) continue
 
-                    categories['main'].push({
-                        commands: Array.isArray(plugin.handler.command) ?
-                            [plugin.handler.command[0]] : // Ambil command pertama saja jika array
-                            [plugin.handler.command],
+                    // Gunakan handler.category atau 'main' sebagai default
+                    const category = plugin.handler.category || 'main'
+                    if (category.toUpperCase() === 'HIDDEN') continue
+
+                    if (!categories[category]) {
+                        categories[category] = []
+                    }
+
+                    const commands = Array.isArray(plugin.handler.command) ?
+                        plugin.handler.command :
+                        [plugin.handler.command]
+
+                    categories[category].push({
+                        commands,
                         help: plugin.handler.help || 'Tidak ada deskripsi',
-                        tags: plugin.handler.tags || [],
-                        isAdmin: plugin.handler.isAdmin,
-                        isBotAdmin: plugin.handler.isBotAdmin,
-                        isOwner: plugin.handler.isOwner,
-                        isGroup: plugin.handler.isGroup
+                        tags: plugin.handler.tags || []
                     })
                 } catch (err) {
                     console.error(`Error loading plugin ${file}:`, err)
                 }
             }
 
-            // Jika ada args (dari klik list), tampilkan detail command
+            // Jika ada args, tampilkan detail command
             if (args) {
                 const searchCmd = args.toLowerCase()
                 let found = false
 
                 for (const [category, plugins] of Object.entries(categories)) {
                     for (const plugin of plugins) {
-                        const cmdList = Array.isArray(plugin.commands) ?
-                            [plugin.commands[0]] : // Ambil command pertama saja jika array
-                            [plugin.commands]
+                        if (plugin.commands.includes(searchCmd)) {
+                            const categoryIcons = {
+                                'main': '⚡',
+                                'ai': '🤖',
+                                'converter': '🔄',
+                                'downloader': '📥',
+                                'group': '👥',
+                                'hidden': '🔒',
+                                'misc': '🛠️',
+                                'moderation': '🛡️',
+                                'owner': '👑',
+                                'search': '🔍',
+                                'sticker': '🎯',
+                                'tools': '⚙️',
+                                'game': '🎮',
+                                'religi': '🕌'
+                            }
 
-                        if (cmdList.includes(searchCmd)) {
                             const icon = categoryIcons[category] || '📁'
                             let detailMenu = `╭─「 📚 COMMAND DETAIL 」\n` +
-                                `├ Command: !${cmdList[0]}\n` +
+                                `├ Command: ${prefix}${searchCmd}\n` +
                                 `├ Description: ${plugin.help}\n` +
                                 `├ Category: ${icon} ${category.toUpperCase()}\n` +
                                 `├ Tags: ${plugin.tags?.join(', ') || '-'}\n` +
-                                `│\n` +
-                                `├ 📋 *REQUIREMENTS:*\n` +
-                                `├ ${plugin.isAdmin ? '✅' : '❌'} Admin Group\n` +
-                                `├ ${plugin.isBotAdmin ? '✅' : '❌'} Bot Admin\n` +
-                                `├ ${plugin.isOwner ? '✅' : '❌'} Owner Bot\n` +
-                                `├ ${plugin.isGroup ? '✅' : '❌'} In Group\n` +
-                                `│\n` +
-                                `├ 💡 *USAGE:*\n` +
-                                `├ !${cmdList[0]} <parameter>\n` +
-                                `├ Reply: !${cmdList[0]}\n` +
-                                `╰──────────────────`
+                                `╰──────────────────\n\n` +
+                                `💡 *Tips:*\n` +
+                                `• Ketik ${prefix}menu untuk kembali ke menu utama\n` +
+                                `• Channel: https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m`
 
                             await m.reply(detailMenu)
                             found = true
@@ -142,13 +130,16 @@ export const handler = {
                     if (found) break
                 }
 
-                // if (!found) {
-                //     await m.reply(`❌ Command "${args}" not found`)
-                // }
-                // return
+                if (!found) {
+                    await m.reply(`❌ Command "${args}" tidak ditemukan`)
+                }
+                return
             }
 
-            // Kategorisasi yang lebih baik
+            // --- List message per kategori ---
+            const sections = []
+            let totalCommands = 0
+
             const categoryIcons = {
                 'main': '⚡',
                 'ai': '🤖',
@@ -161,100 +152,97 @@ export const handler = {
                 'owner': '👑',
                 'search': '🔍',
                 'sticker': '🎯',
-                'tools': '⚙️'
+                'tools': '⚙️',
+                'game': '🎮',
+                'religi': '🕌'
             }
 
-            // Urutan kategori yang diinginkan
             const categoryOrder = [
                 'main', 'ai', 'downloader', 'search', 'converter',
-                'sticker', 'tools', 'group', 'moderation', 'misc', 'owner', 'hidden'
+                'sticker', 'tools', 'group', 'moderation', 'game',
+                'misc', 'owner'
             ]
-
             let menuText = ''
-            let totalCommands = 0
 
-            // Iterasi setiap kategori sesuai urutan
-            for (const category of categoryOrder) {
+            const orderedCategories = categoryOrder.filter(c => categories[c])
+                .concat(Object.keys(categories).filter(c => !categoryOrder.includes(c)))
+
+            for (const category of orderedCategories) {
                 const plugins = categories[category]
                 if (!plugins || plugins.length === 0 || category.toUpperCase() === 'HIDDEN') continue
 
                 const icon = categoryIcons[category] || '📁'
-                const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
+                const rows = []
 
-                menuText += `\n╭─「 ${icon} ${categoryName.toUpperCase()} 」\n`
-
-                // Tambahkan setiap command dengan format yang lebih rapi
-                for (let i = 0; i < plugins.length; i++) {
-                    const plugin = plugins[i]
-                    const cmdList = Array.isArray(plugin.commands) ?
-                        [plugin.commands[0]] :
-                        plugin.commands
-
-                    const isLast = i === plugins.length - 1
-                    const prefix = isLast ? '└─' : '├─'
-                    const subPrefix = isLast ? '   ' : '│  '
-
-                    menuText += `${prefix} .${cmdList[0]}\n`
-                    totalCommands++
+                for (const plugin of plugins) {
+                    for (const cmd of plugin.commands) {
+                        rows.push({
+                            title: `${cmd}`.toUpperCase(),
+                            description: plugin.help,
+                            id: `${cmd}`
+                        })
+                        totalCommands++
+                    }
                 }
 
-                menuText += '╰──────────────────\n'
+                if (rows.length) {
+                    sections.push({
+                        title: `${icon} ${category.toUpperCase()}`,
+                        rows
+                    })
+                }
             }
 
-            const time = new Date()
-            const hours = time.getHours()
-            let greeting = ''
-            if (hours >= 4 && hours < 11) greeting = 'Pagi'
-            else if (hours >= 11 && hours < 15) greeting = 'Siang'
-            else if (hours >= 15 && hours < 18) greeting = 'Sore'
-            else greeting = 'Malam'
+            const hour = new Date().getHours()
+            const greeting = hour >= 4 && hour < 11 ? 'Pagi' : hour < 15 ? 'Siang' : hour < 18 ? 'Sore' : 'Malam'
 
-            // Footer dengan informasi tambahan
-            const footer = `\n📊 *STATISTIK MENU*
-├ Total Kategori: ${Object.keys(categories).filter(cat => categories[cat] && categories[cat].length > 0).length}
-├ Total Commands: ${totalCommands}
-├ Prefix: .
-├ Mode: ${globalThis.botMode || 'Public'}
-╰──────────────────
+            const footer = `📊 Total Kategori: ${sections.length}\n` +
+                `📌 Total Commands: ${totalCommands}\n` +
+                `⚙️ Prefix: ${prefix}\n` +
+                `🔰 Mode: ${settings.botMode}`
+            // Build menu text with categories and commands
+            for (const [category, plugins] of Object.entries(categories)) {
+                if (plugins.length === 0) continue
 
-💡 *TIPS PENGGUNAAN*
-├ Ketik !help <command> untuk detail
-├ Contoh: !help play
-├ Reply pesan dengan command untuk input
-├ Gunakan bot dengan bijak! 🤖
+                const icon = categoryIcons[category] || '📁'
+                menuText += `│ ${icon} *${category.toUpperCase()}*\n`
+                for (const plugin of plugins) {
+                    const cmdList = plugin.commands.map(cmd => `${prefix}${cmd}`).join(', ')
+                    menuText += `│ ▸ ${cmdList}\n`
+                }
+                menuText += '│\n'
+            }
 
-⏰ *DICARI PADA:* ${new Date().toLocaleString('id-ID')}`
-
+            // Send menu message with image and interactive button
             await sock.sendMessage(m.chat, {
-                image: await fetch('https://files.catbox.moe/zpjs9i.jpeg'),
-                caption: `╭─「 🎯 KANATA BOT 」\n` +
-                    `├ Selamat ${greeting} 👋\n` +
-                    `├ Hai @${noTel}\n` +
-                    `│\n` +
-                    `├ Berikut adalah daftar menu\n` +
-                    `├ yang tersedia untuk Anda:\n` +
-                    `${menuText}` +
-                    `${footer}`,
+                image: { url: globalThis.ppUrl },
+                caption: `╭─「 ${botName} 」\n` +
+                    `├ Selamat ${greeting} @${m.sender.split('@')[0]}\n` +
+                    `├ Berikut menu yang tersedia\n` +
+                    `├ Silakan pilih kategori menu:\n` +
+                    `╰────────────⭐\n\n` +
+                    menuText, // Add menuText to caption
+                footer,
+                buttons: [{
+                    buttonId: 'action',
+                    buttonText: { displayText: '📋 Buka Menu' },
+                    type: 4,
+                    nativeFlowInfo: {
+                        name: 'single_select',
+                        paramsJson: JSON.stringify({
+                            title: '📚 KATEGORI MENU',
+                            sections
+                        })
+                    }
+                }],
+                headerType: 1,
+                viewOnce: true,
                 contextInfo: {
                     mentionedJid: [m.sender],
                     isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: globalThis.newsLetterJid,
-                        newsletterName: '乂 Powered By : Roy 乂',
-                        serverMessageId: -1
-                    },
-                    forwardingScore: 999,
-                    externalAdReply: {
-                        title: '乂 Kanata V3 Menu 乂',
-                        body: 'Welcome to Kanata Universe!',
-                        thumbnailUrl: globalThis.ppUrl,
-                        sourceUrl: 'https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m',
-                        mediaType: 1,
-                        renderLargerThumbnail: false
-                    }
-                },
+                    forwardingScore: 999
+                }
             }, { quoted: m })
-
         } catch (error) {
             console.error('Error in help:', error)
             await m.reply('❌ Terjadi kesalahan saat memuat menu')
@@ -263,3 +251,14 @@ export const handler = {
 }
 
 export default handler
+
+// ──[ ASCII Banner ]────────────────────────────────────────
+const banner = figlet.textSync(botName, {
+    font: 'ANSI Shadow', // pilih font unik, boleh diganti
+    horizontalLayout: 'default',
+    verticalLayout: 'default'
+})
+
+// Buat menu text dengan banner
+let menuText = '```\n' + banner + '\n```\n' // blok kode agar rapi di WhatsApp
+menuText += `╭─「 MENU 」\n`

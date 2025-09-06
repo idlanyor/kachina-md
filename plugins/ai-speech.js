@@ -6,9 +6,9 @@ const tempDir = './temp';
 const groq = new Groq({ apiKey: globalThis.apiKey.groq });
 
 export const handler = {
-    command: ['stt', 'speech', 'speech2text', 'transkrip'],
-    tags: ['ai'],
-    help: 'Speech-to-text (Groq Whisper). Gunakan !stt dengan mereply audio/voice note.',
+    command: ['speechtotext'],
+    category: 'ai',
+    help: 'Speech-to-text (Groq Whisper). Gunakan !speechtotext dengan mereply audio/voice note.',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

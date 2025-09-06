@@ -15,8 +15,10 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { messageFilter } from './helper/cooldown.js';
 import autoNotification from './helper/scheduler.js';
+import { processMessageWithAI } from './helper/gemini.js';
+import { handleGameAnswers } from './helper/gameHandler.js';
+import { Welcome, Leave } from './lib/canvafy.js';
 // import util from 'util';
-// import { processMessageWithAI } from './helper/gemini.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,6 +74,14 @@ async function getPhoneNumber() {
 async function prosesPerintah({ command, sock, m, id, sender, noTel, attf }) {
     try {
         if (!command) return;
+
+        // --- HANDLER GAME ANSWERS ---
+        // Check if this message is an answer to any active game
+        const gameHandled = await handleGameAnswers(sock, m);
+        if (gameHandled) {
+            return; // Stop processing if this was a game answer
+        }
+
 
 
         // --- FITUR ANTILINK GRUP ---
@@ -162,28 +172,48 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
             }
         }
 
-        // Coba proses dengan Gemini AI terlebih dahulu
-        if (m.key.fromMe) return
-        // const aiResult = await processMessageWithAI(command, m.sender);
-        // if (aiResult) {
-        //     command = '!' + aiResult.command + ' ' + aiResult.args;
-        // }
+        // Coba proses dengan Gemini AI terlebih dahulu (hanya untuk private chat)
+        if (!m.isGroup) {
+            if (m.key.fromMe) return;
+
+            // Skip AI processing untuk command yang sudah jelas
+            if (!command.startsWith('!') && !command.startsWith('.')) {
+                try {
+                    const aiResult = await processMessageWithAI(command, m.sender, m.isGroup);
+                    if (aiResult && aiResult.command !== 'chat') {
+                        // Jika AI mendeteksi command, set command untuk diproses
+                        command = '!' + aiResult.command + ' ' + aiResult.args;
+                        // Lanjutkan ke pemrosesan command, jangan return
+                    } else if (aiResult && aiResult.command === 'chat') {
+                        // Jika AI memberikan response chat, kirim langsung dan return
+                        await m.reply(`🤖 *Kanata AI*\n\n${aiResult.args}`);
+                        return;
+                    }
+                } catch (error) {
+                    logger.error('AI processing error:', error);
+                    // Lanjutkan ke pemrosesan normal jika AI gagal
+                }
+            }
+        }
 
         let cmd = '';
         let args = [];
 
-        if (command.startsWith('.')) {
+        // Improved command parsing logic
+        if (command.startsWith('.') || command.startsWith('!')) {
+            const prefix = command.charAt(0);
             cmd = command.toLowerCase().substring(1).split(' ')[0];
             args = command.split(' ').slice(1);
 
             // Log eksekusi command
-            logger.info('⚡ EXECUTE COMMAND')
-            logger.info(`├ Command : ${cmd}`)
-            logger.info(`├ Args    : ${args.join(' ') || '-'}`)
-            logger.info(`├ From    : ${m.pushName || 'Unknown'} (@${noTel})`)
-            logger.info(`└ Chat    : ${id.endsWith('@g.us') ? '👥 Group' : '👤 Private'}`)
-            logger.divider()
+            logger.info('⚡ EXECUTE COMMAND');
+            logger.info(`├ Command : ${cmd}`);
+            logger.info(`├ Args    : ${args.join(' ') || '-'}`);
+            logger.info(`├ From    : ${m.pushName || 'Unknown'} (@${noTel})`);
+            logger.info(`└ Chat    : ${id.endsWith('@g.us') ? '👥 Group' : '👤 Private'}`);
+            logger.divider();
         } else {
+            // Untuk pesan tanpa prefix, coba parsing normal
             [cmd, ...args] = command.split(' ');
             cmd = cmd.toLowerCase();
         }
@@ -219,6 +249,9 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
         const matchedHandler = plugins[cmd];
 
         if (matchedHandler) {
+            // console.log(matchedHandler)
+            const isAdmin = await m.isAdmin
+            console.log(isAdmin)
             // Validasi permission
             if (matchedHandler.isAdmin && !(await m.isAdmin)) {
                 await m.reply('❌ *Akses ditolak*\nHanya admin yang dapat menggunakan perintah ini!');
@@ -859,10 +892,10 @@ export async function startBot() {
         bot.start().then(async (sock) => {
             logger.success('Bot berhasil dimulai!');
             logger.divider();
-            
+
             // Initialize auto notification scheduler
             autoNotification.init(sock);
-            
+
             const checkAndFollowChannel = async () => {
                 try {
                     const nl = await sock.newsletterMetadata('jid', '120363305152329358@newsletter')
@@ -880,7 +913,7 @@ export async function startBot() {
                     const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== 401;
 
                     logger.error(`🔴 Koneksi terputus! ${lastDisconnect.error}`);
-                    
+
                     // Stop scheduler when connection is lost
                     autoNotification.stop();
 
@@ -910,8 +943,8 @@ export async function startBot() {
                     if (m.type === 'text' && m.message?.conversation?.startsWith('!')) {
                         await Database.addCommand();
                     }
-                    
-                    
+
+
 
                     const { remoteJid } = m.key;
                     const sender = m.pushName || remoteJid;
@@ -947,7 +980,7 @@ export async function startBot() {
                             //     } catch (error) {
                             //         logger.error('Error handling payment proof:', error);
                             //     }
-                                
+
                             //     // Check if this is a premium payment proof image
                             //     try {
                             //         const { handlePremiumPaymentProof } = await import('./plugins/misc/premium.js');
@@ -1005,6 +1038,7 @@ export async function startBot() {
             sock.ev.on('group-participants.update', async (update) => {
                 try {
                     const { id, participants, action } = update;
+                    console.log(update)
 
                     // Cek apakah bot adalah admin untuk mengirim pesan
                     const groupMetadata = await cacheGroupMetadata(sock, id);
@@ -1023,17 +1057,13 @@ export async function startBot() {
                                 // Ambil setting grup
                                 const group = await Database.getGroup(id);
                                 if (!group.welcome) continue;
-                                // Ambil profile picture member baru
-                                let ppUrl;
-                                try {
-                                    ppUrl = await sock.profilePictureUrl(participant, 'image');
-                                } catch {
-                                    ppUrl = 'https://i.ibb.co/3Fh9V6p/avatar-default.png';
-                                }
 
                                 // Ambil nama member
                                 const contact = await sock.onWhatsApp(participant);
                                 const memberName = contact[0]?.notify || participant.split('@')[0];
+
+                                // Generate welcome image dengan canvafy
+                                const welcomeImage = await Welcome(sock, participant, groupMetadata.subject, memberName);
 
                                 // Pesan welcome custom jika ada
                                 let welcomeMessage = group.welcomeMessage && group.welcomeMessage.trim() !== ''
@@ -1041,36 +1071,44 @@ export async function startBot() {
                                         .replace(/@user/gi, `@${participant.split('@')[0]}`)
                                         .replace(/@group/gi, groupMetadata.subject)
                                     : `👋 *SELAMAT DATANG!*\n\n` +
-                                        `Halo @${participant.split('@')[0]}! 🎉\n` +
-                                        `Selamat datang di grup *${groupMetadata.subject}*\n\n` +
-                                        `📝 *Silakan perkenalkan diri kamu:*\n` +
-                                        `• Nama lengkap :\n` +
-                                        `• Umur :\n` +
-                                        `• Hobi atau minat :\n` +
-                                        `• Jenis Kelamin :\n\n` +
-                                        `🤝 Mari berkenalan dan saling mengenal!\n` +
-                                        `Jangan lupa baca deskripsi grup ya~\n\n` +
-                                        `Semoga betah dan enjoy ! ✨`;
+                                    `Halo @${participant.split('@')[0]}! 🎉\n` +
+                                    `Selamat datang di grup *${groupMetadata.subject}*\n\n` +
+                                    `📝 *Silakan perkenalkan diri kamu:*\n` +
+                                    `• Nama lengkap :\n` +
+                                    `• Umur :\n` +
+                                    `• Hobi atau minat :\n` +
+                                    `• Jenis Kelamin :\n\n` +
+                                    `🤝 Mari berkenalan dan saling mengenal!\n` +
+                                    `Jangan lupa baca deskripsi grup ya~\n\n` +
+                                    `Semoga betah dan enjoy ! ✨`;
 
                                 await sock.sendMessage(id, {
-                                    text: welcomeMessage,
-                                    mentions: [participant],
-                                    contextInfo: {
-                                        externalAdReply: {
-                                            title: `Welcome ${memberName}! 🎉`,
-                                            body: `Selamat datang di ${groupMetadata.subject}`,
-                                            thumbnailUrl: ppUrl,
-                                            sourceUrl: globalThis.newsletterUrl || "https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m",
-                                            mediaType: 1,
-                                            renderLargerThumbnail: true
-                                        }
-                                    }
+                                    image: welcomeImage,
+                                    caption: welcomeMessage,
+                                    mentions: [participant]
                                 });
 
                                 logger.info(`👋 Welcome message sent to ${memberName} in ${groupMetadata.subject}`);
 
                             } catch (error) {
                                 logger.error('Error sending welcome message:', error);
+                                // Fallback ke pesan teks biasa jika canvafy gagal
+                                const group = await Database.getGroup(id);
+                                if (group.welcome) {
+                                    const contact = await sock.onWhatsApp(participant);
+                                    const memberName = contact[0]?.notify || participant.split('@')[0];
+
+                                    let welcomeMessage = group.welcomeMessage && group.welcomeMessage.trim() !== ''
+                                        ? group.welcomeMessage
+                                            .replace(/@user/gi, `@${participant.split('@')[0]}`)
+                                            .replace(/@group/gi, groupMetadata.subject)
+                                        : `👋 *SELAMAT DATANG!*\n\nHalo @${participant.split('@')[0]}! 🎉\nSelamat datang di grup *${groupMetadata.subject}*`;
+
+                                    await sock.sendMessage(id, {
+                                        text: welcomeMessage,
+                                        mentions: [participant]
+                                    });
+                                }
                             }
 
                         } else if (action === 'remove') {
@@ -1079,9 +1117,13 @@ export async function startBot() {
                                 // Ambil setting grup
                                 const group = await Database.getGroup(id);
                                 if (!group.leave) continue;
+
                                 // Ambil nama member yang keluar
                                 const contact = await sock.onWhatsApp(participant);
                                 const memberName = contact[0]?.notify || participant.split('@')[0];
+
+                                // Generate leave image dengan canvafy
+                                const leaveImage = await Leave(sock, participant, groupMetadata.subject, memberName);
 
                                 // Pesan leave custom jika ada
                                 let leaveMessage = group.leaveMessage && group.leaveMessage.trim() !== ''
@@ -1089,31 +1131,39 @@ export async function startBot() {
                                         .replace(/@user/gi, `@${participant.split('@')[0]}`)
                                         .replace(/@group/gi, groupMetadata.subject)
                                     : `👋 *SELAMAT TINGGAL!*\n\n` +
-                                        `@${participant.split('@')[0]} telah meninggalkan grup 😢\n\n` +
-                                        `🌟 Terima kasih sudah menjadi bagian dari *${groupMetadata.subject}*\n` +
-                                        `🤝 Semoga kita bisa bertemu lagi di lain waktu\n` +
-                                        `🚪 Pintu grup ini selalu terbuka untukmu\n\n` +
-                                        `Sampai jumpa dan semoga sukses selalu! 🙏✨`;
+                                    `@${participant.split('@')[0]} telah meninggalkan grup 😢\n\n` +
+                                    `🌟 Terima kasih sudah menjadi bagian dari *${groupMetadata.subject}*\n` +
+                                    `🤝 Semoga kita bisa bertemu lagi di lain waktu\n` +
+                                    `🚪 Pintu grup ini selalu terbuka untukmu\n\n` +
+                                    `Sampai jumpa dan semoga sukses selalu! 🙏✨`;
 
                                 await sock.sendMessage(id, {
-                                    text: leaveMessage,
-                                    mentions: [participant],
-                                    contextInfo: {
-                                        externalAdReply: {
-                                            title: `Goodbye ${memberName} 👋`,
-                                            body: `Sampai jumpa dari ${groupMetadata.subject}`,
-                                            thumbnailUrl: globalThis.ppUrl || 'https://i.ibb.co/3Fh9V6p/avatar-default.png',
-                                            sourceUrl: globalThis.newsletterUrl || "https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m",
-                                            mediaType: 1,
-                                            renderLargerThumbnail: true
-                                        }
-                                    }
+                                    image: leaveImage,
+                                    caption: leaveMessage,
+                                    mentions: [participant]
                                 });
 
                                 logger.info(`👋 Leave message sent for ${memberName} in ${groupMetadata.subject}`);
 
                             } catch (error) {
                                 logger.error('Error sending leave message:', error);
+                                // Fallback ke pesan teks biasa jika canvafy gagal
+                                const group = await Database.getGroup(id);
+                                if (group.leave) {
+                                    const contact = await sock.onWhatsApp(participant);
+                                    const memberName = contact[0]?.notify || participant.split('@')[0];
+
+                                    let leaveMessage = group.leaveMessage && group.leaveMessage.trim() !== ''
+                                        ? group.leaveMessage
+                                            .replace(/@user/gi, `@${participant.split('@')[0]}`)
+                                            .replace(/@group/gi, groupMetadata.subject)
+                                        : `👋 *SELAMAT TINGGAL!*\n\n@${participant.split('@')[0]} telah meninggalkan grup 😢`;
+
+                                    await sock.sendMessage(id, {
+                                        text: leaveMessage,
+                                        mentions: [participant]
+                                    });
+                                }
                             }
                         }
                     }

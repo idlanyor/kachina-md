@@ -2,7 +2,7 @@ import Database from "../helper/database.js";
 
 export const handler = {
     command: 'setleave',
-    tags: ['group'],
+    category: 'group',
     help: 'Set pesan leave custom grup',
     isGroup: true,
     isAdmin: true,
