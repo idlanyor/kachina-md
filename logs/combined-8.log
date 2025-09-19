@@ -1,0 +1,110 @@
+2025-09-18T23:23:40:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:23:40:  97 |     if (isPatching === false) {
+2025-09-18T23:23:40:  98 |       patching.add(filename)
+2025-09-18T23:23:40:  99 |     }
+2025-09-18T23:23:40: 100 | 
+2025-09-18T23:23:40: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:23:40:                                             ^
+2025-09-18T23:23:40: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:23:40:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:23:40:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:23:40: 
+2025-09-18T23:23:43:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:23:43:  97 |     if (isPatching === false) {
+2025-09-18T23:23:43:  98 |       patching.add(filename)
+2025-09-18T23:23:43:  99 |     }
+2025-09-18T23:23:43: 100 | 
+2025-09-18T23:23:43: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:23:43:                                             ^
+2025-09-18T23:23:43: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:23:43:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:23:43:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:23:43: 
+2025-09-18T23:23:45:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:23:45:  97 |     if (isPatching === false) {
+2025-09-18T23:23:45:  98 |       patching.add(filename)
+2025-09-18T23:23:45:  99 |     }
+2025-09-18T23:23:45: 100 | 
+2025-09-18T23:23:45: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:23:45:                                             ^
+2025-09-18T23:23:45: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:23:45:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:23:45:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:23:45: 
+2025-09-18T23:23:47:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:23:47:  97 |     if (isPatching === false) {
+2025-09-18T23:23:47:  98 |       patching.add(filename)
+2025-09-18T23:23:47:  99 |     }
+2025-09-18T23:23:47: 100 | 
+2025-09-18T23:23:47: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:23:47:                                             ^
+2025-09-18T23:23:47: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:23:47:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:23:47:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:23:47: 
+2025-09-18T23:23:50:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:23:50:  97 |     if (isPatching === false) {
+2025-09-18T23:23:50:  98 |       patching.add(filename)
+2025-09-18T23:23:50:  99 |     }
+2025-09-18T23:23:50: 100 | 
+2025-09-18T23:23:50: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:23:50:                                             ^
+2025-09-18T23:23:50: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:23:50:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:23:50:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:23:50: 
+2025-09-18T23:23:52:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:23:52:  97 |     if (isPatching === false) {
+2025-09-18T23:23:52:  98 |       patching.add(filename)
+2025-09-18T23:23:52:  99 |     }
+2025-09-18T23:23:52: 100 | 
+2025-09-18T23:23:52: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:23:52:                                             ^
+2025-09-18T23:23:52: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:23:52:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:23:52:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:23:52: 
+2025-09-18T23:23:55:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:23:55:  97 |     if (isPatching === false) {
+2025-09-18T23:23:55:  98 |       patching.add(filename)
+2025-09-18T23:23:55:  99 |     }
+2025-09-18T23:23:55: 100 | 
+2025-09-18T23:23:55: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:23:55:                                             ^
+2025-09-18T23:23:55: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:23:55:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:23:55:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:23:55: 
+2025-09-18T23:23:57:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:23:57:  97 |     if (isPatching === false) {
+2025-09-18T23:23:57:  98 |       patching.add(filename)
+2025-09-18T23:23:57:  99 |     }
+2025-09-18T23:23:57: 100 | 
+2025-09-18T23:23:57: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:23:57:                                             ^
+2025-09-18T23:23:57: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:23:57:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:23:57:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:23:57: 
+2025-09-18T23:24:00:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:24:00:  97 |     if (isPatching === false) {
+2025-09-18T23:24:00:  98 |       patching.add(filename)
+2025-09-18T23:24:00:  99 |     }
+2025-09-18T23:24:00: 100 | 
+2025-09-18T23:24:00: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:24:00:                                             ^
+2025-09-18T23:24:00: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:24:00:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:24:00:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:24:00: 
+2025-09-18T23:24:02:  96 |     const isPatching = patching.has(filename)
+2025-09-18T23:24:02:  97 |     if (isPatching === false) {
+2025-09-18T23:24:02:  98 |       patching.add(filename)
+2025-09-18T23:24:02:  99 |     }
+2025-09-18T23:24:02: 100 | 
+2025-09-18T23:24:02: 101 |     const exports = self._origRequire.apply(this, arguments)
+2025-09-18T23:24:02:                                             ^
+2025-09-18T23:24:02: TypeError: require() async module "/home/roy/kachina-md/main.js" is unsupported. use "await import()" instead.
+2025-09-18T23:24:02:       at <anonymous> (/home/roy/.bun/install/global/node_modules/require-in-the-middle/index.js:101:39)
+2025-09-18T23:24:02:       at <anonymous> (/home/roy/.bun/install/global/node_modules/pm2/lib/ProcessContainerForkBun.js:27:1)
+2025-09-18T23:24:02: 

@@ -2,7 +2,7 @@ import './global.js'
 import { Kachina, clearMessages, sanitizeBotId } from './bot.js';
 import { logger } from './helper/logger.js';
 import { getMedia } from './helper/mediaMsg.js';
-import { cacheGroupMetadata } from './helper/caching.js'
+import { cacheGroupMetadata } from './helper/caching.js';
 import { fileURLToPath, pathToFileURL } from 'url';
 import fs from 'fs-extra';
 import path from 'path';
@@ -15,7 +15,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { messageFilter } from './helper/cooldown.js';
 import autoNotification from './helper/scheduler.js';
-import { processMessageWithAI } from './helper/gemini.js';
+// import { processMessageWithAI } from './helper/gemini.js';
 import { handleGameAnswers } from './helper/gameHandler.js';
 import { Welcome, Leave } from './lib/canvafy.js';
 // import util from 'util';
@@ -47,7 +47,17 @@ async function getPhoneNumber() {
     try {
         await fs.promises.access(namaSesiPath);
         rl.close();
+        // Jika session sudah ada, gunakan nomor dari konfigurasi atau return undefined
+        return globalThis.botNumber || undefined;
     } catch {
+        // Jika session belum ada, cek apakah ada nomor di konfigurasi
+        if (globalThis.botNumber && globalThis.botNumber.trim() !== '') {
+            logger.info(`Menggunakan nomor telepon dari konfigurasi: ${globalThis.botNumber}`);
+            rl.close();
+            return globalThis.botNumber;
+        }
+        
+        // Jika tidak ada nomor di konfigurasi, minta input manual
         return new Promise(resolve => {
             const validatePhoneNumber = (input) => {
                 const phoneRegex = /^62\d{9,15}$/;
@@ -55,9 +65,11 @@ async function getPhoneNumber() {
             };
             const askForPhoneNumber = () => {
                 logger.showBanner();
+                logger.warning("Nomor telepon belum dikonfigurasi di global.js!");
                 rl.question(chalk.yellowBright("Masukkan nomor telepon (dengan kode negara, contoh: 628xxxxx): "), input => {
                     if (validatePhoneNumber(input)) {
                         logger.success("Nomor telepon valid!");
+                        logger.info("💡 Tip: Anda bisa mengatur globalThis.botNumber di global.js agar tidak perlu input manual lagi.");
                         rl.close();
                         resolve(input);
                     } else {
@@ -69,6 +81,41 @@ async function getPhoneNumber() {
             askForPhoneNumber();
         });
     }
+}
+
+async function getLoginMethod() {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    
+    return new Promise(resolve => {
+        const askForLoginMethod = () => {
+            logger.info("\n🔐 Pilih metode login:");
+            logger.info("1. QR Code (scan dengan WhatsApp) - Recommended");
+            logger.info("2. Pairing Code (masukkan kode di WhatsApp)");
+            logger.info("\n💡 Tips:");
+            logger.info("   - QR Code: Lebih mudah, tidak perlu nomor telepon");
+            logger.info("   - Pairing Code: Perlu nomor telepon yang sama dengan WhatsApp");
+            
+            rl.question(chalk.yellowBright("Pilih metode login (1/2): "), input => {
+                const choice = input.trim().toLowerCase();
+                
+                if (choice === '1' || choice === 'qr' || choice === 'q') {
+                    logger.success("✅ Metode login: QR Code");
+                    logger.info("📱 Siapkan WhatsApp untuk scan QR code...");
+                    rl.close();
+                    resolve('qr');
+                } else if (choice === '2' || choice === 'pairing' || choice === 'p') {
+                    logger.success("✅ Metode login: Pairing Code");
+                    logger.info("📞 Anda akan diminta memasukkan nomor telepon...");
+                    rl.close();
+                    resolve('pairing');
+                } else {
+                    logger.error("❌ Pilihan tidak valid! Masukkan 1 untuk QR Code atau 2 untuk Pairing Code.");
+                    askForLoginMethod();
+                }
+            });
+        };
+        askForLoginMethod();
+    });
 }
 
 async function prosesPerintah({ command, sock, m, id, sender, noTel, attf }) {
@@ -169,30 +216,6 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
                 // Bot bukan admin di grup, blokir semua akses
                 await m.reply(`🚫 *BOT TIDAK ADMIN*\n\nMaaf, bot harus menjadi admin di grup ini untuk dapat mengakses menu dan fitur.\n\nSilakan hubungi admin grup untuk menjadikan bot sebagai admin terlebih dahulu.`);
                 return;
-            }
-        }
-
-        // Coba proses dengan Gemini AI terlebih dahulu (hanya untuk private chat)
-        if (!m.isGroup) {
-            if (m.key.fromMe) return;
-
-            // Skip AI processing untuk command yang sudah jelas
-            if (!command.startsWith('!') && !command.startsWith('.')) {
-                try {
-                    const aiResult = await processMessageWithAI(command, m.sender, m.isGroup);
-                    if (aiResult && aiResult.command !== 'chat') {
-                        // Jika AI mendeteksi command, set command untuk diproses
-                        command = '!' + aiResult.command + ' ' + aiResult.args;
-                        // Lanjutkan ke pemrosesan command, jangan return
-                    } else if (aiResult && aiResult.command === 'chat') {
-                        // Jika AI memberikan response chat, kirim langsung dan return
-                        await m.reply(`🤖 *Kanata AI*\n\n${aiResult.args}`);
-                        return;
-                    }
-                } catch (error) {
-                    logger.error('AI processing error:', error);
-                    // Lanjutkan ke pemrosesan normal jika AI gagal
-                }
             }
         }
 
@@ -412,20 +435,6 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
                     if (!result) result = '✅ Executed with no output';
 
                     await m.reply(result);
-                } catch (error) {
-                    await m.reply(`❌ *ERROR*\n\n${error.message}`);
-                }
-                break;
-
-            case '=>': // Untuk eval - DEPRECATED for security
-                try {
-                    if (!await m.isOwner) {
-                        await m.reply('❌ Perintah ini hanya untuk owner bot!');
-                        return;
-                    }
-
-                    // Redirect to safer eval plugin
-                    await m.reply('❌ *DEPRECATED FOR SECURITY*\n\nEval functionality in main.js has been disabled due to security concerns. Please use the safer ">" command from the eval plugin instead.');
                 } catch (error) {
                     await m.reply(`❌ *ERROR*\n\n${error.message}`);
                 }
@@ -882,57 +891,61 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
 export async function startBot() {
     try {
         logger.showBanner();
-        const phoneNumber = await getPhoneNumber();
+        
+        // Cek keberadaan session terlebih dahulu
+        const sessionPath = `./${globalThis.sessionName}`;
+        const sessionExists = await fs.pathExists(sessionPath);
+        
+        let phoneNumber, loginMethod;
+        
+        if (!sessionExists) {
+            // Untuk session baru, selalu tanya metode login
+            loginMethod = await getLoginMethod();
+            
+            // Hanya minta nomor telepon jika menggunakan pairing code
+            if (loginMethod === 'pairing') {
+                phoneNumber = await getPhoneNumber();
+            } else {
+                phoneNumber = ''; // QR code tidak perlu nomor telepon
+            }
+        } else {
+            // Session sudah ada, gunakan session yang ada
+            phoneNumber = globalThis.botNumber || '';
+            loginMethod = 'existing';
+        }
+        
         const bot = new Kachina({
             phoneNumber,
             sessionId: globalThis.sessionName,
-            useStore: false
+            useStore: false,
+            loginMethod
         });
 
         bot.start().then(async (sock) => {
             logger.success('Bot berhasil dimulai!');
             logger.divider();
 
-            // Initialize auto notification scheduler
             autoNotification.init(sock);
 
-            const checkAndFollowChannel = async () => {
-                try {
-                    const nl = await sock.newsletterMetadata('jid', '120363305152329358@newsletter')
-                    if (nl.viewer_metadata?.view_role === 'GUEST') {
-                        await sock.newsletterFollow('120363305152329358@newsletter')
-                    }
-                } catch (error) {
-                    logger.error('Gagal mengecek/follow channel:', error)
-                }
-            }
-            sock.ev.on('connection.update', async (update) => {
-                const { connection, lastDisconnect } = update;
-
-                if (connection === 'close') {
-                    const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== 401;
-
-                    logger.error(`🔴 Koneksi terputus! ${lastDisconnect.error}`);
-
-                    // Stop scheduler when connection is lost
-                    autoNotification.stop();
-
-                    if (shouldReconnect) {
-                        logger.info(`♻️ Mencoba menyambungkan kembali...`);
-                    } else {
-                        logger.error(`🚫 Sesi kadaluarsa. Harap login Ulang.`);
-                        await fs.remove(`./${globalThis.sessionName}`);
-                        await startBot();
-                        process.exit(1);
-                    }
-                }
-
-                if (connection === 'open') {
-                    await checkAndFollowChannel();
-                    // Restart scheduler when connection is restored
-                    autoNotification.init(sock);
-                }
-            });
+            // Channel follow logic moved to bot.js to avoid duplication
+            // const checkAndFollowChannel = async () => {
+            //     try {
+            //         const nl = await sock.newsletterMetadata('jid', '120363305152329358@newsletter')
+            //         if (nl.viewer_metadata?.view_role === 'GUEST') {
+            //             await sock.newsletterFollow('120363305152329358@newsletter')
+            //         }
+            //     } catch (error) {
+            //         logger.error('Gagal mengecek/follow channel:', error)
+            //     }
+            // }
+            
+            // Setup channel follow on connection open
+            // sock.ev.on('connection.update', async (update) => {
+            //     const { connection } = update;
+            //     if (connection === 'open') {
+            //         await checkAndFollowChannel();
+            //     }
+            // });
 
             sock.ev.on('messages.upsert', async chatUpdate => {
                 try {
@@ -944,13 +957,17 @@ export async function startBot() {
                         await Database.addCommand();
                     }
 
-
-
                     const { remoteJid } = m.key;
                     const sender = m.pushName || remoteJid;
                     const id = remoteJid;
                     const noTel = (id.endsWith('@g.us')) ? m.key.participant?.split('@')[0]?.replace(/[^0-9]/g, '') : id.split('@')[0]?.replace(/[^0-9]/g, '');
                     const mediaTypes = ['image', 'video', 'audio'];
+
+                    // Untuk grup, gunakan cached group metadata
+                    if (m.isGroup) {
+                        // Preload group metadata ke cache untuk menghindari rate limit
+                        await cacheGroupMetadata(sock, id);
+                    }
 
                     // Cek tipe chat dan sender
                     // if (m.isGroup) {

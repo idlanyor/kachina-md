@@ -15,7 +15,14 @@ export const handler = {
             // }
             let userJid
             if (m.quoted) {
-                userJid = m.quoted?.message?.contactMessage?.vcard.match(/waid=(\d+)/)[1] + '@s.whatsapp.net'
+                const vcard = m.quoted?.message?.contactMessage?.vcard
+                const match = vcard?.match(/waid=(\d+)/)
+                if (match && match[1]) {
+                    userJid = match[1] + '@s.whatsapp.net'
+                } else {
+                    await m.reply('❌ Tidak dapat mengekstrak nomor dari kontak yang direply')
+                    return
+                }
             } else if (args) {
                 userJid = args.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
             } else {

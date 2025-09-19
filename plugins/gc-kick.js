@@ -19,8 +19,6 @@ export const handler = {
             }
 
             // Handle mentioned users
-            console.log(await m.groupMetadata())
-            return;
             if (m.mentionedJid && m.mentionedJid.length > 0) {
                 users.push(...m.mentionedJid)
             }

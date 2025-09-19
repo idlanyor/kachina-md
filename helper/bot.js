@@ -1,9 +1,8 @@
-// import { makeWASocket, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, makeInMemoryStore, useMultiFileAuthState, DisconnectReason, Browsers } from "baileys";
 import { makeWASocket, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, makeInMemoryStore, useMultiFileAuthState, DisconnectReason, Browsers } from 'baileys';
 import pino from "pino";
 import NodeCache from "node-cache";
 import chalk from 'chalk';
-import fs from 'fs-extra'; // tambah nggo file handling
+import fs from 'fs-extra';
 import { startBot } from "../main.js";
 
 class Kanata {
@@ -38,6 +37,7 @@ class Kanata {
         let { version, isLatest } = await fetchLatestBaileysVersion();
         const sock = makeWASocket({
             version,
+            shouldSyncHistoryMessage: () => false,
             logger: P,
             printQRInTerminal: false,
             browser: Browsers.macOS("Safari"),
@@ -46,17 +46,13 @@ class Kanata {
                 keys: makeCacheableSignalKeyStore(state.keys, P),
             },
             msgRetryCounterCache,
-            connectOptions: {
-                maxRetries: 5,
-                keepAlive: true,
-            },
+            
         });
 
         store?.bind(sock.ev);
 
         sock.ev.on("creds.update", saveCreds);
 
-        // Tambah mekanisme retry jika koneksi gagal pas request pairing code
         if (!sock.authState.creds.registered) {
             console.log(chalk.yellowBright("Menunggu Pairing Code"));
             globalThis.io.emit("broadcastMessage", `Menunggu Pairing Code`);
@@ -84,10 +80,8 @@ class Kanata {
             }
         }
 
-        // console.log('itu', this)
         sock.ev.on("connection.update", async (update) => {
             const { connection, lastDisconnect } = update;
-            // console.log('ini', this)
             if (connection === "connecting") {
                 console.log(chalk.blue("Memulai koneksi soket"));
                 globalThis.io.emit("broadcastMessage", "Memulai koneksi soket");
@@ -100,23 +94,41 @@ class Kanata {
                 const reason = lastDisconnect?.error?.output?.statusCode;
 
                 if (reason === DisconnectReason.loggedOut) {
-                    console.log(chalk.red("Sesi ora valid, bakal dihapus..."));
-                    globalThis.io.emit("broadcastMessage", "Sesi ora valid, bakal dihapus...");
+                    console.log(chalk.red("Sesi tidak valid, akan dihapus..."));
+                    globalThis.io.emit("broadcastMessage", "Sesi tidak valid, akan dihapus...");
 
-                    // Hapus folder sesi kalo sesi logout
-                    await fs.remove(`./${this.sessionId}`);
-                    console.log(chalk.yellow(`Folder sesi ${this.sessionId} dihapus, login ulang...`));
-                    globalThis.io.emit("broadcastMessage", `Folder sesi ${this.sessionId} dihapus, login ulang...`);
+                    // Remove session folder when logged out with proper error handling
+                    try {
+                        await fs.remove(`./${this.sessionId}`);
+                        console.log(chalk.yellow(`Session folder ${this.sessionId} berhasil dihapus`));
+                        globalThis.io.emit("broadcastMessage", `Session folder ${this.sessionId} berhasil dihapus`);
+                    } catch (error) {
+                        console.log(chalk.red(`Gagal menghapus session folder: ${error.message}`));
+                        globalThis.io.emit("broadcastMessage", `Gagal menghapus session folder: ${error.message}`);
+                    }
 
-
-                    // Login ulang tanpa nge-delay
-                    console.log(chalk.green("Login ulang berhasil. Eksekusi tugas selanjutnya..."));
-                    globalThis.io.emit("broadcastMessage", `Login ulang berhasil. Eksekusi tugas selanjutnya...`);
-                    await startBot();
+                    // Restart with delay for logout
+                    setTimeout(async () => {
+                        console.log(chalk.green("Memulai ulang bot setelah logout..."));
+                        globalThis.io.emit("broadcastMessage", "Memulai ulang bot setelah logout...");
+                        await startBot();
+                    }, 3000);
+                } else if (reason === DisconnectReason.connectionClosed ||
+                    reason === DisconnectReason.connectionLost ||
+                    reason === DisconnectReason.restartRequired) {
+                    // Restart with delay for connection issues
+                    setTimeout(async () => {
+                        console.log(chalk.red("Koneksi terputus, mencoba kembali..."));
+                        globalThis.io.emit("broadcastMessage", "Koneksi terputus, mencoba kembali...");
+                        await startBot();
+                    }, 5000);
                 } else {
-                    console.log(chalk.red("Koneksi terputus, mencoba kembali..."));
-                    globalThis.io.emit("broadcastMessage", `Koneksi terputus, mencoba kembali...`);
-                    await startBot();
+                    // Unknown disconnect reason
+                    setTimeout(async () => {
+                        console.log(chalk.red(`Unknown disconnect reason: ${reason}, restarting...`));
+                        globalThis.io.emit("broadcastMessage", `Unknown disconnect reason: ${reason}, restarting...`);
+                        await startBot();
+                    }, 10000);
                 }
             }
         });

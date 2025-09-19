@@ -1,18 +1,21 @@
 import { sanitizeBotId } from "./bot.js";
-
-const groupCache = new Map();
-const CACHE_TTL = 60000; // 1 menit
+import { cacheGroupMetadata, groupCache } from "./caching.js";
 
 export const getGroupMetadata = async ({ sock, id }) => {
-    const now = Date.now();
-    if (groupCache.has(id)) {
-        const { metadata, timestamp } = groupCache.get(id);
-        if (now - timestamp < CACHE_TTL) {
-            return metadata;
+    // Menggunakan fungsi cacheGroupMetadata dari caching.js
+    let metadata = await cacheGroupMetadata(sock, id);
+    
+    if (!metadata) {
+        // Fallback jika cache gagal
+        try {
+            metadata = await sock.groupMetadata(id);
+        } catch (error) {
+            console.error('Error getting group metadata:', error);
+            return null;
         }
     }
     
-    let metadata = await sock.groupMetadata(id);
+    // Format metadata untuk konsistensi dengan implementasi sebelumnya
     const formattedMetadata = {
         id: metadata.id,
         subject: metadata.subject,
@@ -34,7 +37,6 @@ export const getGroupMetadata = async ({ sock, id }) => {
         ephemeralDuration: metadata.ephemeralDuration,
     };
     
-    groupCache.set(id, { metadata: formattedMetadata, timestamp: now });
     return formattedMetadata;
 };
 

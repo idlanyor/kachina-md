@@ -1,9 +1,9 @@
 import Database from './database.js'
-import pkg from 'baileys'
+import { generateWAMessageFromContent, proto } from 'baileys'
 import { resolve } from 'path'
-const { generateWAMessageFromContent, proto } = pkg
 import { getMedia } from './mediaMsg.js';
 import { readFileSync } from 'fs';
+import { cacheGroupMetadata, groupCache } from './caching.js';
 
 
 const thumbPath = resolve(import.meta.dirname, '../media/thumbnail.jpg')
@@ -15,9 +15,8 @@ export function addMessageHandler(m, sock) {
     m.pushName = m.pushName || 'No Name';
     m.isGroup = m.chat.endsWith('@g.us');
     m.type = getMessageType(m.message);
-
-    m.groupMetadata = m.isGroup ? sock.groupMetadata(m.chat) : null;
-
+    m.groupMetadata = m.isGroup ? cacheGroupMetadata(sock, m.chat) : null;
+    m.ephemeralDuration = m.isGroup ? m.groupMetadata?.ephemeralDuration : 0
     m.isOwner = () => {
         const number = m.sender.split('@')[0]
         return globalThis.ownerNumber.includes(number)
@@ -33,13 +32,9 @@ export function addMessageHandler(m, sock) {
     m.isAdmin = m.isGroup ? (
         async () => {
             const metadata = await m.groupMetadata;
-            // console.log('isAdmin',m.key?.participant)
-
-            return metadata?.participants?.find(p =>{
-                // console.log('isAdmin',p)
-                return p.jid === m.key.participant
+            return metadata?.participants?.find(p => {
+                return p.id === m.key.participant
             })?.admin !== null;
-
         }
     )() : false;
 
@@ -54,9 +49,17 @@ export function addMessageHandler(m, sock) {
             message: actualMsg,
             key: {
                 remoteJid: m.chat,
+                // Update untuk v7: tambahkan remoteJidAlt jika ada
+                ...(m.message.extendedTextMessage.contextInfo.remoteJidAlt && {
+                    remoteJidAlt: m.message.extendedTextMessage.contextInfo.remoteJidAlt
+                }),
                 fromMe: m.message.extendedTextMessage.contextInfo.participant === sock.user.id,
                 id: m.message.extendedTextMessage.contextInfo.stanzaId,
-                participant: m.message.extendedTextMessage.contextInfo.participant
+                participant: m.message.extendedTextMessage.contextInfo.participant,
+                // Update untuk v7: tambahkan participantAlt jika ada
+                ...(m.message.extendedTextMessage.contextInfo.participantAlt && {
+                    participantAlt: m.message.extendedTextMessage.contextInfo.participantAlt
+                })
             },
             type: getMessageType(actualMsg),
             sender: m.message.extendedTextMessage.contextInfo.participant,
@@ -91,26 +94,15 @@ export function addMessageHandler(m, sock) {
                 sourceUrl: "https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m",
             }
         }
-        // contextInfo: {
-        //     forwardingScore: 256,
-        //     isForwarded: false,
-        //     externalAdReply: {
-        //         title: global.ucapan,
-        //         body: wm,
-        //         mediaUrl: sgw,
-        //         description: namebot,
-        //         previewType: "PHOTO",
-        //         thumbnail: fs.readFileSync(thumbPath),
-        //         sourceUrl: sgw,
-        //     }
-        // }
+
 
         if (typeof text === 'string') {
             return await sock.sendMessage(m.chat, {
                 text: text,
                 contextInfo: useContext ? defaultContext : undefined
             }, {
-                quoted: quoted ? m : null
+                quoted: quoted ? m : null,
+                // ephemeralExpiratio : 
             })
         }
 
@@ -143,111 +135,6 @@ export function addMessageHandler(m, sock) {
         if (!m.isGroup) return null;
         return await Database.getGroup(m.chat);
     };
-
-    // Method untuk button biasa
-    m.sendButton = async (text, sections = [], opts = {}) => {
-        const defaultOpts = {
-            header: 'Kanata Bot',
-            footer: '© 2024 Kanata',
-            viewOnce: true,
-            quoted: true
-        }
-
-        opts = { ...defaultOpts, ...opts }
-
-        return await sock.sendMessage(m.chat, {
-            text: text,
-            footer: opts.footer,
-            buttons: [
-                {
-                    buttonId: 'action',
-                    buttonText: {
-                        displayText: 'List Menu'
-                    },
-                    type: 4,
-                    nativeFlowInfo: {
-                        name: 'single_select',
-                        paramsJson: JSON.stringify({
-                            title: opts.header,
-                            sections: sections
-                        })
-                    }
-                }
-            ],
-            headerType: 1,
-            viewOnce: true
-        }, {
-            quoted: opts.quoted ? m : null
-        })
-    }
-
-    // Method buat interactive button
-    m.sendInteractiveButton = async (text, buttons = [], opts = {}) => {
-        const defaultOpts = {
-            header: 'Kanata Bot',
-            footer: '© 2024 Kanata',
-            media: null,
-            mediaType: 'image',
-            newsletterName: 'Kanata Bot',
-            sections: [], // Buat list sections
-            buttonText: 'Pilih Menu', // Text buat list button
-            externalAdReply: {
-                showAdAttribution: true,
-                title: `乂 ${globalThis.botName} 乂`,
-                body: `${globalThis.owner}`,
-                previewType: 0,
-                renderLargerThumbnail: true,
-                thumbnailUrl: globalThis.ppUrl,
-                sourceUrl: `${globalThis.ppUrl}`,
-                mediaType: 1
-            }
-        }
-
-        opts = { ...defaultOpts, ...opts }
-
-        let messageContent = {
-            viewOnceMessage: {
-                message: {
-                    interactiveMessage: proto.Message.InteractiveMessage.create({
-                        body: proto.Message.InteractiveMessage.Body.create({
-                            text: text
-                        }),
-                        footer: proto.Message.InteractiveMessage.Footer.create({
-                            text: opts.footer
-                        }),
-                        header: proto.Message.InteractiveMessage.Header.create({
-                            title: opts.header,
-                            subtitle: 'Created by Roynaldi',
-                            hasMediaAttachment: !!opts.media
-                        }),
-                        contextInfo: {
-                            isForwarded: true,
-                            forwardingScore: 9999999
-                        },
-                        externalAdReply: opts.externalAdReply,
-                        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                            buttons: opts.sections.length > 0 ? [{
-                                name: 'single_select',
-                                buttonParamsJson: JSON.stringify({
-                                    title: opts.header,
-                                    buttonText: opts.buttonText,
-                                    sections: opts.sections
-                                })
-                            }] : buttons
-                        })
-                    })
-                }
-            }
-        }
-
-        let msg = await generateWAMessageFromContent(m.chat, messageContent, {
-            quoted: m
-        })
-
-        return await sock.relayMessage(msg.key.remoteJid, msg.message, {
-            messageId: msg.key.id
-        })
-    }
 
     m.sendListMessage = async (text, sections = [], opts = {}) => {
         const defaultOpts = {

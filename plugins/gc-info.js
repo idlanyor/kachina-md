@@ -39,8 +39,8 @@ export const handler = {
             // Group statistics
             const totalMembers = groupMetadata.participants.length
             const admins = groupMetadata.participants.filter(p => p.admin).length
-            const bannedMembers = settings.bannedMembers.length
-            const totalWarnings = Object.values(settings.warnedMembers).reduce((sum, warnings) => sum + warnings.length, 0)
+            const bannedMembers = (settings.bannedMembers || []).length
+            const totalWarnings = Object.values(settings.warnedMembers || {}).reduce((sum, warnings) => sum + warnings.length, 0)
 
             const infoMsg = `📊 *Group Information*
 
@@ -52,11 +52,11 @@ export const handler = {
 ⚠️ *Total Warnings:* ${totalWarnings}
 
 📈 *Group Statistics:*
-• Messages: ${settings.stats.messages}
-• Commands: ${settings.stats.commands}
-• Kicks: ${settings.stats.kicks}
-• Bans: ${settings.stats.bans}
-• Warnings: ${settings.stats.warnings}
+• Messages: ${(settings.stats || {}).messages || 0}
+• Commands: ${(settings.stats || {}).commands || 0}
+• Kicks: ${(settings.stats || {}).kicks || 0}
+• Bans: ${(settings.stats || {}).bans || 0}
+• Warnings: ${(settings.stats || {}).warnings || 0}
 
 🛡️ *Moderation Settings:*
 • Welcome: ${settings.welcome ? '✅ On' : '❌ Off'}

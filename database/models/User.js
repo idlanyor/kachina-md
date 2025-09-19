@@ -92,11 +92,23 @@ class User {
   static async getById(jid) {
     const db = await Database.connect()
     
-    if (!db.data.users[jid]) {
-      return await this.create({ jid })
+    // Update untuk v7: support LID
+    const normalizedJid = this.normalizeJid(jid);
+    
+    if (!db.data.users[normalizedJid]) {
+      return await this.create({ jid: normalizedJid })
     }
     
-    return db.data.users[jid]
+    return db.data.users[normalizedJid]
+  }
+
+  // Tambahkan method untuk normalize JID
+  static normalizeJid(jid) {
+    // Implementasi normalisasi JID untuk v7
+    if (jid.includes(':')) {
+      return jid.split(':')[0] + '@s.whatsapp.net';
+    }
+    return jid;
   }
 
   static async update(jid, data) {
