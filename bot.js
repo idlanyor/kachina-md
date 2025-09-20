@@ -130,7 +130,6 @@ class Kachina {
                 },
                 getMessage: async (key) => await getMessageFromStore(key)
             };
-
             // Set printQRInTerminal berdasarkan metode login
             if (this.loginMethod === 'qr') {
                 socketConfig.printQRInTerminal = false; // Kita akan handle QR secara manual

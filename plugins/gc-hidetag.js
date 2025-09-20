@@ -9,7 +9,7 @@ export const handler = {
     isGroup: true,
     exec: async ({ sock, m, id, args }) => {
         try {
-            const group = await await m.groupMetadata
+            const group = await m.groupMetadata
             
             // Ambil semua participants dari group
             const participants = group.participants || []
@@ -17,7 +17,7 @@ export const handler = {
             let teks = args || ''
             await sock.sendMessage(id, {
                 text: teks,
-                mentions: participants.map(a => a.lid)
+                mentions: participants.map(a => a.lid || a.id).filter(Boolean)
             }, { quoted: m })
 
         } catch (error) {

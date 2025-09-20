@@ -1,22 +1,51 @@
 import Database from './database.js'
-import { generateWAMessageFromContent, proto } from 'baileys'
 import { resolve } from 'path'
 import { getMedia } from './mediaMsg.js';
 import { readFileSync } from 'fs';
-import { cacheGroupMetadata, groupCache } from './caching.js';
+import { cacheGroupMetadata } from './caching.js';
 
 
 const thumbPath = resolve(import.meta.dirname, '../media/thumbnail.jpg')
 
 export function addMessageHandler(m, sock) {
     m.chat = m.key.remoteJid;
-    m.sender = m.key.fromMe ? sock.user.id : (m.key.participant || m.key.remoteJid);
+
+    // Helper function to get participant with s.whatsapp.net domain
+    const getWhatsAppParticipant = (participant, participantAlt) => {
+        if (participant && participant.includes('s.whatsapp.net')) {
+            return participant;
+        }
+        if (participantAlt && participantAlt.includes('s.whatsapp.net')) {
+            return participantAlt;
+        }
+        return participant || participantAlt;
+    };
+
+    // Helper function to get participant with @lid domain
+    const getLidParticipant = (participant, participantAlt) => {
+        if (participant && participant.includes('@lid')) {
+            return participant;
+        }
+        if (participantAlt && participantAlt.includes('@lid')) {
+            return participantAlt;
+        }
+        return participantAlt || participant;
+    };
+
+    if (!m.key.fromMe) {
+        m.key.participant = getWhatsAppParticipant(m.key.participant, m.key.participantAlt) || m.key.remoteJid;
+    }
+
+    m.sender = m.key.fromMe ? sock.user.id : m.key.participant;
+    m.lid = m.key.fromMe ? sock.user.id : (getLidParticipant(m.key.participant, m.key.participantAlt) || m.key.remoteJid);
     m.senderNumber = m.sender.split('@')[0];
     m.pushName = m.pushName || 'No Name';
     m.isGroup = m.chat.endsWith('@g.us');
     m.type = getMessageType(m.message);
     m.groupMetadata = m.isGroup ? cacheGroupMetadata(sock, m.chat) : null;
     m.ephemeralDuration = m.isGroup ? m.groupMetadata?.ephemeralDuration : 0
+    m.key.participant = m.isGroup ? getWhatsAppParticipant(m.key.participant, m.key.participantAlt) : m.key.remoteJid;
+    m.key.participantAlt = m.isGroup ? getLidParticipant(m.key.participant, m.key.participantAlt) : m.key.remoteJid;
     m.isOwner = () => {
         const number = m.sender.split('@')[0]
         return globalThis.ownerNumber.includes(number)
@@ -45,25 +74,31 @@ export function addMessageHandler(m, sock) {
         const viewOnceMsg = quotedMsg?.viewOnceMessageV2?.message;
         const actualMsg = viewOnceMsg || quotedMsg;
 
+        const quotedWhatsAppParticipant = getWhatsAppParticipant(
+            m.message.extendedTextMessage.contextInfo.participant,
+            m.message.extendedTextMessage.contextInfo.participantAlt
+        );
+
+        const quotedLidParticipant = getLidParticipant(
+            m.message.extendedTextMessage.contextInfo.participant,
+            m.message.extendedTextMessage.contextInfo.participantAlt
+        );
+
         m.quoted = {
             message: actualMsg,
             key: {
                 remoteJid: m.chat,
-                // Update untuk v7: tambahkan remoteJidAlt jika ada
-                ...(m.message.extendedTextMessage.contextInfo.remoteJidAlt && {
-                    remoteJidAlt: m.message.extendedTextMessage.contextInfo.remoteJidAlt
-                }),
-                fromMe: m.message.extendedTextMessage.contextInfo.participant === sock.user.id,
+                fromMe: quotedWhatsAppParticipant === sock.user.id,
                 id: m.message.extendedTextMessage.contextInfo.stanzaId,
-                participant: m.message.extendedTextMessage.contextInfo.participant,
-                // Update untuk v7: tambahkan participantAlt jika ada
+                participant: quotedWhatsAppParticipant,
                 ...(m.message.extendedTextMessage.contextInfo.participantAlt && {
                     participantAlt: m.message.extendedTextMessage.contextInfo.participantAlt
                 })
             },
             type: getMessageType(actualMsg),
-            sender: m.message.extendedTextMessage.contextInfo.participant,
-            senderNumber: m.message.extendedTextMessage.contextInfo.participant.split('@')[0],
+            sender: quotedWhatsAppParticipant,
+            lid: quotedLidParticipant,
+            senderNumber: quotedWhatsAppParticipant?.split('@')[0],
             text: getQuotedText(actualMsg),
             download: async () => {
                 return await getMedia({

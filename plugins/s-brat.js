@@ -4,55 +4,39 @@ import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 export const handler = {
     command: ['brat'],
     category:'sticker',
-    help: 'Generate gambar/brat text dengan berbagai template dan style.\nContoh: !brat text=Halo template=matrix style=mirror mode=animated fontPosition=top-center',
+    help: 'Generate gambar/brat text dengan Ryzumi API.\nContoh: !brat hello world',
     exec: async ({ sock, m, args }) => {
         try {
-            // Parsing argumen
-            let params = {
-                mode: 'image',
-                template: '-',
-                style: 'basic',
-                fontPosition: 'top-left',
-            };
-            let text = '';
             if (!args || args.length === 0) {
-                await m.reply('Masukkan text untuk brat.\nContoh: !brat text=Halo template=matrix style=mirror mode=animated fontPosition=top-center');
+                await m.reply('Masukkan text untuk brat.\nContoh: !brat hello world');
                 return;
             }
-            // Gabung args jika array
-            let argStr = Array.isArray(args) ? args.join(' ') : args;
-            // Regex key=value
-            let regex = /(\w+)=([#\w\-\%]+)/g;
-            let match;
-            while ((match = regex.exec(argStr)) !== null) {
-                let key = match[1];
-                let value = match[2];
-                if (key === 'text') text = decodeURIComponent(value);
-                else params[key] = decodeURIComponent(value);
-            }
-            // Jika tidak ada key text, ambil sisa argumen sebagai text
+
+            // Get text from args
+            let text = Array.isArray(args) ? args.join(' ') : args;
+            
             if (!text) {
-                // Ambil argumen tanpa key=val
-                let noKey = argStr.replace(regex, '').trim();
-                if (noKey) text = noKey;
-            }
-            if (!text) {
-                await m.reply('Masukkan text untuk brat.\nContoh: !brat text=Halo template=matrix style=mirror mode=animated fontPosition=top-center');
+                await m.reply('Masukkan text untuk brat.\nContoh: !brat hello world');
                 return;
             }
-            params.text = text;
+
             // Kirim reaksi proses
             await sock.sendMessage(m.chat, {
                 react: { text: '🎨', key: m.key }
             });
-            // Request ke API brat
-            const { data } = await axios.get('https://api.fasturl.link/maker/brat/advanced', {
-                params,
+
+            // Request ke Ryzumi API
+            const apiUrl = `https://api.ryzumi.vip/api/image/brat?text=${encodeURIComponent(text)}`;
+            const { data } = await axios.get(apiUrl, {
                 responseType: 'arraybuffer',
-                headers: { 'accept': 'image/png' }
+                headers: { 
+                    'accept': 'image/png',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
             });
+
             // Buat stiker dari gambar
-            const sticker = new Sticker(Buffer.from(data, 'binary'), {
+            const sticker = new Sticker(Buffer.from(data), {
                 pack: 'Brat Generator',
                 author: 'KanataBot',
                 type: StickerTypes.FULL,
@@ -60,20 +44,27 @@ export const handler = {
                 id: 'brat',
                 quality: 80,
             });
+            
             const stickerBuffer = await sticker.toBuffer();
+            
             // Kirim stiker ke user
             await sock.sendMessage(m.chat, {
                 sticker: stickerBuffer
             }, { quoted: m });
+            
             // Kirim reaksi sukses
             await sock.sendMessage(m.chat, {
                 react: { text: '✅', key: m.key }
             });
+            
         } catch (error) {
             console.error('Error in brat:', error);
-            await m.reply('❌ Gagal generate brat. Pastikan parameter benar dan coba lagi.');
+            await sock.sendMessage(m.chat, {
+                react: { text: '❌', key: m.key }
+            });
+            await m.reply('❌ Gagal generate brat. Pastikan text valid dan coba lagi.');
         }
     }
 }
 
-export default handler; 
+export default handler;

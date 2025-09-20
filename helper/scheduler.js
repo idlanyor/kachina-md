@@ -1,7 +1,6 @@
 import { logger } from './logger.js';
 import cron from 'node-cron';
 import fetch from 'node-fetch';
-import { proto, prepareWAMessageMedia, generateWAMessageFromContent } from 'baileys';
 
 class AutoNotification {
     constructor() {
@@ -12,20 +11,17 @@ class AutoNotification {
         this.apiEndpoint = globalThis.ryzumi.endpointAnime;
     }
 
-    // Inisialisasi scheduler dengan socket WhatsApp
     init(sock) {
         this.sock = sock;
         this.startDailyNotification();
         logger.info('📅 Anime notification scheduler initialized');
     }
 
-    // Fungsi untuk memulai notifikasi harian jam 12.00
     startDailyNotification() {
         if (this.scheduledJobs.has('daily_12pm')) {
             this.scheduledJobs.get('daily_12pm').destroy();
         }
 
-        // Cron job untuk jam 06.30 setiap hari (0 07 * * *)
         const job = cron.schedule('0 07 * * *', async () => {
             await this.sendDailyAnimeNotification();
         }, {
@@ -38,7 +34,6 @@ class AutoNotification {
         logger.info('⏰ Daily anime notification scheduled for 12:00 PM (Asia/Jakarta)');
     }
 
-    // Fungsi untuk mengambil data anime dari API
     async fetchAnimeData() {
         try {
             const response = await fetch(this.apiEndpoint, {
@@ -60,14 +55,12 @@ class AutoNotification {
         }
     }
 
-    // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
     getCurrentDayName() {
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const today = new Date();
         return days[today.getDay()];
     }
 
-    // Fungsi untuk memfilter anime berdasarkan hari
     filterAnimeByDay(animeList, targetDay) {
         if (!animeList || !Array.isArray(animeList)) {
             return [];
@@ -81,7 +74,6 @@ class AutoNotification {
         });
     }
 
-    // Fungsi untuk mengirim notifikasi anime harian
     async sendDailyAnimeNotification() {
         try {
             if (!this.sock) {
@@ -107,18 +99,15 @@ class AutoNotification {
             const currentDay = this.getCurrentDayName();
             logger.info(`🗓️ Fetching anime for ${currentDay}`);
     
-            // Ambil data anime dari API
             const animeData = await this.fetchAnimeData();
             if (!animeData) {
                 logger.error('❌ Failed to fetch anime data');
                 return;
             }
     
-            // Filter anime berdasarkan hari ini
             const todayAnime = this.filterAnimeByDay(animeData, currentDay);
     
             if (todayAnime.length === 0) {
-                // Kirim pesan biasa jika tidak ada anime
                 let message = `🎌 *JADWAL ANIME HARI INI*\n\n`;
                 message += `📅 ${currentDate}\n`;
                 message += `⏰ ${currentTime}\n\n`;
@@ -126,102 +115,33 @@ class AutoNotification {
                 message += `🔄 Coba cek lagi besok untuk jadwal anime terbaru!`;
                 message += `\n\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`;
 
-                await this.sock.sendMessage(targetNumber, {
-                    text: message,
-                    contextInfo: {
-                        externalAdReply: {
-                            title: `🎌 Jadwal Anime ${currentDay}`,
-                            body: `Tidak ada anime tayang hari ini`,
-                            mediaUrl: "https://antidonasi.web.id",
-                            description: 'Daily Anime Schedule',
-                            previewType: "PHOTO",
-                            sourceUrl: "https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m",
-                        }
-                    }
-                });
+                await this.sock.sendMessage(targetNumber, { text: message });
                 return;
             }
 
-            // Buat cards untuk carousel
-            const cards = await Promise.all(todayAnime.slice(0, 10).map(async (anime, index) => {
+            let animeList = `🎌 *JADWAL ANIME HARI INI*\n\n`;
+            animeList += `📅 ${currentDate}\n`;
+            animeList += `⏰ ${currentTime}\n\n`;
+            animeList += `🎯 *${todayAnime.length} Anime Tayang Hari ${currentDay}*\n\n`;
+
+            todayAnime.forEach((anime, index) => {
                 const episodeInfo = anime.eps && anime.eps[1] ? anime.eps[1].trim() : 'TBA';
-                const animeTitle = anime.judul || 'Unknown Title';
-                const animeSlug = anime.slug || 'no-slug';
-                const animeImage = anime.gambar ? anime.gambar.replace(/`/g, '').trim() : 'https://via.placeholder.com/300x400?text=No+Image';
-                
-                return {
-                    body: proto.Message.InteractiveMessage.Body.fromObject({
-                        text: `*${animeTitle}*\n\n📊 Episode: ${episodeInfo}\n🗓️ Hari: ${anime.rate[1]}`
-                    }),
-                    footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                        text: `© Anime Schedule ${currentDay}`
-                    }),
-                    header: proto.Message.InteractiveMessage.Header.fromObject({
-                        title: `*Anime ${index + 1}*`,
-                        hasMediaAttachment: true,
-                        ...(await prepareWAMessageMedia({ image: { url: animeImage } }, { upload: this.sock.waUploadToServer }))
-                    }),
-                    nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                        buttons: [
-                            {
-                                name: "cta_url",
-                                buttonParamsJson: `{"display_text":"📺 Tonton Anime","url":"https://anime.antidonasi.web.id/anime/${animeSlug}"}`
-                            }
-                        ]
-                    })
-                };
-            }));
-    
-            const message = generateWAMessageFromContent(targetNumber, {
-                viewOnceMessage: {
-                    message: {
-                        messageContextInfo: {
-                            deviceListMetadata: {},
-                            deviceListMetadataVersion: 2
-                        },
-                        interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-                            contextInfo: {
-                                isForwarded: true,
-                                forwardedNewsletterMessageInfo: {
-                                    newsletterJid: '120363305152329358@newsletter',
-                                    newsletterName: 'Powered By : Kanata Bot',
-                                    serverMessageId: -1
-                                },
-                                forwardingScore: 256,
-                                externalAdReply: {
-                                    title: 'Jadwal Anime Harian',
-                                    thumbnailUrl: todayAnime[0]?.gambar?.replace(/`/g, '').trim() || 'https://antidonasi.web.id',
-                                    sourceUrl: 'https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m',
-                                    mediaType: 2,
-                                    renderLargerThumbnail: false
-                                }
-                            },
-                            body: proto.Message.InteractiveMessage.Body.fromObject({
-                                text: `🎌 *JADWAL ANIME HARI INI*\n\n📅 ${currentDate}\n⏰ ${currentTime}\n\n🎯 *${todayAnime.length} Anime Tayang Hari ${currentDay}*\n\n✨ Selamat menonton anime favorit kalian!`
-                            }),
-                            footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                                text: `🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`
-                            }),
-                            header: proto.Message.InteractiveMessage.Header.fromObject({
-                                hasMediaAttachment: false
-                            }),
-                            carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
-                                cards
-                            })
-                        })
-                    }
-                }
-            }, {});
-    
-            await this.sock.relayMessage(targetNumber, message.message, { messageId: message.key.id });
-            logger.success(`📤 Anime carousel notification sent to ${targetNumber.split('@')[0]} - ${todayAnime.length} anime for ${currentDay}`);
+                animeList += `${index + 1}. *${anime.judul}*\n`;
+                animeList += `📊 Episode: ${episodeInfo}\n`;
+                animeList += `🔗 Link: https://anime.antidonasi.web.id/anime/${anime.slug}\n\n`;
+            });
+
+            animeList += `✨ Selamat menonton anime favorit kalian!\n`;
+            animeList += `\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`;
+
+            await this.sock.sendMessage(targetNumber, { text: animeList });
+            logger.success(`📤 Anime notification sent to ${targetNumber.split('@')[0]} - ${todayAnime.length} anime for ${currentDay}`);
     
         } catch (error) {
             logger.error('❌ Error sending anime notification:', error);
         }
     }
 
-    // Fungsi untuk mengirim notifikasi manual (untuk testing)
     async sendTestNotification() {
         try {
             if (!this.sock) {
@@ -229,22 +149,18 @@ class AutoNotification {
                 return false;
             }
 
-            // const targetNumber = '120363401901734192@g.us';
             const targetNumber = '62895395590009@s.whatsapp.net';
             const currentDay = this.getCurrentDayName();
             
-            // Ambil data anime dari API
             const animeData = await this.fetchAnimeData();
             if (!animeData) {
                 logger.error('❌ Failed to fetch anime data for test');
                 return false;
             }
 
-            // Filter anime berdasarkan hari ini
             const todayAnime = this.filterAnimeByDay(animeData, currentDay);
     
             if (todayAnime.length === 0) {
-                // Kirim pesan biasa jika tidak ada anime
                 let message = `🧪 *TEST ANIME NOTIFICATION*\n\n`;
                 message += `📅 Test pada: ${new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' })}\n`;
                 message += `⏰ ${new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' })}\n\n`;
@@ -252,95 +168,27 @@ class AutoNotification {
                 message += `🔄 Coba cek lagi besok untuk jadwal anime terbaru!`;
                 message += `\n\n🧪 *Ini adalah pesan test*\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`;
 
-                await this.sock.sendMessage(targetNumber, {
-                    text: message,
-                    contextInfo: {
-                        externalAdReply: {
-                            title: `🧪 Test Jadwal Anime ${currentDay}`,
-                            body: `Tidak ada anime tayang hari ini`,
-                            mediaUrl: "https://anime.antidonasi.web.id",
-                            description: 'Test Daily Anime Schedule',
-                            previewType: "PHOTO",
-                            sourceUrl: "https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m",
-                        }
-                    }
-                });
+                await this.sock.sendMessage(targetNumber, { text: message });
                 return true;
             }
 
-            // Buat cards untuk carousel test
-            const cards = await Promise.all(todayAnime.slice(0, 10).map(async (anime, index) => {
+            let testMessage = `🧪 *TEST ANIME NOTIFICATION*\n\n`;
+            testMessage += `📅 Test pada: ${new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' })}\n`;
+            testMessage += `⏰ ${new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' })}\n\n`;
+            testMessage += `🎯 *${todayAnime.length} Anime Tayang Hari ${currentDay}*\n\n`;
+
+            todayAnime.forEach((anime, index) => {
                 const episodeInfo = anime.eps && anime.eps[1] ? anime.eps[1].trim() : 'TBA';
-                const animeTitle = anime.judul || 'Unknown Title';
-                const animeSlug = anime.slug || 'no-slug';
-                const animeImage = anime.gambar ? anime.gambar.replace(/`/g, '').trim() : 'https://via.placeholder.com/300x400?text=No+Image';
-                
-                return {
-                    body: proto.Message.InteractiveMessage.Body.fromObject({
-                        text: `*${animeTitle}*\n\n📊 Episode: ${episodeInfo}\n🗓️ Hari: ${anime.rate[1]}`
-                    }),
-                    footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                        text: `© Test Anime Schedule ${currentDay}`
-                    }),
-                    header: proto.Message.InteractiveMessage.Header.fromObject({
-                        title: `*Test Anime ${index + 1}*`,
-                        hasMediaAttachment: true,
-                        ...(await prepareWAMessageMedia({ image: { url: animeImage } }, { upload: this.sock.waUploadToServer }))
-                    }),
-                    nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                        buttons: [
-                            {
-                                name: "cta_url",
-                                buttonParamsJson: `{"display_text":"📺 Tonton Anime","url":"https://anime.antidonasi.web.id/anime/${animeSlug}"}`
-                            }
-                        ]
-                    })
-                };
-            }));
-    
-            const message = generateWAMessageFromContent(targetNumber, {
-                viewOnceMessage: {
-                    message: {
-                        messageContextInfo: {
-                            deviceListMetadata: {},
-                            deviceListMetadataVersion: 2
-                        },
-                        interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-                            contextInfo: {
-                                isForwarded: true,
-                                forwardedNewsletterMessageInfo: {
-                                    newsletterJid: '120363305152329358@newsletter',
-                                    newsletterName: 'Powered By : Kanata Bot',
-                                    serverMessageId: -1
-                                },
-                                forwardingScore: 256,
-                                externalAdReply: {
-                                    title: 'Test Jadwal Anime Harian',
-                                    thumbnailUrl: todayAnime[0]?.gambar?.replace(/`/g, '').trim() || 'https://antidonasi.web.id',
-                                    sourceUrl: 'https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m',
-                                    mediaType: 2,
-                                    renderLargerThumbnail: false
-                                }
-                            },
-                            body: proto.Message.InteractiveMessage.Body.fromObject({
-                                text: `🧪 *TEST ANIME NOTIFICATION*\n\n📅 Test pada: ${new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' })}\n⏰ ${new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' })}\n\n🎯 *${todayAnime.length} Anime Tayang Hari ${currentDay}*\n\n✨ Selamat menonton anime favorit kalian!`
-                            }),
-                            footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                                text: `🧪 *Ini adalah pesan test*\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`
-                            }),
-                            header: proto.Message.InteractiveMessage.Header.fromObject({
-                                hasMediaAttachment: false
-                            }),
-                            carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
-                                cards
-                            })
-                        })
-                    }
-                }
-            }, {});
-    
-            await this.sock.relayMessage(targetNumber, message.message, { messageId: message.key.id });
-            logger.success(`📤 Test anime carousel notification sent to ${targetNumber.split('@')[0]} - ${todayAnime.length} anime for ${currentDay}`);
+                testMessage += `${index + 1}. *${anime.judul}*\n`;
+                testMessage += `📊 Episode: ${episodeInfo}\n`;
+                testMessage += `🔗 Link: https://anime.antidonasi.web.id/anime/${anime.slug}\n\n`;
+            });
+
+            testMessage += `✨ Selamat menonton anime favorit kalian!\n`;
+            testMessage += `\n🧪 *Ini adalah pesan test*\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`;
+
+            await this.sock.sendMessage(targetNumber, { text: testMessage });
+            logger.success(`📤 Test anime notification sent to ${targetNumber.split('@')[0]} - ${todayAnime.length} anime for ${currentDay}`);
             return true;
     
         } catch (error) {
@@ -349,7 +197,6 @@ class AutoNotification {
         }
     }
 
-    // Fungsi untuk menghentikan scheduler
     stop() {
         this.scheduledJobs.forEach((job, name) => {
             job.destroy();
@@ -360,7 +207,6 @@ class AutoNotification {
         logger.info('📅 Anime notification scheduler stopped');
     }
 
-    // Fungsi untuk mendapatkan status scheduler
     getStatus() {
         return {
             isRunning: this.isRunning,
@@ -371,7 +217,6 @@ class AutoNotification {
         };
     }
 
-    // Fungsi untuk mendapatkan preview anime hari ini
     async getAnimePreview() {
         try {
             const animeData = await this.fetchAnimeData();
@@ -383,7 +228,7 @@ class AutoNotification {
             return {
                 day: currentDay,
                 count: todayAnime.length,
-                anime: todayAnime.slice(0, 5) // Return first 5 anime
+                anime: todayAnime.slice(0, 5)
             };
         } catch (error) {
             logger.error('❌ Error getting anime preview:', error);
@@ -392,6 +237,5 @@ class AutoNotification {
     }
 }
 
-// Export instance tunggal
 const autoNotification = new AutoNotification();
 export default autoNotification;

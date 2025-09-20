@@ -1,9 +1,8 @@
 import yts from 'yt-search'
-import { proto, prepareWAMessageMedia, generateWAMessageFromContent } from 'baileys'
 
 export const handler = {
     command: ['ytsearch'],
-    category: 'downloader',
+    category: 'downloader', 
     help: 'Mencari video di YouTube\n\nFormat: !yts <query>',
     isAdmin: false,
     isBotAdmin: false,
@@ -31,90 +30,31 @@ export const handler = {
             }
 
             const videos = searchResults.videos.slice(0, 10)
+            
+            let text = `🎥 *YOUTUBE SEARCH RESULTS*\n\n`
+            text += `🔍 Query: ${args}\n`
+            text += `📊 Found: ${videos.length} videos\n\n`
+            
+            videos.forEach((video, i) => {
+                text += `📺 *Video ${i + 1}*\n`
+                text += `📝 *Title:* ${video.title}\n`
+                text += `👤 *Channel:* ${video.author.name}\n`
+                text += `⏱️ *Duration:* ${video.timestamp}\n`
+                text += `👁️ *Views:* ${video.views.toLocaleString()}\n`
+                text += `📅 *Upload:* ${video.ago}\n`
+                text += `🔗 *URL:* ${video.url}\n`
+                text += `\nTo download:\n`
+                text += `📺 Video: !playv ${video.url}\n`
+                text += `🎵 Audio: !play ${video.url}\n`
+                text += `\n=================\n\n`
+            })
+            
+            text += `\n🤖 Powered by: ${globalThis.botName || 'Kanata Bot'}`
 
-            // Buat cards untuk carousel
-            const cards = await Promise.all(videos.map(async (video, index) => {
-                const videoTitle = video.title || 'Unknown Title'
-                const channelName = video.author?.name || 'Unknown Channel'
-                const duration = video.timestamp || 'Unknown'
-                const views = video.views ? video.views.toLocaleString() : '0'
-                const uploadTime = video.ago || 'Unknown'
-                const videoUrl = video.url || '#'
-                const thumbnailUrl = video.thumbnail || 'https://via.placeholder.com/480x360?text=No+Thumbnail'
-                
-                return {
-                    body: proto.Message.InteractiveMessage.Body.fromObject({
-                        text: `*${videoTitle}*\n\n👤 Channel: ${channelName}\n⏱️ Duration: ${duration}\n👁️ Views: ${views}\n📅 Upload: ${uploadTime}`
-                    }),
-                    footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                        text: `© YouTube Search Results`
-                    }),
-                    header: proto.Message.InteractiveMessage.Header.fromObject({
-                        title: `*Video ${index + 1}*`,
-                        hasMediaAttachment: true,
-                        ...(await prepareWAMessageMedia({ image: { url: thumbnailUrl } }, { upload: sock.waUploadToServer }))
-                    }),
-                    nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                        buttons: [
-                            {
-                                name: "cta_url",
-                                buttonParamsJson: `{"display_text":"🎥 Tonton Video","url":"${videoUrl}"}`
-                            },
-                            {
-                                name: "cta_copy",
-                                buttonParamsJson: `{"display_text":"📺 Download Video","id":"playv ${videoUrl}","copy_code":"playv ${videoUrl}"}`
-                            },
-                            {
-                                name: "cta_copy",
-                                buttonParamsJson: `{"display_text":"🎵 Download Audio","id":" ${videoUrl}","copy_code":"play ${videoUrl}"}`
-                            }
-                        ]
-                    })
-                }
-            }))
-    
-            const message = generateWAMessageFromContent(m.chat, {
-                viewOnceMessage: {
-                    message: {
-                        messageContextInfo: {
-                            deviceListMetadata: {},
-                            deviceListMetadataVersion: 2
-                        },
-                        interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-                            contextInfo: {
-                                isForwarded: true,
-                                forwardedNewsletterMessageInfo: {
-                                    newsletterJid: '120363305152329358@newsletter',
-                                    newsletterName: 'Powered By : Kanata Bot',
-                                    serverMessageId: -1
-                                },
-                                forwardingScore: 256,
-                                externalAdReply: {
-                                    title: 'YouTube Search Results',
-                                    thumbnailUrl: videos[0]?.thumbnail || 'https://via.placeholder.com/480x360?text=YouTube',
-                                    sourceUrl: 'https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m',
-                                    mediaType: 2,
-                                    renderLargerThumbnail: false
-                                }
-                            },
-                            body: proto.Message.InteractiveMessage.Body.fromObject({
-                                text: `🎥 *YOUTUBE SEARCH RESULTS*\n\n🔍 Query: ${args}\n📊 Found: ${videos.length} videos\n\n✨ Pilih video yang ingin ditonton atau download!`
-                            }),
-                            footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                                text: `🤖 Powered by: ${globalThis.botName || 'Kanata Bot'}`
-                            }),
-                            header: proto.Message.InteractiveMessage.Header.fromObject({
-                                hasMediaAttachment: false
-                            }),
-                            carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
-                                cards
-                            })
-                        })
-                    }
-                }
-            }, {})
-    
-            await sock.relayMessage(m.chat, message.message, { messageId: message.key.id })
+            await sock.sendMessage(m.chat, { 
+                image: { url: videos[0].thumbnail },
+                caption: text
+            })
 
             await sock.sendMessage(m.chat, {
                 react: { text: '✅', key: m.key }

@@ -1,13 +1,20 @@
-import axios from 'axios'
+import { spotifydl } from '../lib/scraper/spotify.js'
+
 export const handler = {
     command: ['spotify'],
     category: 'downloader',
-    help: 'Mencari dan memutar lagu dari Spotify\n*Contoh:* !play JKT48 Heavy Rotation',
+    help: 'Mencari dan memutar lagu dari Spotify\n*Contoh:* !spotify https://open.spotify.com/track/...',
     exec: async ({ sock, m, args }) => {
         try {
             console.log(args)
             if (!args || args.length === 0) {
-                await m.reply('🎵 Masukkan judul lagu yang ingin diputar\n*Contoh:* !play JKT48 Heavy Rotation');
+                await m.reply('🎵 Masukkan URL Spotify yang ingin diunduh\n*Contoh:* !spotify https://open.spotify.com/track/6yID3RbYKiwn2p2LPz0OkK');
+                return;
+            }
+
+            const url = args;
+            if (!url.includes('open.spotify.com')) {
+                await m.reply('❌ URL tidak valid. Gunakan URL Spotify yang benar.');
                 return;
             }
 
@@ -16,18 +23,32 @@ export const handler = {
                 react: { text: '🔍', key: m.key }
             });
 
-            // Mencari lagu
-            const { thumbnail, title, author, audio } = await spotifySong(args);
-            if (!audio) {
+            // Mengunduh lagu menggunakan scraper
+            const result = await spotifydl(url);
+            if (!result || !result.download_url) {
                 await m.reply('❌ Lagu tidak ditemukan atau tidak bisa diunduh');
                 return;
             }
 
-            // Kirim thumbnail dan info serta audio dalam satu pesan
-            const messageText = `🎧 *SPOTIFY PLAY*
+            // Proses data artists (array) dan album images
+            const artistNames = Array.isArray(result.artists) 
+                ? result.artists.map(artist => artist.name).join(', ')
+                : result.artists || result.artist || 'Unknown Artist';
+            
+            const thumbnailUrl = result.album?.images?.[0]?.url || result.image || result.thumbnail;
+            const trackName = result.name || result.title || 'Unknown Track';
+            const duration = result.duration_ms 
+                ? Math.floor(result.duration_ms / 1000 / 60) + ':' + String(Math.floor((result.duration_ms / 1000) % 60)).padStart(2, '0')
+                : 'N/A';
 
-🎵 *Judul:* ${title}
-👤 *Artis:* ${author}
+            // Kirim thumbnail dan info serta audio dalam satu pesan
+            const messageText = `🎧 *SPOTIFY DOWNLOADER*
+
+🎵 *Judul:* ${trackName}
+👤 *Artis:* ${artistNames}
+⏱️ *Durasi:* ${duration}
+🆔 *ID:* ${result.id || 'N/A'}
+🎼 *Type:* ${result.type || 'track'}
 
 _Sedang mengirim audio, mohon tunggu..._`;
 
@@ -36,9 +57,9 @@ _Sedang mengirim audio, mohon tunggu..._`;
                 contextInfo: {
                     externalAdReply: {
                         title: '乂 Spotify Downloader 乂',
-                        body: `${title} - ${author}`,
-                        thumbnailUrl: thumbnail,
-                        sourceUrl: 'https://open.spotify.com',
+                        body: `${trackName} - ${artistNames}`,
+                        thumbnailUrl: thumbnailUrl,
+                        sourceUrl: result.external_urls?.spotify || url,
                         mediaType: 1,
                         renderLargerThumbnail: true
                     }
@@ -47,15 +68,15 @@ _Sedang mengirim audio, mohon tunggu..._`;
 
             // Kirim audio
             await sock.sendMessage(m.chat, {
-                audio: { url: audio },
+                audio: { url: result.download_url },
                 mimetype: 'audio/mpeg',
-                fileName: `${title}.mp3`,
+                fileName: `${trackName}.mp3`,
                 contextInfo: {
                     externalAdReply: {
-                        title: title,
-                        body: author,
-                        thumbnailUrl: thumbnail,
-                        sourceUrl: 'https://open.spotify.com',
+                        title: trackName,
+                        body: artistNames,
+                        thumbnailUrl: thumbnailUrl,
+                        sourceUrl: result.external_urls?.spotify || url,
                         mediaType: 1,
                     }
                 }
@@ -67,45 +88,10 @@ _Sedang mengirim audio, mohon tunggu..._`;
             });
 
         } catch (error) {
-            console.error('Error in spotify play:', error);
-            await m.reply('❌ Gagal mengunduh lagu. Silakan coba lagi nanti.');
+            console.error('Error in spotify downloader:', error);
+            await m.reply('❌ Gagal mengunduh lagu. Pastikan URL Spotify valid dan coba lagi nanti.');
         }
     }
 }
 
-// Fungsi untuk mencari dan mengunduh lagu dari Spotify
-async function spotifySong(query) {
-    try {
-        // Cari URL Spotify
-        const { data: searchData } = await axios.get('https://api.fasturl.link/music/spotify', {
-            params: { name: query },
-            headers: { 'X-API-Key': globalThis.apiKey.fasturl, 'accept': 'application/json' }
-        });
-        if (!searchData?.result?.[0]?.url) {
-            throw new Error('Lagu tidak ditemukan');
-        }
-
-        // Unduh lagu dari URL Spotify menggunakan API baru
-        const spotifyUrl = searchData.result[0].url;
-        const { data: songData } = await axios.get('https://ytdlpyton.nvlgroup.my.id/spotify/download/audio', {
-            params: { url: spotifyUrl, mode: 'url' },
-            headers: { 'X-API-Key': globalThis.apiKey.ytdl, 'accept': 'application/json' }
-        });
-        if (!songData || songData.status !== 'Success' || !songData.download_url) {
-            throw new Error('Gagal mengunduh lagu');
-        }
-
-        return {
-            thumbnail: songData.thumbnail,
-            title: songData.title,
-            author: songData.artist,
-            audio: songData.download_url
-        };
-
-    } catch (error) {
-        console.error('Error in spotifySong:', error);
-        throw error;
-    }
-}
-
-export default handler; 
+export default handler;

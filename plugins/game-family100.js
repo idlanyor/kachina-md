@@ -1,4 +1,4 @@
-
+import axios from "axios";
 export const handler = {
     command: ['family100'],
     category: 'game',
@@ -26,40 +26,60 @@ export const handler = {
                 global.family100Game = {};
             }
 
-            // Fetch family100 data from API
-            let response;
-            try {
-                response = await fetch('https://raw.githubusercontent.com/BochilTeam/database/master/games/family100.json');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch family100 data');
-                }
-            } catch (error) {
-                return await m.reply('❌ Gagal mengambil data game. Coba lagi nanti!');
-            }
-
-            const family100Data = await response.json();
+            // Fetch family100 data from new API
+            let family100Data;
+            let retryCount = 0;
+            const maxRetries = 3;
             
-            // Pick random question
-            let randomQuestion = family100Data[Math.floor(Math.random() * family100Data.length)];
+            while (retryCount < maxRetries) {
+                try {
+                    const { data } = await axios.get('https://api.siputzx.my.id/api/games/family100', {
+                        headers: {
+                            'accept': '*/*',
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                        },
+                        timeout: 10000 // 10 second timeout
+                    });
+                    
+                    // Check if API response is successful
+                    if (data.status && data.data) {
+                        family100Data = data.data;
+                        break; // Success, exit retry loop
+                    } else {
+                        throw new Error('API response status is false or data is missing');
+                    }
+                } catch (error) {
+                    retryCount++;
+                    console.log(`Attempt ${retryCount} failed:`, error.message);
+                    
+                    if (retryCount >= maxRetries) {
+                        console.log('All retry attempts failed:', error);
+                        return await m.reply('❌ Gagal mengambil data game setelah beberapa percobaan. Jaringan tidak stabil atau server sedang bermasalah. Coba lagi nanti!');
+                    }
+                    
+                    // Wait before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+                }
+            }
             
             let gameText = `🎯 *GAME FAMILY 100* 🎯\n\n`;
-            gameText += `📝 *Soal:* ${randomQuestion.soal}\n\n`;
+            gameText += `📝 *Soal:* ${family100Data.soal}\n\n`;
             gameText += `🎁 *Hadiah:* ${winScore.toLocaleString('id-ID')} money\n`;
             gameText += `⏰ *Waktu:* 60 detik\n\n`;
-            gameText += `🔍 Terdapat *${randomQuestion.jawaban.length}* jawaban yang harus ditebak!\n`;
-            gameText += `${randomQuestion.jawaban.find(v => v.includes(" ")) ? `💡 *(beberapa jawaban terdapat spasi)*` : ""}\n\n`;
+            gameText += `🔍 Terdapat *${family100Data.jawaban.length}* jawaban yang harus ditebak!\n`;
+            gameText += `${family100Data.jawaban.find(v => v.includes(" ")) ? `💡 *(beberapa jawaban terdapat spasi)*` : ""}\n\n`;
             gameText += `💬 Ketik jawaban langsung di chat!`;
 
             // Store game data
             global.family100Game[id] = {
                 id,
-                soal: randomQuestion.soal,
-                jawaban: randomQuestion.jawaban,
-                terjawab: Array.from(randomQuestion.jawaban, () => false),
+                soal: family100Data.soal,
+                jawaban: family100Data.jawaban,
+                terjawab: Array.from(family100Data.jawaban, () => false),
                 winScore,
                 startTime: Date.now()
             };
-
+            console.log('Family100 game started:', global.family100Game[id]);
             await m.reply(gameText);
 
             // Set 60 second timer

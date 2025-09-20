@@ -34,7 +34,7 @@ export const handler = {
                         externalAdReply: {
                             title: '乂 Qwen AI 乂',
                             body: `Question: ${args}`,
-                            thumbnailUrl: 'https://s6.imgcdn.dev/YYoFZh.jpg',
+                            thumbnailUrl: 'https://s3.ryzumi.vip/ryzumi-api/62109931ae93df4a132534b6.jpg',
                             sourceUrl: `${globalThis.newsletterUrl}`,
                             mediaType: 1,
                             renderLargerThumbnail: true

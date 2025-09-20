@@ -1,0 +1,225 @@
+import fs from 'fs-extra';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+export class AudioEffectsHandler {
+    static async handleBass(sock, m, args) {
+        try {
+            if (!m.quoted || !m.quoted.message?.audioMessage) {
+                await m.reply('❌ Reply audio yang ingin diberi efek bass!');
+                return;
+            }
+
+            await m.reply('⏳ Sedang memproses audio...');
+            const audio = await m.quoted.download();
+            const inputPath = `./temp/${m.chat}_input.mp3`;
+            const outputPath = `./temp/${m.chat}_bass.mp3`;
+
+            await fs.promises.writeFile(inputPath, audio);
+            await execAsync(`ffmpeg -i ${inputPath} -af "bass=g=15:f=110:w=0.6" ${outputPath}`);
+
+            await sock.sendMessage(m.chat, {
+                audio: { url: outputPath },
+                mimetype: 'audio/mp4',
+                ptt: false
+            }, { quoted: m });
+
+            fs.unlinkSync(inputPath);
+            fs.unlinkSync(outputPath);
+        } catch (error) {
+            await m.reply(`❌ Error: ${error.message}`);
+        }
+    }
+
+    static async handleNightcore(sock, m, args) {
+        try {
+            if (!m.quoted || !m.quoted.message?.audioMessage) {
+                await m.reply('❌ Reply audio yang ingin diberi efek nightcore!');
+                return;
+            }
+
+            await m.reply('⏳ Sedang memproses audio...');
+            const audio = await m.quoted.download();
+            const inputPath = `./temp/${m.chat}_input.mp3`;
+            const outputPath = `./temp/${m.chat}_nightcore.mp3`;
+
+            await fs.promises.writeFile(inputPath, audio);
+            await execAsync(`ffmpeg -i ${inputPath} -af "asetrate=44100*1.25,aresample=44100,atempo=1.05" ${outputPath}`);
+
+            await sock.sendMessage(m.chat, {
+                audio: { url: outputPath },
+                mimetype: 'audio/mp4',
+                ptt: false
+            }, { quoted: m });
+
+            fs.unlinkSync(inputPath);
+            fs.unlinkSync(outputPath);
+        } catch (error) {
+            await m.reply(`❌ Error: ${error.message}`);
+        }
+    }
+
+    static async handleSlow(sock, m, args) {
+        try {
+            if (!m.quoted || !m.quoted.message?.audioMessage) {
+                await m.reply('❌ Reply audio yang ingin diberi efek slow!');
+                return;
+            }
+
+            await m.reply('⏳ Sedang memproses audio...');
+            const audio = await m.quoted.download();
+            const inputPath = `./temp/${m.chat}_input.mp3`;
+            const outputPath = `./temp/${m.chat}_slow.mp3`;
+
+            await fs.promises.writeFile(inputPath, audio);
+            await execAsync(`ffmpeg -i ${inputPath} -af "atempo=0.8" ${outputPath}`);
+
+            await sock.sendMessage(m.chat, {
+                audio: { url: outputPath },
+                mimetype: 'audio/mp4',
+                ptt: false
+            }, { quoted: m });
+
+            fs.unlinkSync(inputPath);
+            fs.unlinkSync(outputPath);
+        } catch (error) {
+            await m.reply(`❌ Error: ${error.message}`);
+        }
+    }
+
+    static async handleRobot(sock, m, args) {
+        try {
+            if (!m.quoted || !m.quoted.message?.audioMessage) {
+                await m.reply('❌ Reply audio yang ingin diberi efek robot!');
+                return;
+            }
+
+            await m.reply('⏳ Sedang memproses audio...');
+            const audio = await m.quoted.download();
+            const inputPath = `./temp/${m.chat}_input.mp3`;
+            const outputPath = `./temp/${m.chat}_robot.mp3`;
+
+            await fs.promises.writeFile(inputPath, audio);
+            await execAsync(`ffmpeg -i ${inputPath} -af "afftfilt=real='hypot(re,im)*sin(0)':imag='hypot(re,im)*cos(0)':win_size=512:overlap=0.75" ${outputPath}`);
+
+            await sock.sendMessage(m.chat, {
+                audio: { url: outputPath },
+                mimetype: 'audio/mp4',
+                ptt: false
+            }, { quoted: m });
+
+            fs.unlinkSync(inputPath);
+            fs.unlinkSync(outputPath);
+        } catch (error) {
+            await m.reply(`❌ Error: ${error.message}`);
+        }
+    }
+
+    static async handleReverse(sock, m, args) {
+        try {
+            if (!m.quoted || !m.quoted.message?.audioMessage) {
+                await m.reply('❌ Reply audio yang ingin direverse!');
+                return;
+            }
+
+            await m.reply('⏳ Sedang memproses audio...');
+            const audio = await m.quoted.download();
+            const inputPath = `./temp/${m.chat}_input.mp3`;
+            const outputPath = `./temp/${m.chat}_reverse.mp3`;
+
+            await fs.promises.writeFile(inputPath, audio);
+            await execAsync(`ffmpeg -i ${inputPath} -af "areverse" ${outputPath}`);
+
+            await sock.sendMessage(m.chat, {
+                audio: { url: outputPath },
+                mimetype: 'audio/mp4',
+                ptt: false
+            }, { quoted: m });
+
+            fs.unlinkSync(inputPath);
+            fs.unlinkSync(outputPath);
+        } catch (error) {
+            await m.reply(`❌ Error: ${error.message}`);
+        }
+    }
+
+    static async handleToVn(sock, m, args) {
+        try {
+            if (!m.quoted || !m.quoted.message?.audioMessage) {
+                await m.reply('❌ Reply audio yang ingin dikonversi ke voice note!');
+                return;
+            }
+
+            await sock.sendMessage(m.chat, {
+                react: { text: '⏳', key: m.key }
+            });
+
+            const audio = await m.quoted.download();
+            const inputPath = `./temp/${m.chat}_input.mp3`;
+            const outputPath = `./temp/${m.chat}_vn.ogg`;
+
+            await fs.promises.writeFile(inputPath, audio);
+            await execAsync(`ffmpeg -i ${inputPath} -af "silenceremove=1:0:-50dB" -c:a libopus -b:a 128k ${outputPath}`);
+
+            await sock.sendMessage(m.chat, {
+                audio: { url: outputPath },
+                mimetype: 'audio/ogg; codecs=opus',
+                ptt: true
+            }, { quoted: m });
+
+            fs.unlinkSync(inputPath);
+            fs.unlinkSync(outputPath);
+
+            await sock.sendMessage(m.chat, {
+                react: { text: '✅', key: m.key }
+            });
+        } catch (error) {
+            console.error('Error in tovn:', error);
+            await m.reply(`❌ Error: ${error.message}`);
+            await sock.sendMessage(m.chat, {
+                react: { text: '❌', key: m.key }
+            });
+        }
+    }
+
+    static async handleToMp3(sock, m, args) {
+        try {
+            if (!m.quoted || !m.quoted.message?.audioMessage) {
+                await m.reply('❌ Reply voice note yang ingin dikonversi ke MP3!');
+                return;
+            }
+
+            await sock.sendMessage(m.chat, {
+                react: { text: '⏳', key: m.key }
+            });
+
+            const audio = await m.quoted.download();
+            const inputPath = `./temp/${m.chat}_input.opus`;
+            const outputPath = `./temp/${m.chat}_audio.mp3`;
+
+            await fs.promises.writeFile(inputPath, audio);
+            await execAsync(`ffmpeg -i ${inputPath} -acodec libmp3lame -ab 320k ${outputPath}`);
+
+            await sock.sendMessage(m.chat, {
+                audio: { url: outputPath },
+                mimetype: 'audio/mp4',
+                ptt: false
+            }, { quoted: m });
+
+            fs.unlinkSync(inputPath);
+            fs.unlinkSync(outputPath);
+
+            await sock.sendMessage(m.chat, {
+                react: { text: '✅', key: m.key }
+            });
+        } catch (error) {
+            console.error('Error in tomp3:', error);
+            await m.reply(`❌ Error: ${error.message}`);
+            await sock.sendMessage(m.chat, {
+                react: { text: '❌', key: m.key }
+            });
+        }
+    }
+}

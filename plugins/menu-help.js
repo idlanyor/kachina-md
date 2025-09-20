@@ -3,7 +3,6 @@ import path from 'path'
 import fs from 'fs'
 import { pathToFileURL } from 'url'
 import Database from '../helper/database.js'
-import figlet from 'figlet' // ← tambah impor Figlet
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -40,21 +39,8 @@ export const handler = {
             const prefix = '.'
             const settings = await Database.getSettings()
 
-            // Emoji dan deskripsi mode
-            const modeEmoji = {
-                'public': '📢',
-                'self-private': '👤',
-                'self-me': '👑'
-            }
-
-            const modeDesc = {
-                'public': 'Semua bisa menggunakan',
-                'self-private': 'Private chat & owner di grup',
-                'self-me': 'Hanya owner'
-            }
-
             // Ambil plugin commands - hanya dari folder plugins
-            const pluginsDir = __dirname // Langsung gunakan __dirname karena sudah di folder plugins
+            const pluginsDir = __dirname
             const categories = {}
 
             // Load plugin commands
@@ -112,15 +98,15 @@ export const handler = {
                             }
 
                             const icon = categoryIcons[category] || '📁'
-                            let detailMenu = `╭─「 📚 COMMAND DETAIL 」\n` +
-                                `├ Command: ${prefix}${searchCmd}\n` +
-                                `├ Description: ${plugin.help}\n` +
-                                `├ Category: ${icon} ${category.toUpperCase()}\n` +
-                                `├ Tags: ${plugin.tags?.join(', ') || '-'}\n` +
-                                `╰──────────────────\n\n` +
+                            let detailMenu = `╭━━╼『 📚 COMMAND DETAIL 』\n` +
+                                `▧ Command: ${prefix}${searchCmd}\n` +
+                                `▧ Description: ${plugin.help}\n` +
+                                `▧ Category: ${icon} ${category.toUpperCase()}\n` +
+                                `▧ Tags: ${plugin.tags?.join(', ') || '-'}\n` +
+                                `╰━━━━━━━━━━━━━━━━━━╼\n\n` +
                                 `💡 *Tips:*\n` +
-                                `• Ketik ${prefix}menu untuk kembali ke menu utama\n` +
-                                `• Channel: https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m`
+                                `▧ Ketik ${prefix}menu untuk kembali ke menu utama\n` +
+                                `▧ Channel: https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m`
 
                             await m.reply(detailMenu)
                             found = true
@@ -136,9 +122,16 @@ export const handler = {
                 return
             }
 
-            // --- List message per kategori ---
-            const sections = []
+            // Hitung total commands
             let totalCommands = 0
+            for (const plugins of Object.values(categories)) {
+                for (const plugin of plugins) {
+                    totalCommands += plugin.commands.length
+                }
+            }
+
+            const hour = new Date().getHours()
+            const greeting = hour >= 4 && hour < 11 ? 'Pagi' : hour < 15 ? 'Siang' : hour < 18 ? 'Sore' : 'Malam'
 
             const categoryIcons = {
                 'main': '⚡',
@@ -162,7 +155,13 @@ export const handler = {
                 'sticker', 'tools', 'group', 'moderation', 'game',
                 'misc', 'owner'
             ]
-            let menuText = ''
+
+            // Build menu text dengan dekorasi dari menu.js
+            let menuText = `Hai kak 👋🏻 *@${m.sender.split('@')[0]}*\n`
+            menuText += `▧ Selamat ${greeting}\n\n`
+            
+            menuText += `_*❏ M E N U  B O T*_\n`
+            menuText += `▧ Berikut menu yang tersedia\n\n`
 
             const orderedCategories = categoryOrder.filter(c => categories[c])
                 .concat(Object.keys(categories).filter(c => !categoryOrder.includes(c)))
@@ -172,77 +171,39 @@ export const handler = {
                 if (!plugins || plugins.length === 0 || category.toUpperCase() === 'HIDDEN') continue
 
                 const icon = categoryIcons[category] || '📁'
-                const rows = []
-
+                menuText += `\n╭━━╼『 ${icon} *${category.toUpperCase()}* 』\n`
+                
                 for (const plugin of plugins) {
                     for (const cmd of plugin.commands) {
-                        rows.push({
-                            title: `${cmd}`.toUpperCase(),
-                            description: plugin.help,
-                            id: `${cmd}`
-                        })
-                        totalCommands++
+                        menuText += `┃ ☰ ${prefix}${cmd}\n`
                     }
                 }
-
-                if (rows.length) {
-                    sections.push({
-                        title: `${icon} ${category.toUpperCase()}`,
-                        rows
-                    })
-                }
+                menuText += `╰━━━━━━━━━━━━━━━━━━╼\n`
             }
 
-            const hour = new Date().getHours()
-            const greeting = hour >= 4 && hour < 11 ? 'Pagi' : hour < 15 ? 'Siang' : hour < 18 ? 'Sore' : 'Malam'
+            menuText += `\n_*❏ I N F O  B O T*_\n`
+            menuText += `▧ Total Kategori: ${orderedCategories.filter(c => categories[c] && categories[c].length > 0).length}\n`
+            menuText += `▧ Total Commands: ${totalCommands}\n`
+            menuText += `▧ Prefix: ${prefix}\n`
+            menuText += `▧ Mode: ${settings.botMode}\n`
+            menuText += `▧ Owner: ${owner}\n\n`
+            
+            menuText += `💡 *Tips:*\n`
+            menuText += `▧ Ketik ${prefix}help <command> untuk detail command\n`
+            menuText += `▧ Channel: https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m\n\n`
+            menuText += `_© Create by idlanyor_`
 
-            const footer = `📊 Total Kategori: ${sections.length}\n` +
-                `📌 Total Commands: ${totalCommands}\n` +
-                `⚙️ Prefix: ${prefix}\n` +
-                `🔰 Mode: ${settings.botMode}`
-            // Build menu text with categories and commands
-            for (const [category, plugins] of Object.entries(categories)) {
-                if (plugins.length === 0) continue
-
-                const icon = categoryIcons[category] || '📁'
-                menuText += `│ ${icon} *${category.toUpperCase()}*\n`
-                for (const plugin of plugins) {
-                    const cmdList = plugin.commands.map(cmd => `${prefix}${cmd}`).join(', ')
-                    menuText += `│ ▸ ${cmdList}\n`
-                }
-                menuText += '│\n'
-            }
-
-            // Send menu message with image and interactive button
+            // Send plain text menu
             await sock.sendMessage(m.chat, {
                 image: { url: globalThis.ppUrl },
-                caption: `╭─「 ${botName} 」\n` +
-                    `├ Selamat ${greeting} @${m.sender.split('@')[0]}\n` +
-                    `├ Berikut menu yang tersedia\n` +
-                    `├ Silakan pilih kategori menu:\n` +
-                    `╰────────────⭐\n\n` +
-                    menuText, // Add menuText to caption
-                footer,
-                buttons: [{
-                    buttonId: 'action',
-                    buttonText: { displayText: '📋 Buka Menu' },
-                    type: 4,
-                    nativeFlowInfo: {
-                        name: 'single_select',
-                        paramsJson: JSON.stringify({
-                            title: '📚 KATEGORI MENU',
-                            sections
-                        })
-                    }
-                }],
-                headerType: 1,
-                viewOnce: true,
+                caption: menuText,
                 contextInfo: {
                     mentionedJid: [m.sender],
                     isForwarded: true,
                     forwardingScore: 999
                 }
             }, { quoted: m })
+
         } catch (error) {
             console.error('Error in help:', error)
             await m.reply('❌ Terjadi kesalahan saat memuat menu')
@@ -251,14 +212,3 @@ export const handler = {
 }
 
 export default handler
-
-// ──[ ASCII Banner ]────────────────────────────────────────
-const banner = figlet.textSync(botName, {
-    font: 'ANSI Shadow', // pilih font unik, boleh diganti
-    horizontalLayout: 'default',
-    verticalLayout: 'default'
-})
-
-// Buat menu text dengan banner
-let menuText = '```\n' + banner + '\n```\n' // blok kode agar rapi di WhatsApp
-menuText += `╭─「 MENU 」\n`
