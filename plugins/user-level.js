@@ -3,8 +3,9 @@ import User from '../database/models/User.js'
 import canvafy from 'canvafy'
 
 export const handler = {
-    command: ['level', 'lvl', 'rank'],
+    command: ['level'],
     description: 'Menampilkan level card dengan canvas',
+    help: 'Menampilkan level card user',
     category: 'user',
 
     async exec({ m, sock, args }) {

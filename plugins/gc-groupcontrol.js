@@ -7,6 +7,10 @@ export const handler = {
     isBotAdmin: true,
     exec: async ({ sock, m, cmd }) => {
         try {
+            if(!m.isAdmin){
+                await m.reply('❌ Hanya admin yang dapat menggunakan perintah ini');
+                return;
+            }
             // Ambil metadata grup
             const groupMetadata = await sock.groupMetadata(m.chat);
             

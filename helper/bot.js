@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import { startBot } from "../main.js";
 
-class Kanata {
+class Kachina {
     constructor(data, io = null) {
         this.phoneNumber = data.phoneNumber;
         this.sessionId = data.sessionId;
@@ -229,4 +229,4 @@ async function clearMessages(m) {
 }
 const sanitizeBotId = botId => botId.split(":")[0] + "@s.whatsapp.net";
 
-export { Kanata, clearMessages, sanitizeBotId };
+export { Kachina, clearMessages, sanitizeBotId };

@@ -8,7 +8,7 @@ const groq = new Groq({ apiKey: globalThis.apiKey.groq });
 export const handler = {
     command: ['tts'],
     category: 'ai',
-    help: 'Text-to-speech (Groq PlayAI). Gunakan !tts <teks> atau reply pesan dengan !tts',
+    help: 'AI Text-to-speech',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

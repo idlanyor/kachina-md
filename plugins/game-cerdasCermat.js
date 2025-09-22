@@ -9,7 +9,7 @@ const userAnswerCooldowns = new Map();
 export const handler = {
     command: ['cerdasCermat', 'cc','lcc'],
     category: 'game',
-    help: 'Game Cerdas Cermat - Kuis mata pelajaran SD!\n\nFormat: !cerdasCermat <matapelajaran> <jumlahsoal>\nContoh: !cerdasCermat matematika 5\n\nMata Pelajaran: matematika, bindo, tik, pkn, bing, penjas, pai, jawa, ips, ipa\nJumlah Soal: 5-10',
+    help: 'Game Cerdas Cermat',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

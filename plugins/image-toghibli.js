@@ -2,8 +2,8 @@ import { downloadMediaMessage } from 'baileys'
 
 export const handler = {
     command: ['toghibli'],
-    category: 'ai',
-    help: 'Mengkonversi gambar menjadi style Studio Ghibli\n\nCara pakai:\n1. Reply gambar dengan !toghibli\n2. Kirim gambar dengan caption !toghibli [prompt]',
+    category: 'image',
+    help: 'To Ghibli',
     exec: async ({ sock, m, args }) => {
         try {
             let quotedMsg

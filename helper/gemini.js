@@ -148,7 +148,7 @@ export async function analyzeMessage(message, plugins, retryCount = 0) {
     try {
         const analyzeModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const prompt = `Lu adalah Kanata, bot WhatsApp yang pinter banget. Lu punya fitur-fitur keren berikut:
+        const prompt = `Lu adalah Kachina, bot WhatsApp yang pinter banget. Lu punya fitur-fitur keren berikut:
 
 ${JSON.stringify(plugins, null, 2)}
 
@@ -250,13 +250,13 @@ export async function chatWithAI(message, plugins, userId) {
         if (history.length > 0) {
             conversationContext = '\n\nRiwayat percakapan sebelumnya:\n';
             history.forEach((msg, index) => {
-                const role = msg.role === 'user' ? 'User' : 'Kanata';
+                const role = msg.role === 'user' ? 'User' : 'Kachina';
                 conversationContext += `${role}: ${msg.content}\n`;
             });
             conversationContext += '\nLanjutkan percakapan berdasarkan context di atas.\n';
         }
 
-        const prompt = `Lu adalah Kanata, seorang teman yang baik dan bisa dipercaya. Lu adalah sosok yang:
+        const prompt = `Lu adalah Kachina, seorang teman yang baik dan bisa dipercaya. Lu adalah sosok yang:
 - Empati dan peduli sama orang lain
 - Bisa dengerin dengan sabar tanpa menghakimi
 - Punya perspektif yang bijak tapi tetep humble

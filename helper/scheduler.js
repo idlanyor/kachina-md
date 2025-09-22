@@ -113,7 +113,7 @@ class AutoNotification {
                 message += `⏰ ${currentTime}\n\n`;
                 message += `😔 Tidak ada anime yang tayang hari ${currentDay}\n\n`;
                 message += `🔄 Coba cek lagi besok untuk jadwal anime terbaru!`;
-                message += `\n\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`;
+                message += `\n\n🤖 Auto Update by: ${globalThis.botName || 'Kachina Bot'}`;
 
                 await this.sock.sendMessage(targetNumber, { text: message });
                 return;
@@ -132,7 +132,7 @@ class AutoNotification {
             });
 
             animeList += `✨ Selamat menonton anime favorit kalian!\n`;
-            animeList += `\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`;
+            animeList += `\n🤖 Auto Update by: ${globalThis.botName || 'Kachina Bot'}`;
 
             await this.sock.sendMessage(targetNumber, { text: animeList });
             logger.success(`📤 Anime notification sent to ${targetNumber.split('@')[0]} - ${todayAnime.length} anime for ${currentDay}`);
@@ -166,7 +166,7 @@ class AutoNotification {
                 message += `⏰ ${new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' })}\n\n`;
                 message += `😔 Tidak ada anime yang tayang hari ${currentDay}\n\n`;
                 message += `🔄 Coba cek lagi besok untuk jadwal anime terbaru!`;
-                message += `\n\n🧪 *Ini adalah pesan test*\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`;
+                message += `\n\n🧪 *Ini adalah pesan test*\n🤖 Auto Update by: ${globalThis.botName || 'Kachina Bot'}`;
 
                 await this.sock.sendMessage(targetNumber, { text: message });
                 return true;
@@ -185,7 +185,7 @@ class AutoNotification {
             });
 
             testMessage += `✨ Selamat menonton anime favorit kalian!\n`;
-            testMessage += `\n🧪 *Ini adalah pesan test*\n🤖 Auto Update by: ${globalThis.botName || 'Kanata Bot'}`;
+            testMessage += `\n🧪 *Ini adalah pesan test*\n🤖 Auto Update by: ${globalThis.botName || 'Kachina Bot'}`;
 
             await this.sock.sendMessage(targetNumber, { text: testMessage });
             logger.success(`📤 Test anime notification sent to ${targetNumber.split('@')[0]} - ${todayAnime.length} anime for ${currentDay}`);

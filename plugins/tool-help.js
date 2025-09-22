@@ -228,14 +228,14 @@ export const handler = {
 
             await sock.sendMessage(m.chat, {
                 image: { url: `${globalThis.ppUrl}` },
-                caption: `╭─「 🎯 KANATA BOT 」\n` +
+                caption: `╭─「 🎯 KACHINA BOT 」\n` +
                          `├ Selamat ${greeting} 👋\n` +
                          `├ Hai @${noTel}\n` +
                          `│\n` +
                          `├ Silahkan pilih kategori menu\n` +
                          `├ yang ingin ditampilkan:\n` +
                          `${footer}`,
-                footer: '© 2024 Kanata Bot • Created by Roy',
+                footer: '© 2024 Kachina Bot • Created by Roy',
                 buttons: [
                     {
                         buttonId: 'action',
@@ -259,7 +259,7 @@ export const handler = {
                     isForwarded: true,
                     forwardingScore: 999,
                     externalAdReply: {
-                        title: '乂 Kanata Bot Menu 乂',
+                        title: '乂 Kachina Bot Menu 乂',
                         body: 'Interactive Menu System',
                         thumbnailUrl: `${globalThis.ppUrl}`,
                         sourceUrl: `${globalThis.newsletterUrl}`,

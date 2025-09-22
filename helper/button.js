@@ -5,7 +5,7 @@ export const sendIAMessage = async (jid, btns = [], quoted, opts = {}, sock) => 
             message: {
                 interactiveMessage: proto.Message.InteractiveMessage.create({
                     body: proto.Message.InteractiveMessage.Body.create({
-                        text: '*Kanata Bot V2*', // Isi utama pesan
+                        text: '*Kachina Bot V2*', // Isi utama pesan
                     }),
                     footer: proto.Message.InteractiveMessage.Footer.create({
                         text: opts.footer, // Footer pesan
@@ -25,8 +25,8 @@ export const sendIAMessage = async (jid, btns = [], quoted, opts = {}, sock) => 
                     },
                     externalAdReply: {
                         showAdAttribution: true,
-                        title: `乂 Kanata 乂`,
-                        body: 'Kanata Bot',
+                        title: `乂 Kachina 乂`,
+                        body: 'Kachina Bot',
                         // mediaType: 1,
                         previewType: 0,
                         renderLargerThumbnail: true,

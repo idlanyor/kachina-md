@@ -1,7 +1,7 @@
 import User from '../database/models/User.js'
 
 export const handler = {
-    command: ['balance', 'bal', 'money', 'dompet'],
+    command: ['bal'],
     category: 'user',
     help: 'Cek balance/saldo Anda',
     isRegistered: true,

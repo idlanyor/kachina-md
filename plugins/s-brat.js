@@ -38,7 +38,7 @@ export const handler = {
             // Buat stiker dari gambar
             const sticker = new Sticker(Buffer.from(data), {
                 pack: 'Brat Generator',
-                author: 'KanataBot',
+                author: 'KachinaBot',
                 type: StickerTypes.FULL,
                 categories: ['✨'],
                 id: 'brat',

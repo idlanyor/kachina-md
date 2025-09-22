@@ -40,7 +40,7 @@ export const handler = {
             // Create sticker from GIF using wa-sticker-formatter
             const sticker = new Sticker(Buffer.from(response.data), {
                 pack: 'Animated Brat Generator',
-                author: 'KanataBot',
+                author: 'KachinaBot',
                 type: StickerTypes.FULL,
                 categories: ['🎬'],
                 id: 'bratvid',

@@ -27,14 +27,14 @@ function findJsFiles(dir) {
 export const handler = {
     command: ['help', 'h', 'menu'],
     category: 'info',
-    help: 'Menampilkan menu bantuan',
+    help: 'Menampilkan menu bantuan. Gunakan .menu <kategori> untuk melihat perintah dalam kategori',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
     isGroup: false,
     exec: async ({ sock, m, args, noTel, sender }) => {
         try {
-            const botName = globalThis.botName || 'Kanata Bot'
+            const botName = globalThis.botName || 'Kachina Bot'
             const owner = globalThis.owner || 'Roy'
             const prefix = '.'
             const settings = await Database.getSettings()
@@ -72,52 +72,80 @@ export const handler = {
                 }
             }
 
-            // Jika ada args, tampilkan detail command
-            if (args) {
-                const searchCmd = args.toLowerCase()
+            // Definisi icon kategori
+            const categoryIcons = {
+                'main': '⚡',
+                'ai': '🤖',
+                'converter': '🔄',
+                'downloader': '📥',
+                'group': '👥',
+                'hidden': '🔒',
+                'misc': '🛠️',
+                'moderation': '🛡️',
+                'owner': '👑',
+                'search': '🔍',
+                'sticker': '🎯',
+                'tools': '⚙️',
+                'game': '🎮',
+                'religi': '🕌',
+                'info': '📊'
+            }
+            
+            // Jika ada args, cek apakah itu kategori atau command
+            if (args && args.length > 0) {
+                const searchArg = args.toLowerCase()
                 let found = false
-
+                
+                // Cek apakah args adalah kategori
                 for (const [category, plugins] of Object.entries(categories)) {
-                    for (const plugin of plugins) {
-                        if (plugin.commands.includes(searchCmd)) {
-                            const categoryIcons = {
-                                'main': '⚡',
-                                'ai': '🤖',
-                                'converter': '🔄',
-                                'downloader': '📥',
-                                'group': '👥',
-                                'hidden': '🔒',
-                                'misc': '🛠️',
-                                'moderation': '🛡️',
-                                'owner': '👑',
-                                'search': '🔍',
-                                'sticker': '🎯',
-                                'tools': '⚙️',
-                                'game': '🎮',
-                                'religi': '🕌'
+                    if (category.toLowerCase() === searchArg) {
+                        const icon = categoryIcons[category] || '📁'
+                        let categoryMenu = `╭━━╼『 MENU ${category.toUpperCase()} 』\n`
+                        
+                        for (const plugin of plugins) {
+                            for (const cmd of plugin.commands) {
+                                categoryMenu += `┃ ☰ _*${prefix}${cmd} - ${plugin.help.trim()}*_\n`
                             }
-
-                            const icon = categoryIcons[category] || '📁'
-                            let detailMenu = `╭━━╼『 📚 COMMAND DETAIL 』\n` +
-                                `▧ Command: ${prefix}${searchCmd}\n` +
-                                `▧ Description: ${plugin.help}\n` +
-                                `▧ Category: ${icon} ${category.toUpperCase()}\n` +
-                                `▧ Tags: ${plugin.tags?.join(', ') || '-'}\n` +
-                                `╰━━━━━━━━━━━━━━━━━━╼\n\n` +
-                                `💡 *Tips:*\n` +
-                                `▧ Ketik ${prefix}menu untuk kembali ke menu utama\n` +
-                                `▧ Channel: https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m`
-
-                            await m.reply(detailMenu)
-                            found = true
-                            break
                         }
+                        
+                        categoryMenu += `╰━━━━━━━━━━━━━━━━━━╼\n\n` +
+                            `💡 *Tips:*\n` +
+                            `▧ Ketik ${prefix}help <command> untuk detail command\n` +
+                            `▧ Ketik ${prefix}menu untuk kembali ke menu utama\n` +
+                        
+                        await m.reply(categoryMenu)
+                        found = true
+                        break
                     }
-                    if (found) break
+                }
+                
+                // Jika bukan kategori, cek apakah itu command
+                if (!found) {
+                    for (const [category, plugins] of Object.entries(categories)) {
+                        for (const plugin of plugins) {
+                            if (plugin.commands.includes(searchArg)) {
+                                const icon = categoryIcons[category] || '📁'
+                                let detailMenu = `╭━━╼『 📚 COMMAND DETAIL 』\n` +
+                                    `▧ Command: ${prefix}${searchArg}\n` +
+                                    `▧ Description: ${plugin.help}\n` +
+                                    `▧ Category: ${icon} ${category.toUpperCase()}\n` +
+                                    `▧ Tags: ${plugin.tags?.join(', ') || '-'}\n` +
+                                    `╰━━━━━━━━━━━━━━━━━━╼\n\n` +
+                                    `💡 *Tips:*\n` +
+                                    `▧ Ketik ${prefix}menu untuk kembali ke menu utama\n` +
+                                    `▧ Channel: https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m`
+
+                                await m.reply(detailMenu)
+                                found = true
+                                break
+                            }
+                        }
+                        if (found) break
+                    }
                 }
 
                 if (!found) {
-                    await m.reply(`❌ Command "${args}" tidak ditemukan`)
+                    await m.reply(`❌ Command atau kategori "${args}" tidak ditemukan`)
                 }
                 return
             }
@@ -133,22 +161,6 @@ export const handler = {
             const hour = new Date().getHours()
             const greeting = hour >= 4 && hour < 11 ? 'Pagi' : hour < 15 ? 'Siang' : hour < 18 ? 'Sore' : 'Malam'
 
-            const categoryIcons = {
-                'main': '⚡',
-                'ai': '🤖',
-                'converter': '🔄',
-                'downloader': '📥',
-                'group': '👥',
-                'hidden': '🔒',
-                'misc': '🛠️',
-                'moderation': '🛡️',
-                'owner': '👑',
-                'search': '🔍',
-                'sticker': '🎯',
-                'tools': '⚙️',
-                'game': '🎮',
-                'religi': '🕌'
-            }
 
             const categoryOrder = [
                 'main', 'ai', 'downloader', 'search', 'converter',
@@ -156,30 +168,32 @@ export const handler = {
                 'misc', 'owner'
             ]
 
-            // Build menu text dengan dekorasi dari menu.js
+            // Build menu text dengan dekorasi dari menu.js - hanya tampilkan kategori
             let menuText = `Hai kak 👋🏻 *@${m.sender.split('@')[0]}*\n`
             menuText += `▧ Selamat ${greeting}\n\n`
             
-            menuText += `_*❏ M E N U  B O T*_\n`
-            menuText += `▧ Berikut menu yang tersedia\n\n`
+            menuText += `_*❏ K A C H I N A -  M D*_\n`
+            menuText += `▧ Berikut kategori menu yang tersedia\n`
+            menuText += `▧ Ketik ${prefix}menu <kategori> untuk melihat daftar perintah\n\n`
 
             const orderedCategories = categoryOrder.filter(c => categories[c])
                 .concat(Object.keys(categories).filter(c => !categoryOrder.includes(c)))
 
+            menuText += `╭━━╼『 _*❏ L I S T  M E N U  *_ 』\n`
             for (const category of orderedCategories) {
                 const plugins = categories[category]
                 if (!plugins || plugins.length === 0 || category.toUpperCase() === 'HIDDEN') continue
 
                 const icon = categoryIcons[category] || '📁'
-                menuText += `\n╭━━╼『 ${icon} *${category.toUpperCase()}* 』\n`
-                
+                // Hitung jumlah perintah dalam kategori
+                let commandCount = 0
                 for (const plugin of plugins) {
-                    for (const cmd of plugin.commands) {
-                        menuText += `┃ ☰ ${prefix}${cmd}\n`
-                    }
+                    commandCount += plugin.commands.length
                 }
-                menuText += `╰━━━━━━━━━━━━━━━━━━╼\n`
+                
+                menuText += `┃ ☰ _*MENU ${category.toUpperCase()} (${commandCount} CMD)*_\n`
             }
+            menuText += `╰━━━━━━━━━━━━━━━━━━╼\n`
 
             menuText += `\n_*❏ I N F O  B O T*_\n`
             menuText += `▧ Total Kategori: ${orderedCategories.filter(c => categories[c] && categories[c].length > 0).length}\n`
@@ -189,6 +203,7 @@ export const handler = {
             menuText += `▧ Owner: ${owner}\n\n`
             
             menuText += `💡 *Tips:*\n`
+            menuText += `▧ Ketik ${prefix}menu <kategori> untuk melihat perintah dalam kategori\n`
             menuText += `▧ Ketik ${prefix}help <command> untuk detail command\n`
             menuText += `▧ Channel: https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m\n\n`
             menuText += `_© Create by idlanyor_`

@@ -4,7 +4,7 @@ import yts from 'yt-search'
 export const handler = {
     command: ['play'],
     category:'downloader',
-    help: 'Download video YouTube',
+    help: 'Download audio YouTube',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
@@ -38,10 +38,8 @@ export const handler = {
                 videoUrl = searchResults.videos[0].url
             }
 
-            // Download audio using API
-            const response = await axios.post('https://ytdlp.antidonasi.web.id/download/audio', {
-                url: videoUrl
-            })
+            // Download audio menggunakan API Ryzumi
+            const response = await axios.get(`https://api.ryzumi.vip/api/downloader/ytmp3?url=${encodeURIComponent(videoUrl)}`)
 
             if (response.data.error) {
                 throw new Error(response.data.error)

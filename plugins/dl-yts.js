@@ -3,7 +3,7 @@ import yts from 'yt-search'
 export const handler = {
     command: ['ytsearch'],
     category: 'downloader', 
-    help: 'Mencari video di YouTube\n\nFormat: !yts <query>',
+    help: 'Search video on YouTube',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
@@ -49,7 +49,7 @@ export const handler = {
                 text += `\n=================\n\n`
             })
             
-            text += `\n🤖 Powered by: ${globalThis.botName || 'Kanata Bot'}`
+            text += `\n🤖 Powered by: ${globalThis.botName || 'Kachina Bot'}`
 
             await sock.sendMessage(m.chat, { 
                 image: { url: videos[0].thumbnail },

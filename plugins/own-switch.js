@@ -1,13 +1,12 @@
 import Database from '../helper/database.js'
 
 export const handler = {
-    command: ['self', 'switch'],
+    command: ['mode'],
     category: 'owner',
-    help: 'Mengubah mode bot (public/self-private/self-me)',
+    help: 'Mengubah mode bot',
     isOwner: true,
     exec: async ({ sock, m, args }) => {
         try {
-            // Jika tidak ada argumen, tampilkan list mode
             if (!args) {
                 await sock.sendMessage(m.chat, {
                     text: "🤖 *BOT MODE SETTINGS*\n\n" +

@@ -1,9 +1,9 @@
 import User from '../database/models/User.js'
 
 export const handler = {
-    command: ['me', 'profile', 'profil'],
+    command: ['me'],
     category: 'user',
-    help: 'Tampilkan profil user Anda',
+    help: 'Tampilkan profil user',
     isRegistered: true,
     exec: async ({ sock, m, args }) => {
         try {

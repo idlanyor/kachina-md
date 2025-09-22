@@ -4,7 +4,7 @@ import axios from 'axios';
 export const handler = {
     command: ['caklontong'],
     category: 'game',
-    help: 'Game tebak cak lontong - Tebak jawaban dari pertanyaan unik!\n\nFormat: !caklontong',
+    help: 'Game tebak cak lontong',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

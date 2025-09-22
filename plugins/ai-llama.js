@@ -5,7 +5,7 @@ const groq = new Groq({ apiKey: globalThis.apiKey.groq });
 export const handler = {
     command: ['llama'],
     category: 'ai',
-    help: 'Chat dengan Llama AI (Groq). Gunakan !llama <pesan> atau reply pesan dengan !llama',
+    help: 'AI Llama',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
@@ -35,7 +35,7 @@ export const handler = {
                 messages: [
                     {
                         role: 'system',
-                        content: 'Kamu adalah Kanata Bot, asisten AI berbasis Llama-4 yang ramah, informatif, dan selalu menjawab dalam bahasa Indonesia. Sertakan emoji jika sesuai.'
+                        content: 'Kamu adalah Kachina Bot, asisten AI berbasis Llama-4 yang ramah, informatif, dan selalu menjawab dalam bahasa Indonesia. Sertakan emoji jika sesuai.'
                     },
                     {
                         role: 'user',

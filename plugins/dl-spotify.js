@@ -1,20 +1,13 @@
-import { spotifydl } from '../lib/scraper/spotify.js'
+import axios from 'axios';
 
 export const handler = {
-    command: ['spotify'],
+    command: ['spotify', 'sp'],
     category: 'downloader',
-    help: 'Mencari dan memutar lagu dari Spotify\n*Contoh:* !spotify https://open.spotify.com/track/...',
+    help: 'Download lagu Spotify',
     exec: async ({ sock, m, args }) => {
         try {
-            console.log(args)
             if (!args || args.length === 0) {
-                await m.reply('🎵 Masukkan URL Spotify yang ingin diunduh\n*Contoh:* !spotify https://open.spotify.com/track/6yID3RbYKiwn2p2LPz0OkK');
-                return;
-            }
-
-            const url = args;
-            if (!url.includes('open.spotify.com')) {
-                await m.reply('❌ URL tidak valid. Gunakan URL Spotify yang benar.');
+                await m.reply('🎵 Masukkan URL Spotify atau kata kunci pencarian\n*Contoh:* !spotify https://open.spotify.com/track/...\n*Atau:* !spotify judul lagu');
                 return;
             }
 
@@ -23,32 +16,69 @@ export const handler = {
                 react: { text: '🔍', key: m.key }
             });
 
-            // Mengunduh lagu menggunakan scraper
-            const result = await spotifydl(url);
-            if (!result || !result.download_url) {
-                await m.reply('❌ Lagu tidak ditemukan atau tidak bisa diunduh');
-                return;
+            const input = args;
+            let trackData;
+            let downloadUrl;
+
+            // Cek apakah input adalah URL Spotify atau kata kunci pencarian
+            if (input.includes('open.spotify.com')) {
+                // Proses URL Spotify
+                const encodedUrl = encodeURIComponent(input);
+                const downloadResponse = await axios.get(`https://api.ryzumi.vip/api/downloader/spotify?url=${encodedUrl}`, {
+                    headers: { 'accept': 'application/json' }
+                });
+
+                if (!downloadResponse.data.success) {
+                    await m.reply('❌ Lagu tidak ditemukan atau tidak bisa diunduh');
+                    return;
+                }
+
+                trackData = downloadResponse.data.metadata;
+                downloadUrl = downloadResponse.data.link;
+            } else {
+                // Proses pencarian
+                const encodedQuery = encodeURIComponent(input);
+                const searchResponse = await axios.get(`https://api.ryzumi.vip/api/search/spotify?query=${encodedQuery}`, {
+                    headers: { 'accept': 'application/json' }
+                });
+
+                if (!searchResponse.data.tracks || searchResponse.data.tracks.length === 0) {
+                    await m.reply('❌ Tidak ditemukan hasil untuk pencarian tersebut');
+                    return;
+                }
+
+                // Ambil hasil pertama
+                const firstTrack = searchResponse.data.tracks[0];
+                
+                // Download lagu dari hasil pencarian
+                const encodedUrl = encodeURIComponent(firstTrack.url);
+                const downloadResponse = await axios.get(`https://api.ryzumi.vip/api/downloader/spotify?url=${encodedUrl}`, {
+                    headers: { 'accept': 'application/json' }
+                });
+
+                if (!downloadResponse.data.success) {
+                    await m.reply('❌ Lagu ditemukan tapi tidak bisa diunduh');
+                    return;
+                }
+
+                trackData = downloadResponse.data.metadata;
+                downloadUrl = downloadResponse.data.link;
             }
 
-            // Proses data artists (array) dan album images
-            const artistNames = Array.isArray(result.artists) 
-                ? result.artists.map(artist => artist.name).join(', ')
-                : result.artists || result.artist || 'Unknown Artist';
-            
-            const thumbnailUrl = result.album?.images?.[0]?.url || result.image || result.thumbnail;
-            const trackName = result.name || result.title || 'Unknown Track';
-            const duration = result.duration_ms 
-                ? Math.floor(result.duration_ms / 1000 / 60) + ':' + String(Math.floor((result.duration_ms / 1000) % 60)).padStart(2, '0')
+            // Format durasi jika tersedia dari pencarian
+            const duration = trackData.duration_ms 
+                ? Math.floor(trackData.duration_ms / 1000 / 60) + ':' + String(Math.floor((trackData.duration_ms / 1000) % 60)).padStart(2, '0')
                 : 'N/A';
 
-            // Kirim thumbnail dan info serta audio dalam satu pesan
+            // Kirim thumbnail dan info
             const messageText = `🎧 *SPOTIFY DOWNLOADER*
 
-🎵 *Judul:* ${trackName}
-👤 *Artis:* ${artistNames}
-⏱️ *Durasi:* ${duration}
-🆔 *ID:* ${result.id || 'N/A'}
-🎼 *Type:* ${result.type || 'track'}
+🎵 *Judul:* ${trackData.title}
+👤 *Artis:* ${trackData.artists}
+💿 *Album:* ${trackData.album || 'N/A'}
+📅 *Rilis:* ${trackData.releaseDate || 'N/A'}
+🆔 *ID:* ${trackData.id || 'N/A'}
+${trackData.duration_ms ? `⏱️ *Durasi:* ${duration}` : ''}
 
 _Sedang mengirim audio, mohon tunggu..._`;
 
@@ -57,9 +87,9 @@ _Sedang mengirim audio, mohon tunggu..._`;
                 contextInfo: {
                     externalAdReply: {
                         title: '乂 Spotify Downloader 乂',
-                        body: `${trackName} - ${artistNames}`,
-                        thumbnailUrl: thumbnailUrl,
-                        sourceUrl: result.external_urls?.spotify || url,
+                        body: `${trackData.title} - ${trackData.artists}`,
+                        thumbnailUrl: trackData.cover,
+                        sourceUrl: `https://open.spotify.com/track/${trackData.id}`,
                         mediaType: 1,
                         renderLargerThumbnail: true
                     }
@@ -68,15 +98,15 @@ _Sedang mengirim audio, mohon tunggu..._`;
 
             // Kirim audio
             await sock.sendMessage(m.chat, {
-                audio: { url: result.download_url },
+                audio: { url: downloadUrl },
                 mimetype: 'audio/mpeg',
-                fileName: `${trackName}.mp3`,
+                fileName: `${trackData.title}.mp3`,
                 contextInfo: {
                     externalAdReply: {
-                        title: trackName,
-                        body: artistNames,
-                        thumbnailUrl: thumbnailUrl,
-                        sourceUrl: result.external_urls?.spotify || url,
+                        title: trackData.title,
+                        body: trackData.artists,
+                        thumbnailUrl: trackData.cover,
+                        sourceUrl: `https://open.spotify.com/track/${trackData.id}`,
                         mediaType: 1,
                     }
                 }
@@ -89,7 +119,7 @@ _Sedang mengirim audio, mohon tunggu..._`;
 
         } catch (error) {
             console.error('Error in spotify downloader:', error);
-            await m.reply('❌ Gagal mengunduh lagu. Pastikan URL Spotify valid dan coba lagi nanti.');
+            await m.reply('❌ Gagal mengunduh lagu. Pastikan URL Spotify valid atau coba kata kunci pencarian lain.');
         }
     }
 }

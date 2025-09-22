@@ -63,7 +63,7 @@ class User {
     const defaultUser = {
       jid: userId,
       name: userData.name || '',
-      number: userId.split('@')[0],
+      number: userId.split('@')[0] || userId,
       registered: false,
       banned: false,
       warnings: 0,
@@ -222,7 +222,7 @@ class User {
 
     // Filter karakter yang tidak diinginkan
     const cleanName = name.trim().replace(/[<>"'&]/g, '')
-    
+
     if (cleanName.length === 0) {
       throw new Error('Name contains invalid characters')
     }
@@ -238,46 +238,46 @@ class User {
   // Leveling system
   static async addExperience(jid, xp, skipLevelUpCheck = false) {
     const user = await this.getById(jid)
-    
+
     // Validasi input XP
     if (xp <= 0 || !Number.isFinite(xp)) {
       throw new Error('Invalid XP amount')
     }
-    
+
     // Hitung experience baru dengan validasi overflow
     let newExperience = user.experience + xp
     if (newExperience > XP_CONFIG.maxExperience) {
       newExperience = XP_CONFIG.maxExperience
     }
-    
+
     const currentLevel = user.level
     let newLevel = Math.floor(newExperience / XP_CONFIG.levelMultiplier) + 1
-    
+
     // Batasi level maksimum
     if (newLevel > XP_CONFIG.maxLevel) {
       newLevel = XP_CONFIG.maxLevel
       newExperience = XP_CONFIG.maxLevel * XP_CONFIG.levelMultiplier
     }
-  
+
     await this.update(jid, {
       experience: newExperience,
       level: newLevel
     })
-  
+
     // Update rank after XP change
     await this.updateUserRank(jid)
-  
+
     if (newLevel > currentLevel && !skipLevelUpCheck) {
       await this.handleLevelUp(jid, newLevel)
     }
-  
-    return { 
+
+    return {
       user,
       previousLevel: currentLevel,
-      newLevel, 
+      newLevel,
       newExperience,
       xpGained: xp,
-      leveledUp: newLevel > currentLevel 
+      leveledUp: newLevel > currentLevel
     }
   }
 
@@ -285,7 +285,7 @@ class User {
     // Add level up bonus dengan skipLevelUpCheck = true untuk mencegah infinite loop
     const bonusXP = Math.min(newLevel * 10, 1000) // Batasi bonus XP maksimum
     await this.addExperience(jid, bonusXP, true) // PENTING: set skipLevelUpCheck = true
-  
+
     // Add achievement if applicable
     if (newLevel % 10 === 0) {
       await this.addAchievement(jid, `level_${newLevel}`)

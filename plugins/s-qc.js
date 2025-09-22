@@ -39,9 +39,11 @@ export const handler = {
                 if (m.message) {
                     const messageType = Object.keys(m.message)[0];
                     if (messageType === "conversation") {
-                        text = args
+                        // Hapus perintah .qc atau !qc dari awal teks
+                        text = args.replace(/^[!.]qc\s*/i, "");
                     } else if (messageType === "extendedTextMessage") {
-                        text = m.message.extendedTextMessage.text.replace(/^!qc\s*/, "");
+                        // Hapus perintah .qc atau !qc dari awal teks
+                        text = m.message.extendedTextMessage.text.replace(/^[!.]qc\s*/i, "");
                     }
                 }
 
@@ -84,7 +86,7 @@ export const handler = {
             // 🔹 Bikin stiker
             const sticker = new Sticker(Buffer.from(response.data), {
                 pack: "Quotly Sticker",
-                author: "Kanata Bot",
+                author: "Kachina Bot",
                 type: StickerTypes.FULL,
                 categories: ["💬"],
                 id: `qc-${Date.now()}`,

@@ -2,9 +2,10 @@ import User from '../database/models/User.js'
 
 export default {
   name: 'setname',
-  aliases: ['setname', 'changename', 'ubahname'],
+  aliases: ['setname'],
   category: 'user',
   desc: 'Set atau ubah nama pengguna',
+  help: 'Set atau ubah nama pengguna',
   use: '<nama_baru>',
   example: '.setname John Doe',
   

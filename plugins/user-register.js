@@ -1,7 +1,7 @@
 import User from '../database/models/User.js'
 
 export const handler = {
-    command: ['daftar', 'register', 'reg'],
+    command: ['daftar'],
     category: 'user',
     help: 'Daftar sebagai user bot',
     exec: async ({ sock, m, args }) => {

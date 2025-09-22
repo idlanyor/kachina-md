@@ -4,7 +4,7 @@ import yts from 'yt-search'
 export const handler = {
     command: ['playv'],
     category: 'downloader',
-    help: 'Download video YouTube\nFormat: !playv <url/query> [--quality]\nContoh: !playv rickroll --720p',
+    help: 'Download video YouTube',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
@@ -49,12 +49,10 @@ export const handler = {
                 videoUrl = searchResults.videos[0].url
             }
 
-            // Download video using new API
-            const response = await axios.post('https://ytdlp.antidonasi.web.id/download/video', {
-                url: videoUrl,
-                quality: quality,
-                format: "mp4"
-            })
+            // Download video using Ryzumi API
+            const encodedUrl = encodeURIComponent(videoUrl)
+            const qualityParam = quality.replace('p', '') // Convert '480p' to '480'
+            const response = await axios.get(`https://api.ryzumi.vip/api/downloader/ytmp4?url=${encodedUrl}&quality=${qualityParam}`)
 
             if (!response.data.url) {
                 throw new Error('Download URL not found')

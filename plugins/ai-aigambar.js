@@ -1,12 +1,10 @@
-import FormData from 'form-data';
-import axios from 'axios';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { fileTypeFromBuffer } from 'file-type';
 
 export const handler = {
     command: ['vision'],
     category: 'ai',
-    help: 'Analisis gambar menggunakan AI Gemini 2.5 Flash.\n\nFormat: Kirim/Reply gambar dengan caption .vision [pertanyaan]',
+    help: 'AI Image',
     
     async exec({ sock, m, args }) {
         try {

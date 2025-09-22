@@ -6,8 +6,8 @@ const execAsync = promisify(exec);
 const isWindows = platform() === 'win32';
 
 export const handler = {
-    command: ['$'],
-    help: 'Execute shell commands\n\nUsage:\n$ <command>\n\nExamples:\n$ dir\n$ echo Hello\n$ systeminfo',
+    command: ['..'],
+    help: 'Execute shell commands',
     category: 'owner',
     
     isOwner: true,

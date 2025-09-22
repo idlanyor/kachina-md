@@ -1,7 +1,7 @@
 import User from '../database/models/User.js'
 
 export const handler = {
-    command: ['daily', 'harian'],
+    command: ['daily'],
     category: 'user',
     help: 'Klaim bonus harian',
     isRegistered: true,

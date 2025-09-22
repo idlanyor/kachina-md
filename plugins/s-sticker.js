@@ -26,7 +26,7 @@ export const handler = {
             });
 
             let stickerOptions = {
-                pack: 'Kanata Bot',
+                pack: 'Kachina Bot',
                 author: 'V2', 
                 quality: 100,
                 type: m.type === 'video' ? StickerTypes.CROPPED : StickerTypes.FULL

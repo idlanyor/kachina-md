@@ -123,7 +123,7 @@ export function addMessageHandler(m, sock) {
                 title: `乂 ${globalThis.botName} 乂`,
                 body: globalThis.owner,
                 mediaUrl: "https://antidonasi.web.id",
-                description: 'Kanata-V3',
+                description: 'Kachina-V3',
                 previewType: "PHOTO",
                 thumbnail: readFileSync(thumbPath),
                 sourceUrl: "https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1m",
@@ -173,16 +173,16 @@ export function addMessageHandler(m, sock) {
 
     m.sendListMessage = async (text, sections = [], opts = {}) => {
         const defaultOpts = {
-            header: 'Kanata Bot',
-            footer: '© 2024 Kanata',
+            header: 'Kachina Bot',
+            footer: '© 2024 Kachina',
             buttonText: 'Pilih Menu',
             quoted: true,
-            newsletterName: 'Kanata Bot',
+            newsletterName: 'Kachina Bot',
             externalAdReply: {
-                title: "Kanata Bot",
+                title: "Kachina Bot",
                 body: "Simple WhatsApp Bot",
                 thumbnailUrl: globalThis.ppUrl,
-                sourceUrl: "https://github.com/base-kanata",
+                sourceUrl: "https://github.com/base-kachina",
                 mediaType: 1,
                 renderLargerThumbnail: true
             }

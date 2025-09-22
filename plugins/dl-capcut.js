@@ -2,12 +2,12 @@ import { capcutDl } from '../lib/scraper/capcut.js';
 
 export const handler = {
     command: ['capcut'],
-    help: 'Download template CapCut. Gunakan !capcut <url> atau reply pesan dengan !capcut',
+    help: 'Download template CapCut',
     category: 'downloader',
 
     async exec({ m, args, sock }) {
         try {
-            let url = args;
+            let url = args; 
 
             // Jika tidak ada URL tapi ada reply
             if (!url && m.quoted) {

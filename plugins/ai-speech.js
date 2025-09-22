@@ -8,7 +8,7 @@ const groq = new Groq({ apiKey: globalThis.apiKey.groq });
 export const handler = {
     command: ['speechtotext'],
     category: 'ai',
-    help: 'Speech-to-text (Groq Whisper). Gunakan !speechtotext dengan mereply audio/voice note.',
+    help: 'AI Speech-to-text',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

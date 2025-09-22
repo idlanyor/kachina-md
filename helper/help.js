@@ -42,13 +42,13 @@ export async function helpMessage() {
     const plugins = await loadPlugins(pluginsDir);
     // console.log(plugins)
 
-    let caption = "🌟 Hai, aku Kanata! Senang sekali bisa membantu kamu hari ini. Berikut adalah daftar perintah yang bisa kamu gunakan:\n";
+    let caption = "🌟 Hai, aku Kachina! Senang sekali bisa membantu kamu hari ini. Berikut adalah daftar perintah yang bisa kamu gunakan:\n";
 
-    for (const kanata in plugins) {
+    for (const kachina in plugins) {
         // Nambah header folder
-        caption += `❏┄┅━┅┄〈 〘 ${kanata.toUpperCase()} 〙\n`;
+        caption += `❏┄┅━┅┄〈 〘 ${kachina.toUpperCase()} 〙\n`;
 
-        plugins[kanata].forEach(plugin => {
+        plugins[kachina].forEach(plugin => {
             const command = plugin.handler; 
             caption += `- *${command}*\n`;
         });

@@ -13,7 +13,7 @@ const tmpDir = path.join(__dirname, '../../tmp')
 export const handler = {
     command: ['gitclone'],
     category: 'downloader',
-    help: 'Download repository GitHub\nContoh: !gitclone https://github.com/username/repo',
+    help: 'Download repository Github',
     exec: async ({ sock, m, args }) => {
         try {
             if (!args) {

@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(globalThis.apiKey.gemini);
 export const handler = {
     command: ['ai'],
     category: 'ai',
-    help: 'Chat sederhana dengan AI. Gunakan .ai <pesan> atau reply pesan dengan .ai',
+    help: 'AI Chat',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

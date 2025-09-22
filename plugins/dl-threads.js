@@ -3,7 +3,7 @@ import axios from 'axios'
 export const handler = {
     command: ['threads'],
     category: 'downloader',
-    help: 'Download video/image from Threads',
+    help: 'Download from Threads',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
@@ -65,7 +65,7 @@ export const handler = {
                     video: {
                         url: mediaUrl
                     },
-                    caption: `✅ Downloaded using Kanata Bot\n🧵 Threads Video\n🔗 Source: ${args}`,
+                    caption: `✅ Downloaded using Kachina Bot\n🧵 Threads Video\n🔗 Source: ${args}`,
                     contextInfo: {
                         externalAdReply: {
                             title: 'Threads Video',
@@ -81,7 +81,7 @@ export const handler = {
                     image: {
                         url: mediaUrl
                     },
-                    caption: `✅ Downloaded using Kanata Bot\n🧵 Threads Image\n🔗 Source: ${args}`,
+                    caption: `✅ Downloaded using Kachina Bot\n🧵 Threads Image\n🔗 Source: ${args}`,
                     contextInfo: {
                         externalAdReply: {
                             title: 'Threads Image',

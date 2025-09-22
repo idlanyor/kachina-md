@@ -1,7 +1,7 @@
 import User from '../database/models/User.js'
 
 export const handler = {
-    command: ['transfer', 'tf', 'kirim'],
+    command: ['transfer'],
     category: 'user',
     help: 'Transfer balance ke user lain',
     isRegistered: true,

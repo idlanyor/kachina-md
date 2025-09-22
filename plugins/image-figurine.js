@@ -4,9 +4,9 @@ import { fileTypeFromBuffer } from 'file-type';
 const GEMINI_API_BASE = process.env.GEMINI_API_BASE || 'http://localhost:3000';
 
 export const handler = {
-    command: ['figurine', 'patung'],
-    category: 'ai',
-    help: 'Convert gambar menjadi figurine realistis. Kirim/reply gambar dengan .figurine atau gunakan URL',
+    command: ['figurine'],
+    category: 'image',
+    help: 'AI Figure Maker',
     exec: async ({ m, args, sock }) => {
         try {
             let imageUrl = '';

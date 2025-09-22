@@ -46,7 +46,7 @@ export const handler = {
             const uptime = formatUptime(process.uptime());
 
             // Simple status message
-            const status = `*🤖 KANATA BOT STATUS*
+            const status = `*🤖 KACHINA BOT STATUS*
 
 ` +
                 `📊 *Response:* ${responseTime}s\n` +

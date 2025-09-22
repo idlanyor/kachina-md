@@ -1,8 +1,8 @@
-import { tiktokDl } from '../lib/scraper/tiktok.js';
+import axios from 'axios';
 
 export const handler = {
     command: ['tt'],
-    help: 'Mendownload video TikTok. Gunakan !tiktok <url> atau reply pesan dengan !tiktok\n\nFlag:\n--audio : Download audio saja',
+    help: 'Download video TikTok',
     category: 'downloader',
     
     async exec({ m, args, sock }) {
@@ -45,23 +45,28 @@ export const handler = {
                 react: { text: '⏳', key: m.key }
             });
             
-            // Proses download
-            const result = await tiktokDl(url);
+            // Proses download menggunakan TikWM API
+            const encodedUrl = encodeURIComponent(url);
+            const apiUrl = `https://tikwm.com/api/?url=${encodedUrl}`;
+            const response = await axios.get(apiUrl);
             
-            if (!result.status) {
-                throw new Error(result.message || 'Gagal mendapatkan video TikTok');
+            if (response.data.code !== 0) {
+                throw new Error(response.data.msg || 'Gagal mendapatkan video TikTok');
             }
+            
+            const result = response.data;
             
             // Format caption
             let caption = `📱 *TIKTOK DOWNLOADER*\n\n` +
-                         `*Author:* ${result.data.author}\n` +
-                         `*Caption:* ${result.data.caption}\n\n`;
+                         `*Author:* ${result.data.author.nickname}\n` +
+                         `*Username:* @${result.data.author.unique_id}\n` +
+                         `*Caption:* ${result.data.title}\n\n`;
             
             if (isAudioOnly) {
                 // Download audio saja
-                if (result.data.audio) {
+                if (result.data.music) {
                     await sock.sendMessage(m.chat, {
-                        audio: { url: result.data.audio },
+                        audio: { url: result.data.music },
                         mimetype: 'audio/mpeg',
                         caption: caption
                     });
@@ -69,13 +74,12 @@ export const handler = {
                     throw new Error('Audio tidak tersedia');
                 }
             } else {
-                // Download video (ambil kualitas terbaik)
-                if (result.data.video && result.data.video.length > 0) {
-                    // Ambil video dengan kualitas terbaik (biasanya yang terakhir)
-                    const bestVideo = result.data.video[result.data.video.length - 1];
+                // Download video
+                if (result.data.play) {
                     await sock.sendMessage(m.chat, {
-                        video: { url: bestVideo.url },
-                        caption: caption
+                        video: { url: result.data.play },
+                        caption: caption,
+                        thumbnail: result.data.cover
                     });
                 } else {
                     throw new Error('Video tidak tersedia');
@@ -97,4 +101,4 @@ export const handler = {
             });
         }
     }
-}; 
+};
