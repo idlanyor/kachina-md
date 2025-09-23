@@ -47,43 +47,47 @@ export const handler = {
                     throw new Error('File harus berupa gambar!');
                 }
 
-                // Upload to temporary service to get URL (using catbox like tool-upload.js)
+                // Upload to Ryzumi API to get URL
                 const FormData = (await import('form-data')).default;
                 const formData = new FormData();
-                formData.append('reqtype', 'fileupload');
-                formData.append('fileToUpload', buffer, {
+                formData.append('file', buffer, {
                     filename: `image.${fileType.ext}`,
                     contentType: fileType.mime
                 });
 
-                const uploadResponse = await axios.post('https://catbox.moe/user/api.php', formData, {
+                const uploadResponse = await axios.post('https://api.ryzumi.vip/api/uploader/ryzencdn', formData, {
                     headers: {
+                        'accept': 'application/json',
                         ...formData.getHeaders()
                     },
                     timeout: 60000
                 });
 
-                if (!uploadResponse.data.startsWith('https://')) {
+                if (!uploadResponse.data || !uploadResponse.data.success || !uploadResponse.data.url) {
                     throw new Error('Gagal upload gambar ke server');
                 }
 
-                imageUrl = uploadResponse.data;
+                imageUrl = uploadResponse.data.url;
             }
 
-            // Call Gemini API Wrapper dengan GET method
-            const response = await axios.get(`${GEMINI_API_BASE}/figurine/`, {
+            // Call Nekolabs API untuk konversi gambar ke figurine
+            const response = await axios.get(`https://api.nekolabs.my.id/tools/convert/tofigure`, {
                 params: {
                     imageUrl: imageUrl
                 },
-                timeout: 180000, // 3 menit timeout
-                responseType: 'arraybuffer'
+                timeout: 180000 // 3 menit timeout
             });
 
-            // Check if response is image data
-            if (response.data && response.data.byteLength > 0) {
+            // Check if response contains result URL
+            if (response.data && response.data.status && response.data.result) {
+                // Download image from result URL
+                const imageResponse = await axios.get(response.data.result, {
+                    responseType: 'arraybuffer'
+                });
+                
                 // Send processed image
                 await sock.sendMessage(m.chat, {
-                    image: Buffer.from(response.data),
+                    image: Buffer.from(imageResponse.data),
                     caption: `🗿 *FIGURINE GENERATED*\n\n✨ Gambar berhasil diubah menjadi figurine realistis!\n🔗 *Source:* ${imageUrl}\n⏰ *Processed:* ${new Date().toLocaleString('id-ID')}`,
                     contextInfo: {
                         externalAdReply: {

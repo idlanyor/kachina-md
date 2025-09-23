@@ -4,12 +4,11 @@ import { handleAnswer } from '../plugins/game-cerdasCermat.js';
 export const handleSinonimAnswer = async (sock, m) => {
     try {
         if (!global.sinonimGame || !global.sinonimGame[m.chat]) {
-            return false; // No active game
+            return false;
         }
 
         let room = global.sinonimGame[m.chat];
 
-        // Perbaikan: ambil teks dari message object yang benar
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -21,7 +20,6 @@ export const handleSinonimAnswer = async (sock, m) => {
 
         if (!text) return false;
 
-        // Check if answer matches any sinonim
         let isCorrect = false;
         let answerIndex = -1;
 
@@ -34,22 +32,17 @@ export const handleSinonimAnswer = async (sock, m) => {
         }
 
         if (isCorrect) {
-            // Mark as answered
             room.terjawab[answerIndex] = m.sender;
 
-            // Calculate points based on difficulty and speed
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let points = Math.floor(room.winScore / room.sinonim.length) + (timeBonus * 10);
 
-            // Add money to user (implement your database logic here)
-            // await Database.addMoney(m.sender, points);
 
             let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
             correctMsg += `✅ *${room.sinonim[answerIndex]}* adalah sinonim dari *${room.kata}*\n`;
             correctMsg += `💰 +${points.toLocaleString('id-ID')} money\n`;
             correctMsg += `⚡ Bonus waktu: +${timeBonus * 10} poin\n\n`;
 
-            // Check if all answered
             let allAnswered = room.terjawab.every(v => v !== false);
             if (allAnswered) {
                 let winners = [...new Set(room.terjawab)];
@@ -73,10 +66,10 @@ export const handleSinonimAnswer = async (sock, m) => {
                 }, { quoted: m });
             }
 
-            return true; // Message handled
+            return true; 
         }
 
-        return false; // Not a correct answer
+        return false; 
 
     } catch (error) {
         console.error('Error handling sinonim answer:', error);
@@ -337,8 +330,6 @@ export const handleCerdasCermatAnswer = async (sock, m) => {
     }
 };
 
-// Handler untuk game lainnya bisa ditambahkan di sini
-// Add new tekateki answer handler function
 export const handleTekatekiAnswer = async (sock, m) => {
     try {
         if (!global.tekatekiGame || !global.tekatekiGame[m.chat]) {
@@ -347,7 +338,6 @@ export const handleTekatekiAnswer = async (sock, m) => {
 
         let room = global.tekatekiGame[m.chat];
 
-        // Get text from message object
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -358,7 +348,6 @@ export const handleTekatekiAnswer = async (sock, m) => {
         text = text?.toLowerCase().trim();
         if (!text || text.length < 2) return false;
 
-        // Check if answer matches any jawaban
         let isCorrect = false;
         for (let correctAnswer of room.jawaban) {
             if (text === correctAnswer.toLowerCase().trim()) {
@@ -393,7 +382,7 @@ export const handleTekatekiAnswer = async (sock, m) => {
             return true;
         }
 
-        return false; // Not a correct answer
+        return false;
 
     } catch (error) {
         console.error('Error handling tekateki answer:', error);
@@ -401,11 +390,10 @@ export const handleTekatekiAnswer = async (sock, m) => {
     }
 };
 
-// Handler untuk game asahotak
 export const handleAsahOtakAnswer = async (sock, m) => {
     try {
         if (!global.asahOtakGame || !global.asahOtakGame[m.chat]) {
-            return false; // No active game
+            return false; 
         }
 
         let room = global.asahOtakGame[m.chat];
@@ -431,11 +419,9 @@ export const handleAsahOtakAnswer = async (sock, m) => {
         }
 
         if (isCorrect) {
-            // Calculate reward based on time
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let reward = room.winScore + (timeBonus * 50);
             
-            // Add balance to user
             try {
                 await User.addBalance(m.sender, reward, 'AsahOtak game win');
             } catch (error) {
@@ -458,10 +444,138 @@ export const handleAsahOtakAnswer = async (sock, m) => {
             return true;
         }
 
-        return false; // Not a correct answer
+        return false;
 
     } catch (error) {
         console.error('Error handling asahotak answer:', error);
+        return false;
+    }
+};
+
+export const handleTebakWarnaAnswer = async (sock, m) => {
+    try {
+        if (!global.tebakWarnaGame || !global.tebakWarnaGame[m.chat]) {
+            return false; 
+        }
+
+        let room = global.tebakWarnaGame[m.chat];
+
+        let text = '';
+        if (m.message?.conversation) {
+            text = m.message.conversation;
+        } else if (m.message?.extendedTextMessage?.text) {
+            text = m.message.extendedTextMessage.text;
+        }
+
+        text = text?.trim();
+        if (!text) return false;
+
+        const isCorrect = text === room.jawaban;
+
+        if (isCorrect) {
+            let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
+            let reward = room.winScore + (timeBonus * 50);
+            
+            try {
+                await User.addBalance(m.sender, reward, 'TebakWarna game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
+
+            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
+            correctMsg += `✅ Jawaban: *${room.jawaban}*\n`;
+            correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
+            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
+
+            // Hapus pesan gambar sebelumnya jika messageId tersimpan
+            if (room.messageId) {
+                try {
+                    await sock.sendMessage(m.chat, { 
+                        delete: room.messageId 
+                    });
+                } catch (error) {
+                    console.error('Error deleting image message:', error);
+                }
+            }
+
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: [m.sender]
+            }, { quoted: m });
+
+            delete global.tebakWarnaGame[m.chat];
+            return true;
+        }
+
+        return false; 
+
+    } catch (error) {
+        console.error('Error handling tebakwarna answer:', error);
+        return false;
+    }
+};
+
+export const handleTebakKalimatAnswer = async (sock, m) => {
+    try {
+        if (!global.tebakKalimatGame || !global.tebakKalimatGame[m.chat]) {
+            return false;
+        }
+
+        let room = global.tebakKalimatGame[m.chat];
+
+        let text = '';
+        if (m.message?.conversation) {
+            text = m.message.conversation;
+        } else if (m.message?.extendedTextMessage?.text) {
+            text = m.message.extendedTextMessage.text;
+        }
+
+        text = text?.toLowerCase().trim();
+        if (!text) return false;
+
+        const isCorrect = text === room.jawaban.toLowerCase();
+
+        if (isCorrect) {
+            let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
+            let reward = room.winScore + (timeBonus * 50);
+            
+            try {
+                await User.addBalance(m.sender, reward, 'TebakKalimat game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
+
+            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
+            correctMsg += `✅ Jawaban: *${room.jawaban}*\n`;
+            correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
+            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
+
+            // Hapus pesan pertanyaan sebelumnya jika messageId tersimpan
+            if (room.messageId) {
+                try {
+                    await sock.sendMessage(m.chat, { 
+                        delete: room.messageId 
+                    });
+                } catch (error) {
+                    console.error('Error deleting question message:', error);
+                }
+            }
+
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: [m.sender]
+            }, { quoted: m });
+
+            delete global.tebakKalimatGame[m.chat];
+            return true;
+        }
+
+        return false; 
+
+    } catch (error) {
+        console.error('Error handling tebakkalimat answer:', error);
         return false;
     }
 };
@@ -474,35 +588,34 @@ export const handleGameAnswers = async (sock, m) => {
         handleFamily100Answer,
         handleCerdasCermatAnswer,
         handleTekatekiAnswer,
-        handleAsahOtakAnswer
+        handleAsahOtakAnswer,
+        handleTebakWarnaAnswer,
+        handleTebakKalimatAnswer
     ];
 
     for (const handler of handlers) {
         try {
             const handled = await handler(sock, m);
             if (handled) {
-                return true; // Message was handled by this game
+                return true;
             }
         } catch (error) {
             console.error('Error in game handler:', error);
         }
     }
 
-    return false; // No game handled this message
+    return false;
 };
 
-// Tambahkan di function yang handle message
 export async function handleGameMessage(sock, m) {
-    // Handle cerdas cermat answers
     if (global.cerdasCermatGame && global.cerdasCermatGame[m.chat]) {
         const answer = m.text?.trim().toLowerCase();
         if (['a', 'b', 'c', 'd'].includes(answer)) {
             await handleAnswer(sock, m, answer);
-            return true; // Message handled
+            return true;
         }
     }
     
-    // Remove tekateki handling from here since it's now in handleGameAnswers
 
-    return false; // Message not handled
+    return false;
 }
