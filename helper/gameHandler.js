@@ -401,6 +401,71 @@ export const handleTekatekiAnswer = async (sock, m) => {
     }
 };
 
+// Handler untuk game asahotak
+export const handleAsahOtakAnswer = async (sock, m) => {
+    try {
+        if (!global.asahOtakGame || !global.asahOtakGame[m.chat]) {
+            return false; // No active game
+        }
+
+        let room = global.asahOtakGame[m.chat];
+
+        // Get text from message object
+        let text = '';
+        if (m.message?.conversation) {
+            text = m.message.conversation;
+        } else if (m.message?.extendedTextMessage?.text) {
+            text = m.message.extendedTextMessage.text;
+        }
+
+        text = text?.toLowerCase().trim();
+        if (!text || text.length < 2) return false;
+
+        // Check if answer matches any jawaban
+        let isCorrect = false;
+        for (let correctAnswer of room.jawaban) {
+            if (text === correctAnswer.toLowerCase().trim()) {
+                isCorrect = true;
+                break;
+            }
+        }
+
+        if (isCorrect) {
+            // Calculate reward based on time
+            let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
+            let reward = room.winScore + (timeBonus * 50);
+            
+            // Add balance to user
+            try {
+                await User.addBalance(m.sender, reward, 'AsahOtak game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
+
+            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
+            correctMsg += `✅ Jawaban: *${room.jawaban[0]}*\n`;
+            correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
+            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
+
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: [m.sender]
+            }, { quoted: m });
+
+            // End game
+            delete global.asahOtakGame[m.chat];
+            return true;
+        }
+
+        return false; // Not a correct answer
+
+    } catch (error) {
+        console.error('Error handling asahotak answer:', error);
+        return false;
+    }
+};
+
 export const handleGameAnswers = async (sock, m) => {
     // Try each game handler
     const handlers = [
@@ -408,7 +473,8 @@ export const handleGameAnswers = async (sock, m) => {
         handleCaklontongAnswer,
         handleFamily100Answer,
         handleCerdasCermatAnswer,
-        handleTekatekiAnswer 
+        handleTekatekiAnswer,
+        handleAsahOtakAnswer
     ];
 
     for (const handler of handlers) {

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import yts from 'yt-search'
+import User from '../database/models/User.js'
 
 export const handler = {
     command: ['playv'],
@@ -11,9 +12,19 @@ export const handler = {
     isGroup: false,
     exec: async ({ sock, m, args }) => {
         try {
+            // Get user and set localization
+            const user = await User.getById(m.sender);
+            const userLang = user.preferences?.language || 'id';
+            globalThis.localization.setLocale(userLang);
+
             if (!args) {
-                await m.reply('📋 Format:\n1. !playv <search query> [--quality]\n2. !playv <youtube url> [--quality]\n\nQuality options: --144p, --240p, --360p, --480p, --720p, --1080p, --1440p, --2160p,\nContoh: !playv rickroll --720p')
-                return
+                const helpText = `📋 ${t('download.format')}:\n` +
+                    `1. !playv <${t('download.search_query')}> [--quality]\n` +
+                    `2. !playv <${t('download.youtube_url')}> [--quality]\n\n` +
+                    `${t('download.quality_options')}: --144p, --240p, --360p, --480p, --720p, --1080p, --1440p, --2160p\n` +
+                    `${t('common.example')}: !playv rickroll --720p`;
+                await m.reply(helpText);
+                return;
             }
 
             // Parse quality parameter
@@ -43,7 +54,7 @@ export const handler = {
                     await sock.sendMessage(m.chat, {
                         react: { text: '❌', key: m.key }
                     })
-                    await m.reply('❌ Video tidak ditemukan')
+                    await m.reply(t('download.video_not_found'))
                     return
                 }
                 videoUrl = searchResults.videos[0].url

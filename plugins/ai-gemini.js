@@ -1,4 +1,5 @@
 import { chatWithAI, analyzeMessage, getAllPluginCommands } from '../helper/gemini.js';
+import User from '../database/models/User.js';
 
 export const handler = {
     command: ['gemini'],
@@ -10,6 +11,11 @@ export const handler = {
     isGroup: false,
     exec: async ({ m, args, sock }) => {
         try {
+            // Get user and set localization
+            const user = await User.getById(m.sender);
+            const userLang = user.preferences?.language || 'id';
+            globalThis.localization.setLocale(userLang);
+
             let question = args;
 
             // Jika tidak ada pertanyaan tapi ada reply
@@ -19,7 +25,20 @@ export const handler = {
 
             // Validasi input
             if (!question) {
-                await m.reply(`🤖 *GEMINI AI CHAT*\n\nCara penggunaan:\n1. !gemini <pertanyaan>\n2. Reply pesan dengan !gemini\n\nContoh:\n!gemini Apa itu artificial intelligence?\n!gemini Jelaskan tentang machine learning\n!gemini Buat puisi tentang teknologi\n\n💡 Tips:\n• Tanyakan hal apapun yang ingin kamu ketahui\n• AI akan menjawab dengan bahasa yang mudah dipahami\n• Bisa untuk diskusi, belajar, atau sekedar ngobrol`);
+                const helpText = `🤖 *${t('ai.gemini_chat')}*\n\n` +
+                    `${t('ai.usage')}:\n` +
+                    `1. !gemini <${t('ai.question')}>\n` +
+                    `2. ${t('ai.reply_message')} !gemini\n\n` +
+                    `${t('common.example')}:\n` +
+                    `!gemini ${t('ai.example_question_1')}\n` +
+                    `!gemini ${t('ai.example_question_2')}\n` +
+                    `!gemini ${t('ai.example_question_3')}\n\n` +
+                    `💡 ${t('common.tips')}:\n` +
+                    `• ${t('ai.tips_1')}\n` +
+                    `• ${t('ai.tips_2')}\n` +
+                    `• ${t('ai.tips_3')}`;
+
+                await m.reply(helpText);
                 return;
             }
 

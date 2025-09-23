@@ -63,7 +63,7 @@ class User {
     const defaultUser = {
       jid: userId,
       name: userData.name || '',
-      number: userId.split('@')[0] || userId,
+      number: userId,
       registered: false,
       banned: false,
       warnings: 0,

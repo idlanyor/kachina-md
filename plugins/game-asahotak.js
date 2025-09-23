@@ -6,9 +6,9 @@ const gameCooldowns = new Map();
 const GAME_COOLDOWN = 60000; // 1 menit cooldown per grup
 
 export const handler = {
-    command: ['tekateki'],
+    command: ['asahotak'],
     category: 'game',
-    help: 'Game Teka-teki - Asah otakmu dengan teka-teki seru!\n\nFormat: !tekateki\nContoh: !tekateki\n\nJawab dengan mengetik jawaban yang tepat!',
+    help: 'Game Asah Otak - Asah otakmu dengan pertanyaan seru!\n\nFormat: !asahotak\nContoh: !asahotak\n\nJawab dengan mengetik jawaban yang tepat!',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
@@ -29,25 +29,23 @@ export const handler = {
             let winScore = 5000;
 
             // Check if there's already an active game
-            if (global.tekatekiGame && global.tekatekiGame[id]) {
+            if (global.asahOtakGame && global.asahOtakGame[id]) {
                 return await m.reply(t('game.already_playing'));
             }
 
             // Initialize global game object if not exists
-            if (!global.tekatekiGame) {
-                global.tekatekiGame = {};
+            if (!global.asahOtakGame) {
+                global.asahOtakGame = {};
             }
-
-
             
-            // Fetch tekateki data from API
-            let tekatekiData;
+            // Fetch asahotak data from API
+            let asahOtakData;
             let retryCount = 0;
             const maxRetries = 3;
 
             while (retryCount < maxRetries) {
                 try {
-                    const { data } = await axios.get('https://api.siputzx.my.id/api/games/tekateki', {
+                    const { data } = await axios.get('https://api.siputzx.my.id/api/games/asahotak', {
                         headers: {
                             'accept': '*/*',
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -57,20 +55,20 @@ export const handler = {
 
                     // Check if API response is successful
                     if (data.status && data.data && data.data.soal && data.data.jawaban) {
-                        tekatekiData = data.data;
+                        asahOtakData = data.data;
                         break; // Success, exit retry loop
                     } else {
                         throw new Error('API response status is false or data is missing');
                     }
                 } catch (error) {
                     retryCount++;
-                    console.log(`Tekateki API attempt ${retryCount} failed:`, error.message);
+                    console.log(`AsahOtak API attempt ${retryCount} failed:`, error.message);
 
                     if (retryCount >= maxRetries) {
-                        console.error('All Tekateki API attempts failed:', error);
+                        console.error('All AsahOtak API attempts failed:', error);
                         // Remove cooldown jika gagal
                         gameCooldowns.delete(chatId);
-                        return await m.reply('❌ Gagal mengambil data teka-teki setelah beberapa percobaan. Jaringan tidak stabil atau server sedang bermasalah. Coba lagi nanti!');
+                        return await m.reply('❌ Gagal mengambil data asah otak setelah beberapa percobaan. Jaringan tidak stabil atau server sedang bermasalah. Coba lagi nanti!');
                     }
 
                     // Wait before retrying
@@ -78,30 +76,30 @@ export const handler = {
                 }
             }
 
-            let gameText = `🧩 *TEKA-TEKI SERU* 🧩\n\n`;
-            gameText += `❓ *Soal:*\n${tekatekiData.soal}\n\n`;
+            let gameText = `🧠 *ASAH OTAK* 🧠\n\n`;
+            gameText += `❓ *Soal:*\n${asahOtakData.soal}\n\n`;
             gameText += `🎁 *Hadiah:* ${winScore.toLocaleString('id-ID')} money\n`;
             gameText += `⏰ *Waktu:* 60 detik\n\n`;
             gameText += `💬 Ketik jawabanmu langsung di chat!`;
 
             // Store game data
-            global.tekatekiGame[id] = {
+            global.asahOtakGame[id] = {
                 id,
-                soal: tekatekiData.soal,
-                jawaban: Array.isArray(tekatekiData.jawaban) ? tekatekiData.jawaban : [tekatekiData.jawaban],
+                soal: asahOtakData.soal,
+                jawaban: Array.isArray(asahOtakData.jawaban) ? asahOtakData.jawaban : [asahOtakData.jawaban],
                 winScore,
                 startTime: Date.now()
             };
             
-            console.log('Tekateki game started:', global.tekatekiGame[id]);
+            console.log('AsahOtak game started:', global.asahOtakGame[id]);
             await m.reply(gameText);
 
             // Set 60 second timer
             setTimeout(async () => {
-                if (global.tekatekiGame && global.tekatekiGame[id]) {
-                    let timeoutCaption = `⏰ *GAME TEKATEKI - WAKTU HABIS!*\n\n`;
-                    timeoutCaption += `📝 *Soal:* ${tekatekiData.soal}\n`;
-                    timeoutCaption += `✅ *Jawaban:* ${Array.isArray(tekatekiData.jawaban) ? tekatekiData.jawaban.join(' / ') : tekatekiData.jawaban}\n\n`;
+                if (global.asahOtakGame && global.asahOtakGame[id]) {
+                    let timeoutCaption = `⏰ *GAME ASAH OTAK - WAKTU HABIS!*\n\n`;
+                    timeoutCaption += `📝 *Soal:* ${asahOtakData.soal}\n`;
+                    timeoutCaption += `✅ *Jawaban:* ${Array.isArray(asahOtakData.jawaban) ? asahOtakData.jawaban.join(' / ') : asahOtakData.jawaban}\n\n`;
                     timeoutCaption += `🎮 *Game berakhir karena waktu habis!*`;
 
                     await sock.sendMessage(id, {
@@ -110,12 +108,12 @@ export const handler = {
                         quoted: m
                     });
 
-                    delete global.tekatekiGame[id];
+                    delete global.asahOtakGame[id];
                 }
             }, 60000); // 60 seconds
 
         } catch (error) {
-            console.error('Error in tekateki game:', error);
+            console.error('Error in asahotak game:', error);
             // Remove cooldown jika error
             gameCooldowns.delete(m.chat);
             await m.reply('❌ Terjadi kesalahan saat memulai game. Coba lagi!');

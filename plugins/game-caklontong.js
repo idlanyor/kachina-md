@@ -1,5 +1,11 @@
-import Database from '../helper/database.js';
-import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Mendapatkan path absolut untuk file JSON lokal
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dataPath = path.join(__dirname, '../lib/data/games/caklontong.json');
 
 export const handler = {
     command: ['caklontong'],
@@ -29,9 +35,9 @@ export const handler = {
             }
 
             try {
-                // Fetch questions from API
-                const response = await axios.get('https://raw.githubusercontent.com/BochilTeam/database/master/games/caklontong.json');
-                const questions = response.data;
+                // Baca data pertanyaan dari file JSON lokal
+                const questionsRaw = fs.readFileSync(dataPath, 'utf-8');
+                const questions = JSON.parse(questionsRaw);
                 
                 // Pick random question
                 let randomQuestion = questions[Math.floor(Math.random() * questions.length)];

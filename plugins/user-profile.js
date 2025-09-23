@@ -10,9 +10,13 @@ export const handler = {
             const targetJid = m.mentionedJid?.[0] || m.sender
             const user = await User.getById(targetJid)
             const isOwnProfile = targetJid === m.sender
-            
+
+            // Set user's language for localization
+            const userLang = user.preferences?.language || 'id'
+            globalThis.localization.setLocale(userLang)
+
             if (!user.registered && !isOwnProfile) {
-                return await m.reply('❌ User tersebut belum terdaftar!')
+                return await m.reply(t('user.not_registered'))
             }
             
             // Get level info

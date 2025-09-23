@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import User from '../database/models/User.js';
 
 const ISO_LANGUAGES = {
     'af': 'Afrikaans',
@@ -185,6 +186,11 @@ export const handler = {
 
     async exec({ m, args, sock }) {
         try {
+            // Get user and set localization
+            const user = await User.getById(m.sender);
+            const userLang = user.preferences?.language || 'id';
+            globalThis.localization.setLocale(userLang);
+
             let text, targetLang = 'id';
             args = args.split(' ');
             // Cek jika ada kode bahasa di args pertama
@@ -202,14 +208,14 @@ export const handler = {
 
             // Validasi input
             if (!text) {
-                let helpText = `🌐 *TRANSLATOR*\n\n`;
-                helpText += `Cara penggunaan:\n`;
-                helpText += `1. !tr <kode_bahasa> <teks>\n`;
-                helpText += `2. Reply pesan dengan !tr <kode_bahasa>\n\n`;
-                helpText += `Contoh:\n`;
-                helpText += `- !tr en Selamat pagi\n`;
-                helpText += `- !tr ja Good morning\n\n`;
-                helpText += `Daftar kode bahasa:\n`;
+                let helpText = `🌐 *${t('tools.translate.title')}*\n\n`;
+                helpText += `${t('tools.translate.usage')}:\n`;
+                helpText += `1. !tr <${t('tools.translate.language_code')}> <${t('tools.translate.text')}>\n`;
+                helpText += `2. ${t('tools.translate.reply_message')} !tr <${t('tools.translate.language_code')}>\n\n`;
+                helpText += `${t('common.example')}:\n`;
+                helpText += `- !tr en ${t('tools.translate.example_text_1')}\n`;
+                helpText += `- !tr ja ${t('tools.translate.example_text_2')}\n\n`;
+                helpText += `${t('tools.translate.language_codes')}:\n`;
 
                 Object.entries(ISO_LANGUAGES).forEach(([code, lang]) => {
                     helpText += `${code} = ${lang}\n`;
