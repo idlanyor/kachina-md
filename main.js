@@ -47,14 +47,14 @@ async function getPhoneNumber() {
         const askNumber = () => {
             rl.question(chalk.cyan('Masukkan nomor WhatsApp (dengan kode negara, contoh: 628123456789): '), (input) => {
                 const phoneNumber = input.trim();
-                
+
                 // Validasi nomor telepon
                 if (!/^\d{10,15}$/.test(phoneNumber)) {
                     console.log(chalk.red('❌ Format nomor tidak valid! Gunakan format: 628123456789'));
                     askNumber();
                     return;
                 }
-                
+
                 // Validasi kode negara Indonesia
                 if (!phoneNumber.startsWith('62')) {
                     console.log(chalk.yellow('⚠️  Pastikan menggunakan kode negara Indonesia (62)'));
@@ -68,12 +68,12 @@ async function getPhoneNumber() {
                     });
                     return;
                 }
-                
+
                 rl.close();
                 resolve(phoneNumber);
             });
         };
-        
+
         askNumber();
     });
 }
@@ -88,11 +88,11 @@ async function getLoginMethod() {
         console.log(chalk.cyan('\n📱 Pilih metode login:'));
         console.log(chalk.white('1. QR Code (scan dengan WhatsApp)'));
         console.log(chalk.white('2. Pairing Code (masukkan kode di WhatsApp)'));
-        
+
         const askMethod = () => {
             rl.question(chalk.cyan('\nPilih metode (1/2): '), (input) => {
                 const choice = input.trim();
-                
+
                 if (choice === '1') {
                     rl.close();
                     resolve('qr');
@@ -105,7 +105,7 @@ async function getLoginMethod() {
                 }
             });
         };
-        
+
         askMethod();
     });
 }
@@ -113,17 +113,17 @@ async function getLoginMethod() {
 export async function startBot() {
     try {
         logger.showBanner();
-        
+
         // Cek keberadaan session terlebih dahulu
         const sessionPath = `./${globalThis.sessionName}`;
         const sessionExists = await fs.pathExists(sessionPath);
-        
+
         let phoneNumber, loginMethod;
-        
+
         if (!sessionExists) {
             // Untuk session baru, selalu tanya metode login
             loginMethod = await getLoginMethod();
-            
+
             // Hanya minta nomor telepon jika menggunakan pairing code
             if (loginMethod === 'pairing') {
                 phoneNumber = await getPhoneNumber();
@@ -135,7 +135,7 @@ export async function startBot() {
             phoneNumber = globalThis.botNumber || '';
             loginMethod = 'existing';
         }
-        
+
         const bot = new Kachina({
             phoneNumber,
             sessionId: globalThis.sessionName,
@@ -148,11 +148,12 @@ export async function startBot() {
             logger.divider();
 
             autoNotification.init(sock);
-            
+
             sock.ev.on('messages.upsert', async chatUpdate => {
                 try {
                     let m = chatUpdate.messages[0];
                     m = addMessageHandler(m, sock);
+                    if (!m.key?.fromMe) return
                     await Database.addMessage();
 
                     if (m.type === 'text' && m.message?.conversation?.startsWith('!')) {
