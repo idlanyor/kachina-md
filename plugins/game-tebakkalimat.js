@@ -107,9 +107,12 @@ export const handler = {
             // Set 60 second timer
             setTimeout(async () => {
                 if (global.tebakKalimatGame && global.tebakKalimatGame[id]) {
+                    // Get session data instead of using closure variables
+                    const gameSession = global.tebakKalimatGame[id];
+                    
                     let timeoutCaption = `⏰ *GAME TEBAK KALIMAT - WAKTU HABIS!*\n\n`;
-                    timeoutCaption += `📝 *Pertanyaan:* ${tebakKalimatData.pertanyaan}\n`;
-                    timeoutCaption += `✅ *Jawaban:* ${tebakKalimatData.jawaban}\n\n`;
+                    timeoutCaption += `📝 *Pertanyaan:* ${gameSession.pertanyaan}\n`;
+                    timeoutCaption += `✅ *Jawaban:* ${gameSession.jawaban}\n\n`;
                     timeoutCaption += `🎮 *Game berakhir karena waktu habis!*`;
 
                     await sock.sendMessage(id, {
