@@ -48,28 +48,29 @@ export const handleSinonimAnswer = async (sock, m) => {
                 let winners = [...new Set(room.terjawab)];
                 correctMsg += `🏆 *GAME SELESAI!*\n`;
                 correctMsg += `🎊 Semua sinonim berhasil ditebak!\n`;
-                correctMsg += `👏 Selamat untuk semua pemenang: ${winners.map(w => `@${w.split('@')[0]}`).join(', ')}`;
-
-                await sock.sendMessage(m.chat, {
-                    text: correctMsg,
-                    mentions: winners
-                }, { quoted: m });
+                correctMsg += `🏅 Pemenang: ${winners.map(w => `@${w.split('@')[0]}`).join(', ')}`;
 
                 delete global.sinonimGame[m.chat];
             } else {
-                let remaining = room.terjawab.filter(v => v === false).length;
-                correctMsg += `🔍 Masih ada ${remaining} sinonim lagi yang belum ditebak!`;
-
-                await sock.sendMessage(m.chat, {
-                    text: correctMsg,
-                    mentions: [m.sender]
-                }, { quoted: m });
+                let remaining = room.sinonim.filter((_, i) => !room.terjawab[i]);
+                correctMsg += `📝 Sisa ${remaining.length} sinonim lagi`;
             }
 
-            return true; 
+            try {
+                await User.addBalance(m.sender, points, 'Sinonim game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
+
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: allAnswered ? [...new Set(room.terjawab)] : [m.sender]
+            }, { quoted: m });
+
+            return true;
         }
 
-        return false; 
+        return false;
 
     } catch (error) {
         console.error('Error handling sinonim answer:', error);
@@ -77,16 +78,14 @@ export const handleSinonimAnswer = async (sock, m) => {
     }
 };
 
-// Handler untuk menjawab game caklontong
 export const handleCaklontongAnswer = async (sock, m) => {
     try {
         if (!global.caklontongGame || !global.caklontongGame[m.chat]) {
-            return false; // No active game
+            return false;
         }
 
         let room = global.caklontongGame[m.chat];
 
-        // Ambil teks dari message object yang benar
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -95,28 +94,25 @@ export const handleCaklontongAnswer = async (sock, m) => {
         }
 
         text = text?.toLowerCase().trim();
-
         if (!text) return false;
 
-        // Check if answer is correct
-        if (text === room.jawaban) {
-            // Mark as answered
-            room.answered = true;
+        const isCorrect = text === room.jawaban.toLowerCase();
 
-            // Calculate points based on speed
+        if (isCorrect) {
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
-            let points = room.winScore + (timeBonus * 50);
-
-            // Add money to user (implement your database logic here)
-            // await Database.addMoney(m.sender, points);
+            let reward = room.winScore + (timeBonus * 50);
+            
+            try {
+                await User.addBalance(m.sender, reward, 'Caklontong game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
 
             let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
-            correctMsg += `✅ *Jawaban:* ${room.jawaban}\n`;
-            correctMsg += `📝 *Deskripsi:* ${room.deskripsi}\n\n`;
-            correctMsg += `💰 +${points.toLocaleString('id-ID')} money\n`;
-            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n\n`;
-            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!\n`;
-            correctMsg += `Ingin bermain lagi? Ketik !caklontong`;
+            correctMsg += `✅ Jawaban: *${room.jawaban}*\n`;
+            correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
+            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
 
             await sock.sendMessage(m.chat, {
                 text: correctMsg,
@@ -124,10 +120,10 @@ export const handleCaklontongAnswer = async (sock, m) => {
             }, { quoted: m });
 
             delete global.caklontongGame[m.chat];
-            return true; // Message handled
+            return true;
         }
 
-        return false; // Not a correct answer
+        return false;
 
     } catch (error) {
         console.error('Error handling caklontong answer:', error);
@@ -135,16 +131,14 @@ export const handleCaklontongAnswer = async (sock, m) => {
     }
 };
 
-// Handler untuk menjawab game family100
 export const handleFamily100Answer = async (sock, m) => {
     try {
         if (!global.family100Game || !global.family100Game[m.chat]) {
-            return false; // No active game
+            return false;
         }
 
         let room = global.family100Game[m.chat];
 
-        // Ambil teks dari message object yang benar
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -153,70 +147,58 @@ export const handleFamily100Answer = async (sock, m) => {
         }
 
         text = text?.toLowerCase().trim();
+        if (!text || text.length < 2) return false;
 
-        if (!text) return false;
-
-        // Check if answer matches any jawaban
         let isCorrect = false;
         let answerIndex = -1;
 
         for (let i = 0; i < room.jawaban.length; i++) {
-            if (room.jawaban[i].toLowerCase() === text && !room.terjawab[i]) {
+            if (room.jawaban[i].toLowerCase().includes(text) && !room.terjawab[i]) {
                 isCorrect = true;
                 answerIndex = i;
                 break;
             }
         }
 
-        // Di dalam handleFamily100Answer
         if (isCorrect) {
-            // Mark as answered
             room.terjawab[answerIndex] = m.sender;
 
-            // Calculate points based on difficulty and speed
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
-            let points = Math.floor(room.winScore / room.jawaban.length) + (timeBonus * 20);
+            let points = Math.floor(room.winScore / room.jawaban.length) + (timeBonus * 10);
 
-            // Add balance to user
+            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
+            correctMsg += `✅ *${room.jawaban[answerIndex]}*\n`;
+            correctMsg += `💰 +${points.toLocaleString('id-ID')} money\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 10} poin\n\n`;
+
+            let allAnswered = room.terjawab.every(v => v !== false);
+            if (allAnswered) {
+                let winners = [...new Set(room.terjawab)];
+                correctMsg += `🏆 *GAME SELESAI!*\n`;
+                correctMsg += `🎊 Semua jawaban berhasil ditebak!\n`;
+                correctMsg += `🏅 Pemenang: ${winners.map(w => `@${w.split('@')[0]}`).join(', ')}`;
+
+                delete global.family100Game[m.chat];
+            } else {
+                let remaining = room.jawaban.filter((_, i) => !room.terjawab[i]);
+                correctMsg += `📝 Sisa ${remaining.length} jawaban lagi`;
+            }
+
             try {
                 await User.addBalance(m.sender, points, 'Family100 game win');
             } catch (error) {
                 console.error('Error adding balance:', error);
             }
 
-            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
-            correctMsg += `✅ *${room.jawaban[answerIndex]}* adalah jawaban yang tepat!\n`;
-            correctMsg += `💰 +Rp ${points.toLocaleString('id-ID')}\n`;
-            correctMsg += `⚡ Bonus waktu: +${timeBonus * 20} poin\n\n`;
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: allAnswered ? [...new Set(room.terjawab)] : [m.sender]
+            }, { quoted: m });
 
-            // Check if all answered
-            let allAnswered = room.terjawab.every(v => v !== false);
-            if (allAnswered) {
-                let winners = [...new Set(room.terjawab)];
-                correctMsg += `🏆 *GAME SELESAI!*\n`;
-                correctMsg += `🎊 Semua jawaban berhasil ditebak!\n`;
-                correctMsg += `👏 Selamat untuk semua pemenang: ${winners.map(w => `@${w.split('@')[0]}`).join(', ')}`;
-
-                await sock.sendMessage(m.chat, {
-                    text: correctMsg,
-                    mentions: winners
-                }, { quoted: m });
-
-                delete global.family100Game[m.chat];
-            } else {
-                let remaining = room.terjawab.filter(v => v === false).length;
-                correctMsg += `🔍 Masih ada ${remaining} jawaban lagi yang belum ditebak!`;
-
-                await sock.sendMessage(m.chat, {
-                    text: correctMsg,
-                    mentions: [m.sender]
-                }, { quoted: m });
-            }
-
-            return true; // Message handled
+            return true;
         }
 
-        return false; // Not a correct answer
+        return false;
 
     } catch (error) {
         console.error('Error handling family100 answer:', error);
@@ -224,119 +206,13 @@ export const handleFamily100Answer = async (sock, m) => {
     }
 };
 
-// Handler untuk menjawab game cerdas cermat
 export const handleCerdasCermatAnswer = async (sock, m) => {
     try {
         if (!global.cerdasCermatGame || !global.cerdasCermatGame[m.chat]) {
-            return false; // No active game
-        }
-
-        let room = global.cerdasCermatGame[m.chat];
-
-        // Get text from message
-        let text = '';
-        if (m.message?.conversation) {
-            text = m.message.conversation;
-        } else if (m.message?.extendedTextMessage?.text) {
-            text = m.message.extendedTextMessage.text;
-        }
-
-        text = text?.toLowerCase().trim();
-
-        if (!text) return false;
-
-        // Check if it's a valid answer (a, b, c, d)
-        if (!['a', 'b', 'c', 'd'].includes(text)) {
             return false;
         }
 
-        const currentQ = room.soal[room.currentQuestion];
-        if (!currentQ) return false;
-
-        // Clear timeout
-        if (room.timeout) {
-            clearTimeout(room.timeout);
-            room.timeout = null;
-        }
-
-        // Initialize participant if not exists
-        if (!room.participants.has(m.sender)) {
-            room.participants.set(m.sender, {
-                score: 0,
-                totalMoney: 0,
-                answers: []
-            });
-        }
-
-        const participant = room.participants.get(m.sender);
-
-        // Check if answer is correct
-        const isCorrect = text === currentQ.jawaban_benar.toLowerCase();
-
-        let responseText = '';
-        if (isCorrect) {
-            room.score++;
-            participant.score++;
-
-            // Calculate points
-            let points = 1000;
-            participant.totalMoney += points;
-
-            // Add balance to user
-            try {
-                await User.addBalance(m.sender, points, 'Cerdas Cermat game win');
-            } catch (error) {
-                console.error('Error adding balance:', error);
-            }
-
-            responseText = `🎉 *JAWABAN BENAR!*\n\n`;
-            responseText += `✅ Jawaban: *${text.toUpperCase()}*\n`;
-            responseText += `💰 +${points.toLocaleString('id-ID')} money\n`;
-            responseText += `📊 Skor @${m.sender.split('@')[0]}: ${participant.score}/${room.jumlahSoal}`;
-        } else {
-            responseText = `❌ *JAWABAN SALAH!*\n\n`;
-            responseText += `❌ Jawabanmu: *${text.toUpperCase()}*\n`;
-            responseText += `✅ Jawaban benar: *${currentQ.jawaban_benar.toUpperCase()}*\n`;
-            responseText += `📊 Skor @${m.sender.split('@')[0]}: ${participant.score}/${room.jumlahSoal}`;
-        }
-
-        // Record the answer
-        participant.answers.push({
-            question: room.currentQuestion + 1,
-            answer: text,
-            correct: isCorrect
-        });
-
-        await sock.sendMessage(m.chat, {
-            text: responseText,
-            mentions: [m.sender],
-        }, { quoted: m });
-
-        // Move to next question
-        room.currentQuestion++;
-
-        // Wait 3 seconds before next question
-        setTimeout(async () => {
-            if (global.cerdasCermatGame[m.chat]) {
-                const { startQuestion } = await import('../plugins/game-cerdasCermat.js');
-                await startQuestion(sock, m, m.chat);
-            }
-        }, 3000);
-
-        return true;
-    } catch (error) {
-        console.error('Error in handleCerdasCermatAnswer:', error);
-        return false;
-    }
-};
-
-export const handleTekatekiAnswer = async (sock, m) => {
-    try {
-        if (!global.tekatekiGame || !global.tekatekiGame[m.chat]) {
-            return false; // No active game
-        }
-
-        let room = global.tekatekiGame[m.chat];
+        let room = global.cerdasCermatGame[m.chat];
 
         let text = '';
         if (m.message?.conversation) {
@@ -357,10 +233,85 @@ export const handleTekatekiAnswer = async (sock, m) => {
         }
 
         if (isCorrect) {
-            // Calculate reward
+            let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
+            let reward = room.winScore + (timeBonus * 50);
+            
+            try {
+                await User.addBalance(m.sender, reward, 'CerdasCermat game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
+
+            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
+            correctMsg += `✅ Jawaban: *${room.jawaban[0]}*\n`;
+            correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
+            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
+
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: [m.sender]
+            }, { quoted: m });
+
+            delete global.cerdasCermatGame[m.chat];
+            return true;
+        }
+
+        return false;
+
+    } catch (error) {
+        console.error('Error handling cerdasCermat answer:', error);
+        return false;
+    }
+};
+
+export const handleTekatekiAnswer = async (sock, m) => {
+    try {
+        if (!global.tekatekiGame || !global.tekatekiGame[m.chat]) {
+            return false;
+        }
+
+        let room = global.tekatekiGame[m.chat];
+
+        // Prevent race condition: Check if game has been running for at least 2 seconds
+        const gameRunTime = Date.now() - room.startTime;
+        if (gameRunTime < 2000) {
+            console.log(`Game too fast, ignoring answer. Runtime: ${gameRunTime}ms`);
+            return false;
+        }
+
+        // Atomic check: Ensure session still exists after time validation
+        if (!global.tekatekiGame[m.chat]) {
+            return false;
+        }
+
+        let text = '';
+        if (m.message?.conversation) {
+            text = m.message.conversation;
+        } else if (m.message?.extendedTextMessage?.text) {
+            text = m.message.extendedTextMessage.text;
+        }
+
+        text = text?.toLowerCase().trim();
+        if (!text || text.length < 2) return false;
+
+        let isCorrect = false;
+        for (let correctAnswer of room.jawaban) {
+            if (text === correctAnswer.toLowerCase().trim()) {
+                isCorrect = true;
+                break;
+            }
+        }
+
+        if (isCorrect) {
+            // Atomic operation: Mark as answered to prevent double processing
+            if (room.answered) {
+                return false; // Already answered
+            }
+            room.answered = true;
+
             let reward = room.winScore || 5000;
             
-            // Add balance to user
             try {
                 await User.addBalance(m.sender, reward, 'Tekateki game win');
             } catch (error) {
@@ -377,7 +328,6 @@ export const handleTekatekiAnswer = async (sock, m) => {
                 mentions: [m.sender]
             }, { quoted: m });
 
-            // End game
             delete global.tekatekiGame[m.chat];
             return true;
         }
@@ -393,12 +343,23 @@ export const handleTekatekiAnswer = async (sock, m) => {
 export const handleAsahOtakAnswer = async (sock, m) => {
     try {
         if (!global.asahOtakGame || !global.asahOtakGame[m.chat]) {
-            return false; 
+            return false;
         }
 
         let room = global.asahOtakGame[m.chat];
 
-        // Get text from message object
+        // Prevent race condition: Check if game has been running for at least 2 seconds
+        const gameRunTime = Date.now() - room.startTime;
+        if (gameRunTime < 2000) {
+            console.log(`Game too fast, ignoring answer. Runtime: ${gameRunTime}ms`);
+            return false;
+        }
+
+        // Atomic check: Ensure session still exists after time validation
+        if (!global.asahOtakGame[m.chat]) {
+            return false;
+        }
+
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -409,7 +370,6 @@ export const handleAsahOtakAnswer = async (sock, m) => {
         text = text?.toLowerCase().trim();
         if (!text || text.length < 2) return false;
 
-        // Check if answer matches any jawaban
         let isCorrect = false;
         for (let correctAnswer of room.jawaban) {
             if (text === correctAnswer.toLowerCase().trim()) {
@@ -419,6 +379,12 @@ export const handleAsahOtakAnswer = async (sock, m) => {
         }
 
         if (isCorrect) {
+            // Atomic operation: Mark as answered to prevent double processing
+            if (room.answered) {
+                return false; // Already answered
+            }
+            room.answered = true;
+
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let reward = room.winScore + (timeBonus * 50);
             
@@ -439,7 +405,6 @@ export const handleAsahOtakAnswer = async (sock, m) => {
                 mentions: [m.sender]
             }, { quoted: m });
 
-            // End game
             delete global.asahOtakGame[m.chat];
             return true;
         }
@@ -455,10 +420,22 @@ export const handleAsahOtakAnswer = async (sock, m) => {
 export const handleTebakWarnaAnswer = async (sock, m) => {
     try {
         if (!global.tebakWarnaGame || !global.tebakWarnaGame[m.chat]) {
-            return false; 
+            return false;
         }
 
         let room = global.tebakWarnaGame[m.chat];
+
+        // Prevent race condition: Check if game has been running for at least 2 seconds
+        const gameRunTime = Date.now() - room.startTime;
+        if (gameRunTime < 2000) {
+            console.log(`Game too fast, ignoring answer. Runtime: ${gameRunTime}ms`);
+            return false;
+        }
+
+        // Atomic check: Ensure session still exists after time validation
+        if (!global.tebakWarnaGame[m.chat]) {
+            return false;
+        }
 
         let text = '';
         if (m.message?.conversation) {
@@ -473,6 +450,12 @@ export const handleTebakWarnaAnswer = async (sock, m) => {
         const isCorrect = text === room.jawaban;
 
         if (isCorrect) {
+            // Atomic operation: Mark as answered to prevent double processing
+            if (room.answered) {
+                return false; // Already answered
+            }
+            room.answered = true;
+
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let reward = room.winScore + (timeBonus * 50);
             
@@ -488,7 +471,6 @@ export const handleTebakWarnaAnswer = async (sock, m) => {
             correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
             correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
 
-            // Hapus pesan gambar sebelumnya jika messageId tersimpan
             if (room.messageId) {
                 try {
                     await sock.sendMessage(m.chat, { 
@@ -508,7 +490,7 @@ export const handleTebakWarnaAnswer = async (sock, m) => {
             return true;
         }
 
-        return false; 
+        return false;
 
     } catch (error) {
         console.error('Error handling tebakwarna answer:', error);
@@ -524,6 +506,18 @@ export const handleTebakkataAnswer = async (sock, m) => {
 
         let room = global.tebakkataGame[m.chat];
 
+        // Prevent race condition: Check if game has been running for at least 2 seconds
+        const gameRunTime = Date.now() - room.startTime;
+        if (gameRunTime < 2000) {
+            console.log(`Game too fast, ignoring answer. Runtime: ${gameRunTime}ms`);
+            return false;
+        }
+
+        // Atomic check: Ensure session still exists after time validation
+        if (!global.tebakkataGame[m.chat]) {
+            return false;
+        }
+
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -537,6 +531,12 @@ export const handleTebakkataAnswer = async (sock, m) => {
         const isCorrect = text === room.jawaban.toLowerCase();
 
         if (isCorrect) {
+            // Atomic operation: Mark as answered to prevent double processing
+            if (room.answered) {
+                return false; // Already answered
+            }
+            room.answered = true;
+
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let reward = room.winScore + (timeBonus * 50);
             
@@ -553,7 +553,6 @@ export const handleTebakkataAnswer = async (sock, m) => {
             correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
             correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
 
-            // Hapus pesan pertanyaan sebelumnya jika messageId tersimpan
             if (room.messageId) {
                 try {
                     await sock.sendMessage(m.chat, { 
@@ -573,7 +572,7 @@ export const handleTebakkataAnswer = async (sock, m) => {
             return true;
         }
 
-        return false; 
+        return false;
 
     } catch (error) {
         console.error('Error handling tebakkata answer:', error);
@@ -589,6 +588,18 @@ export const handleTebakKalimatAnswer = async (sock, m) => {
 
         let room = global.tebakKalimatGame[m.chat];
 
+        // Prevent race condition: Check if game has been running for at least 2 seconds
+        const gameRunTime = Date.now() - room.startTime;
+        if (gameRunTime < 2000) {
+            console.log(`Game too fast, ignoring answer. Runtime: ${gameRunTime}ms`);
+            return false;
+        }
+
+        // Atomic check: Ensure session still exists after time validation
+        if (!global.tebakKalimatGame[m.chat]) {
+            return false;
+        }
+
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -602,6 +613,12 @@ export const handleTebakKalimatAnswer = async (sock, m) => {
         const isCorrect = text === room.jawaban.toLowerCase();
 
         if (isCorrect) {
+            // Atomic operation: Mark as answered to prevent double processing
+            if (room.answered) {
+                return false; // Already answered
+            }
+            room.answered = true;
+
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let reward = room.winScore + (timeBonus * 50);
             
@@ -617,7 +634,6 @@ export const handleTebakKalimatAnswer = async (sock, m) => {
             correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
             correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
 
-            // Hapus pesan pertanyaan sebelumnya jika messageId tersimpan
             if (room.messageId) {
                 try {
                     await sock.sendMessage(m.chat, { 
@@ -637,7 +653,7 @@ export const handleTebakKalimatAnswer = async (sock, m) => {
             return true;
         }
 
-        return false; 
+        return false;
 
     } catch (error) {
         console.error('Error handling tebakkalimat answer:', error);
@@ -653,6 +669,18 @@ export const handleSiapakahakuAnswer = async (sock, m) => {
 
         let room = global.siapakahakuGame[m.chat];
 
+        // Prevent race condition: Check if game has been running for at least 2 seconds
+        const gameRunTime = Date.now() - room.startTime;
+        if (gameRunTime < 2000) {
+            console.log(`Game too fast, ignoring answer. Runtime: ${gameRunTime}ms`);
+            return false;
+        }
+
+        // Atomic check: Ensure session still exists after time validation
+        if (!global.siapakahakuGame[m.chat]) {
+            return false;
+        }
+
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -666,6 +694,12 @@ export const handleSiapakahakuAnswer = async (sock, m) => {
         const isCorrect = text === room.jawaban.toLowerCase();
 
         if (isCorrect) {
+            // Atomic operation: Mark as answered to prevent double processing
+            if (room.answered) {
+                return false; // Already answered
+            }
+            room.answered = true;
+
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let reward = room.winScore + (timeBonus * 50);
             
@@ -681,7 +715,6 @@ export const handleSiapakahakuAnswer = async (sock, m) => {
             correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
             correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
 
-            // Hapus pesan pertanyaan sebelumnya jika messageId tersimpan
             if (room.messageId) {
                 try {
                     await sock.sendMessage(m.chat, { 
@@ -701,7 +734,7 @@ export const handleSiapakahakuAnswer = async (sock, m) => {
             return true;
         }
 
-        return false; 
+        return false;
 
     } catch (error) {
         console.error('Error handling siapakahaku answer:', error);
@@ -717,6 +750,18 @@ export const handleSusunkataAnswer = async (sock, m) => {
 
         let room = global.susunkataGame[m.chat];
 
+        // Prevent race condition: Check if game has been running for at least 2 seconds
+        const gameRunTime = Date.now() - room.startTime;
+        if (gameRunTime < 2000) {
+            console.log(`Game too fast, ignoring answer. Runtime: ${gameRunTime}ms`);
+            return false;
+        }
+
+        // Atomic check: Ensure session still exists after time validation
+        if (!global.susunkataGame[m.chat]) {
+            return false;
+        }
+
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -730,6 +775,12 @@ export const handleSusunkataAnswer = async (sock, m) => {
         const isCorrect = text === room.jawaban.toLowerCase();
 
         if (isCorrect) {
+            // Atomic operation: Mark as answered to prevent double processing
+            if (room.answered) {
+                return false; // Already answered
+            }
+            room.answered = true;
+
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let reward = room.winScore + (timeBonus * 50);
             
@@ -740,14 +791,12 @@ export const handleSusunkataAnswer = async (sock, m) => {
             }
 
             let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
-            correctMsg += `🎯 *Kategori:* ${room.tipe}\n`;
-            correctMsg += `🔀 *Huruf Acak:* ${room.soal}\n`;
+            correctMsg += `🔤 *Soal:* ${room.soal}\n`;
             correctMsg += `✅ *Jawaban:* ${room.jawaban}\n`;
             correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
             correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
             correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
 
-            // Hapus pesan pertanyaan sebelumnya jika messageId tersimpan
             if (room.messageId) {
                 try {
                     await sock.sendMessage(m.chat, { 
@@ -767,7 +816,7 @@ export const handleSusunkataAnswer = async (sock, m) => {
             return true;
         }
 
-        return false; 
+        return false;
 
     } catch (error) {
         console.error('Error handling susunkata answer:', error);
@@ -783,6 +832,18 @@ export const handleTebakkimiaAnswer = async (sock, m) => {
 
         let room = global.tebakkimiaGame[m.chat];
 
+        // Prevent race condition: Check if game has been running for at least 2 seconds
+        const gameRunTime = Date.now() - room.startTime;
+        if (gameRunTime < 2000) {
+            console.log(`Game too fast, ignoring answer. Runtime: ${gameRunTime}ms`);
+            return false;
+        }
+
+        // Atomic check: Ensure session still exists after time validation
+        if (!global.tebakkimiaGame[m.chat]) {
+            return false;
+        }
+
         let text = '';
         if (m.message?.conversation) {
             text = m.message.conversation;
@@ -796,6 +857,12 @@ export const handleTebakkimiaAnswer = async (sock, m) => {
         const isCorrect = text === room.jawaban.toLowerCase();
 
         if (isCorrect) {
+            // Atomic operation: Mark as answered to prevent double processing
+            if (room.answered) {
+                return false; // Already answered
+            }
+            room.answered = true;
+
             let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
             let reward = room.winScore + (timeBonus * 50);
             
@@ -812,7 +879,6 @@ export const handleTebakkimiaAnswer = async (sock, m) => {
             correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
             correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
 
-            // Hapus pesan pertanyaan sebelumnya jika messageId tersimpan
             if (room.messageId) {
                 try {
                     await sock.sendMessage(m.chat, { 
@@ -832,7 +898,7 @@ export const handleTebakkimiaAnswer = async (sock, m) => {
             return true;
         }
 
-        return false; 
+        return false;
 
     } catch (error) {
         console.error('Error handling tebakkimia answer:', error);
@@ -841,7 +907,6 @@ export const handleTebakkimiaAnswer = async (sock, m) => {
 };
 
 export const handleGameAnswers = async (sock, m) => {
-    // Try each game handler
     const handlers = [
         handleSinonimAnswer,
         handleCaklontongAnswer,
@@ -864,7 +929,7 @@ export const handleGameAnswers = async (sock, m) => {
                 return true;
             }
         } catch (error) {
-            console.error('Error in game handler:', error);
+            console.error(`Error in game handler:`, error);
         }
     }
 
@@ -872,14 +937,10 @@ export const handleGameAnswers = async (sock, m) => {
 };
 
 export async function handleGameMessage(sock, m) {
-    if (global.cerdasCermatGame && global.cerdasCermatGame[m.chat]) {
-        const answer = m.text?.trim().toLowerCase();
-        if (['a', 'b', 'c', 'd'].includes(answer)) {
-            await handleAnswer(sock, m, answer);
-            return true;
-        }
+    try {
+        return await handleGameAnswers(sock, m);
+    } catch (error) {
+        console.error('Error handling game message:', error);
+        return false;
     }
-    
-
-    return false;
 }
