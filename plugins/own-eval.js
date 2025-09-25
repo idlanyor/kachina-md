@@ -9,7 +9,7 @@ export const handler = {
     async exec({ m, args, sock }) {
         try {
             // Security check pertama - hanya owner yang bisa mengakses
-            if (!m.isOwner) {
+            if (!m.isOwner()) {
                 await m.reply('❌ Perintah ini hanya untuk owner bot!');
                 return;
             }

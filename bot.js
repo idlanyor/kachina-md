@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 import { startBot } from "./main.js";
 import { logger } from './helper/logger.js';
 import autoNotification from './helper/scheduler.js';
+import qrcode from 'qrcode-terminal'
 
 // Global state to prevent multiple simultaneous restarts
 let isRestarting = false;
@@ -15,7 +16,7 @@ let botInstance = null;
 let isInstanceRunning = false;
 
 // Group metadata cache - TTL 5 menit untuk menghindari data stale
-const groupMetadataCache = new NodeCache({ 
+const groupMetadataCache = new NodeCache({
     stdTTL: 300, // 5 menit
     checkperiod: 60, // Check expired keys setiap 60 detik
     useClones: false // Untuk performa yang lebih baik
@@ -36,12 +37,12 @@ class Kachina {
             logger.warning("Bot instance sudah berjalan, menggunakan instance yang ada...");
             return botInstance.sock;
         }
-        
+
         if (this.isConnecting) {
             logger.warning("Connection attempt already in progress, skipping...");
             return null;
         }
-        
+
         isInstanceRunning = true;
         botInstance = this;
         this.isConnecting = true;
@@ -66,7 +67,7 @@ class Kachina {
             const getMessageFromStore = async (key) => {
                 const maxRetries = 3;
                 const baseDelay = 2000; // 2 detik
-                
+
                 for (let attempt = 0; attempt < maxRetries; attempt++) {
                     try {
                         if (store) {
@@ -90,7 +91,7 @@ class Kachina {
             const P = pino({ level: "silent" });
             let { state, saveCreds } = await this.validateAndRecoverSession();
             let { version } = await fetchLatestBaileysVersion();
-            
+
             // Konfigurasi socket berdasarkan metode login
             const socketConfig = {
                 version,
@@ -107,7 +108,7 @@ class Kachina {
                         if (cached) {
                             return cached;
                         }
-                        
+
                         const metadata = await this.sock.groupMetadata(jid);
                         if (metadata) {
                             groupMetadataCache.set(jid, metadata);
@@ -148,7 +149,7 @@ class Kachina {
                     if (qr) {
                         logger.info('\n🔗 QR Code diterima!');
                         logger.info('📱 Scan QR code berikut dengan WhatsApp:');
-                        logger.info('\n' + qr);
+                        qrcode.generate(qr)
                         logger.info('\n⏰ QR Code akan expired dalam 40 detik');
                         logger.info('💡 Jika QR tidak muncul, coba restart aplikasi\n');
                     }
@@ -159,11 +160,11 @@ class Kachina {
             if (this.loginMethod === 'pairing' && !this.sock.authState.creds.registered) {
                 logger.info("🔐 Memulai proses pairing code...");
                 const number = this.phoneNumber;
-                
+
                 if (!number || number.trim() === '') {
                     throw new Error('Nomor telepon diperlukan untuk pairing code');
                 }
-                
+
                 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
                 let retryCount = 0;
                 const maxRetries = 3;
@@ -181,7 +182,7 @@ class Kachina {
                     } catch (err) {
                         retryCount++;
                         logger.error(`Pairing attempt ${retryCount}/${maxRetries} failed:`, err.message);
-                        
+
                         if (retryCount >= maxRetries) {
                             logger.error("Max pairing retries reached, cleaning up session...");
                             await this.cleanup();
@@ -189,7 +190,7 @@ class Kachina {
                             this.scheduleRestart(5000);
                             return null;
                         }
-                        
+
                         await delay(2000);
                     }
                 }
@@ -198,20 +199,20 @@ class Kachina {
             // Connection update handler
             this.sock.ev.on("connection.update", async (update) => {
                 const { connection, lastDisconnect } = update;
-                
+
                 if (connection === "connecting") {
                     logger.connection.connecting("Memulai koneksi soket");
                 } else if (connection === "open") {
                     logger.connection.connected("Soket terhubung");
                     this.isConnecting = false;
-                    
+
                     // Clear any pending restart
                     if (restartTimeout) {
                         clearTimeout(restartTimeout);
                         restartTimeout = null;
                     }
                     isRestarting = false;
-                    
+
                     // Initialize scheduler when connection is established
                     autoNotification.init(this.sock);
                 } else if (connection === "close") {
@@ -230,20 +231,20 @@ class Kachina {
                     if (reason === DisconnectReason.loggedOut) {
                         logger.error("Sesi tidak valid, akan dihapus...");
                         logger.warning(`Folder sesi ${this.sessionId} dihapus, login ulang...`);
-                        
+
                         await this.cleanup();
-                        
+
                         try {
                             await fs.remove(`./${this.sessionId}`);
                             logger.info(`Session folder ${this.sessionId} berhasil dihapus`);
                         } catch (error) {
                             logger.error(`Gagal menghapus session folder: ${error.message}`);
                         }
-                        
+
                         this.scheduleRestart(3000);
-                    } else if (reason === DisconnectReason.connectionClosed || 
-                             reason === DisconnectReason.connectionLost ||
-                             reason === DisconnectReason.restartRequired) {
+                    } else if (reason === DisconnectReason.connectionClosed ||
+                        reason === DisconnectReason.connectionLost ||
+                        reason === DisconnectReason.restartRequired) {
                         logger.error("Koneksi terputus, mencoba kembali...");
                         await this.cleanup();
                         this.scheduleRestart(5000);
@@ -260,12 +261,12 @@ class Kachina {
         } catch (error) {
             this.isConnecting = false;
             logger.error("Error during bot start:", error);
-            
+
             if (error.message?.includes('session') || error.message?.includes('auth')) {
                 logger.warning("Possible session corruption detected, attempting recovery...");
                 await this.handleSessionCorruption();
             }
-            
+
             this.scheduleRestart(5000);
             return null;
         }
@@ -277,15 +278,15 @@ class Kachina {
             if (this.sock) {
                 // Remove all event listeners to prevent memory leaks
                 this.sock.ev.removeAllListeners();
-                
+
                 // Close connection if still open
                 if (this.sock.ws && this.sock.ws.readyState === 1) {
                     this.sock.ws.close();
                 }
-                
+
                 this.sock = null;
             }
-            
+
             // Reset singleton state
             if (botInstance === this) {
                 botInstance = null;
@@ -300,25 +301,25 @@ class Kachina {
     async validateAndRecoverSession() {
         try {
             const { state, saveCreds } = await useMultiFileAuthState(this.sessionId);
-            
+
             // Basic validation of session state
             if (!state || !state.creds || !saveCreds) {
                 throw new Error('Invalid session state structure');
             }
-            
+
             return { state, saveCreds };
         } catch (error) {
             logger.warning(`Session validation failed: ${error.message}`);
-            
+
             // Attempt to backup and recreate session
             await this.backupCorruptedSession();
-            
+
             // Create fresh session
             const { state, saveCreds } = await useMultiFileAuthState(this.sessionId);
             return { state, saveCreds };
         }
     }
-    
+
     // Handle session corruption by backing up and cleaning
     async handleSessionCorruption() {
         try {
@@ -329,12 +330,12 @@ class Kachina {
             throw error;
         }
     }
-    
+
     // Backup corrupted session for debugging
     async backupCorruptedSession() {
         try {
             const backupPath = `${this.sessionId}_corrupted_${Date.now()}`;
-            
+
             if (await fs.pathExists(this.sessionId)) {
                 await fs.move(this.sessionId, backupPath);
                 logger.info(`Corrupted session backed up to: ${backupPath}`);
@@ -359,14 +360,14 @@ class Kachina {
         }
 
         isRestarting = true;
-        
+
         // Clear any existing timeout
         if (restartTimeout) {
             clearTimeout(restartTimeout);
         }
 
         logger.info(`Scheduling restart in ${delay}ms...`);
-        
+
         restartTimeout = setTimeout(async () => {
             try {
                 logger.info("Executing scheduled restart...");
