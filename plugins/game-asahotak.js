@@ -97,9 +97,12 @@ export const handler = {
             // Set 60 second timer
             setTimeout(async () => {
                 if (global.asahOtakGame && global.asahOtakGame[id]) {
+                    // Get session data instead of using closure variables
+                    const gameSession = global.asahOtakGame[id];
+                    
                     let timeoutCaption = `⏰ *GAME ASAH OTAK - WAKTU HABIS!*\n\n`;
-                    timeoutCaption += `📝 *Soal:* ${asahOtakData.soal}\n`;
-                    timeoutCaption += `✅ *Jawaban:* ${Array.isArray(asahOtakData.jawaban) ? asahOtakData.jawaban.join(' / ') : asahOtakData.jawaban}\n\n`;
+                    timeoutCaption += `📝 *Soal:* ${gameSession.soal}\n`;
+                    timeoutCaption += `✅ *Jawaban:* ${Array.isArray(gameSession.jawaban) ? gameSession.jawaban.join(' / ') : gameSession.jawaban}\n\n`;
                     timeoutCaption += `🎮 *Game berakhir karena waktu habis!*`;
 
                     await sock.sendMessage(id, {
