@@ -580,6 +580,70 @@ export const handleTebakKalimatAnswer = async (sock, m) => {
     }
 };
 
+export const handleSiapakahakuAnswer = async (sock, m) => {
+    try {
+        if (!global.siapakahakuGame || !global.siapakahakuGame[m.chat]) {
+            return false;
+        }
+
+        let room = global.siapakahakuGame[m.chat];
+
+        let text = '';
+        if (m.message?.conversation) {
+            text = m.message.conversation;
+        } else if (m.message?.extendedTextMessage?.text) {
+            text = m.message.extendedTextMessage.text;
+        }
+
+        text = text?.toLowerCase().trim();
+        if (!text) return false;
+
+        const isCorrect = text === room.jawaban.toLowerCase();
+
+        if (isCorrect) {
+            let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
+            let reward = room.winScore + (timeBonus * 50);
+            
+            try {
+                await User.addBalance(m.sender, reward, 'Siapakahaku game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
+
+            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
+            correctMsg += `✅ Jawaban: *${room.jawaban}*\n`;
+            correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
+            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
+
+            // Hapus pesan pertanyaan sebelumnya jika messageId tersimpan
+            if (room.messageId) {
+                try {
+                    await sock.sendMessage(m.chat, { 
+                        delete: room.messageId 
+                    });
+                } catch (error) {
+                    console.error('Error deleting question message:', error);
+                }
+            }
+
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: [m.sender]
+            }, { quoted: m });
+
+            delete global.siapakahakuGame[m.chat];
+            return true;
+        }
+
+        return false; 
+
+    } catch (error) {
+        console.error('Error handling siapakahaku answer:', error);
+        return false;
+    }
+};
+
 export const handleGameAnswers = async (sock, m) => {
     // Try each game handler
     const handlers = [
@@ -590,7 +654,8 @@ export const handleGameAnswers = async (sock, m) => {
         handleTekatekiAnswer,
         handleAsahOtakAnswer,
         handleTebakWarnaAnswer,
-        handleTebakKalimatAnswer
+        handleTebakKalimatAnswer,
+        handleSiapakahakuAnswer
     ];
 
     for (const handler of handlers) {
