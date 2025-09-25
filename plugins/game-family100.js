@@ -2,7 +2,8 @@ import axios from "axios";
 export const handler = {
     command: ['family100'],
     category: 'game',
-    help: 'Game Family 100 - Tebak jawaban dari pertanyaan survey!\n\nFormat: !family100',
+    help: 'Game Family 100',
+    desc: 'Game Family 100 - Tebak jawaban dari pertanyaan survey!\n\nFormat: !family100',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

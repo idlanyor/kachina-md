@@ -516,6 +516,71 @@ export const handleTebakWarnaAnswer = async (sock, m) => {
     }
 };
 
+export const handleTebakkataAnswer = async (sock, m) => {
+    try {
+        if (!global.tebakkataGame || !global.tebakkataGame[m.chat]) {
+            return false;
+        }
+
+        let room = global.tebakkataGame[m.chat];
+
+        let text = '';
+        if (m.message?.conversation) {
+            text = m.message.conversation;
+        } else if (m.message?.extendedTextMessage?.text) {
+            text = m.message.extendedTextMessage.text;
+        }
+
+        text = text?.toLowerCase().trim();
+        if (!text) return false;
+
+        const isCorrect = text === room.jawaban.toLowerCase();
+
+        if (isCorrect) {
+            let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
+            let reward = room.winScore + (timeBonus * 50);
+            
+            try {
+                await User.addBalance(m.sender, reward, 'Tebakkata game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
+
+            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
+            correctMsg += `🎯 *Petunjuk:* ${room.soal}\n`;
+            correctMsg += `✅ *Jawaban:* ${room.jawaban}\n`;
+            correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
+            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
+
+            // Hapus pesan pertanyaan sebelumnya jika messageId tersimpan
+            if (room.messageId) {
+                try {
+                    await sock.sendMessage(m.chat, { 
+                        delete: room.messageId 
+                    });
+                } catch (error) {
+                    console.error('Error deleting question message:', error);
+                }
+            }
+
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: [m.sender]
+            }, { quoted: m });
+
+            delete global.tebakkataGame[m.chat];
+            return true;
+        }
+
+        return false; 
+
+    } catch (error) {
+        console.error('Error handling tebakkata answer:', error);
+        return false;
+    }
+};
+
 export const handleTebakKalimatAnswer = async (sock, m) => {
     try {
         if (!global.tebakKalimatGame || !global.tebakKalimatGame[m.chat]) {
@@ -720,6 +785,7 @@ export const handleGameAnswers = async (sock, m) => {
         handleTekatekiAnswer,
         handleAsahOtakAnswer,
         handleTebakWarnaAnswer,
+        handleTebakkataAnswer,
         handleTebakKalimatAnswer,
         handleSiapakahakuAnswer,
         handleSusunkataAnswer

@@ -10,6 +10,7 @@ export const handler = {
     command: ['cerdasCermat', 'cc','lcc'],
     category: 'game',
     help: 'Game Cerdas Cermat',
+    desc: 'Game Cerdas Cermat - Bermain cerdas cermat dengan berbagai matapelajaran!\n\nFormat: !cerdasCermat <matapelajaran> <jumlahsoal>\nContoh: !cerdasCermat matematika 5\n\nJawab dengan mengetik jawaban yang tepat!',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

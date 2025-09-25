@@ -8,7 +8,8 @@ const GAME_COOLDOWN = 60000; // 1 menit cooldown per grup
 export const handler = {
     command: ['susunkata'],
     category: 'game',
-    help: 'Game Susun Kata - Susun huruf acak menjadi kata yang benar!\n\nFormat: !susunkata\nContoh: !susunkata\n\nJawab dengan mengetik kata yang tepat!',
+    help: 'Game Susun Kata',
+    desc: 'Game Susun Kata - Susun huruf acak menjadi kata yang benar!\n\nFormat: !susunkata\nContoh: !susunkata\n\nJawab dengan mengetik kata yang tepat!',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

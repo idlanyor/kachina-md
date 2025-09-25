@@ -8,7 +8,8 @@ const GAME_COOLDOWN = 60000; // 1 menit cooldown per grup
 export const handler = {
     command: ['siapakahaku'],
     category: 'game',
-    help: 'Game Siapakah Aku - Tebak siapa yang dimaksud dari petunjuk!\n\nFormat: !siapakahaku\nContoh: !siapakahaku\n\nJawab dengan mengetik jawaban yang tepat!',
+    help: 'Game Siapakah Aku',
+    desc: 'Game Siapakah Aku - Tebak siapa yang dimaksud dari petunjuk!\n\nFormat: !siapakahaku\nContoh: !siapakahaku\n\nJawab dengan mengetik jawaban yang tepat!',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

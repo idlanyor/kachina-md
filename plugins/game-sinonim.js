@@ -3,7 +3,8 @@ import Database from '../helper/database.js';
 export const handler = {
     command: ['sinonim'],
     category: 'game',
-    help: 'Game tebak sinonim kata - Tebak kata-kata yang memiliki arti sama!\n\nFormat: !sinonim',
+    help: 'Game Tebak Sinonim Kata',
+    desc: 'Game tebak sinonim kata - Tebak kata-kata yang memiliki arti sama!\n\nFormat: !sinonim',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

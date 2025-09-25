@@ -8,7 +8,8 @@ const GAME_COOLDOWN = 60000; // 1 menit cooldown per grup
 export const handler = {
     command: ['tebakwarna'],
     category: 'game',
-    help: 'Game Tebak Warna ',
+    help: 'Game Tebak Warna',
+    desc: 'Game Tebak Warna - Tebak warna dari gambar!\n\nFormat: !tebakwarna\nContoh: !tebakwarna\n\nJawab dengan mengetik warna yang tepat!',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

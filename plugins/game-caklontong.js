@@ -10,7 +10,8 @@ const dataPath = path.join(__dirname, '../lib/data/games/caklontong.json');
 export const handler = {
     command: ['caklontong'],
     category: 'game',
-    help: 'Game tebak cak lontong',
+    help: 'Tebak Cak Lontong',
+    desc: 'Game Tebak Cak Lontong - Tebak jawaban dari pertanyaan cak lontong!\n\nFormat: !caklontong\nContoh: !caklontong\n\nJawab dengan mengetik jawaban yang tepat!',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,

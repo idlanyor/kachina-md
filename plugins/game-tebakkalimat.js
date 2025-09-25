@@ -8,7 +8,8 @@ const GAME_COOLDOWN = 60000; // 1 menit cooldown per grup
 export const handler = {
     command: ['tebakkalimat'],
     category: 'game',
-    help: 'Game Tebak Kalimat - Lengkapi kalimat yang hilang!\n\nFormat: !tebakkalimat\nContoh: !tebakkalimat\n\nJawab dengan mengetik jawaban yang tepat!',
+    help: 'Game Tebak Kalimat',
+    desc: 'Game Tebak Kalimat - Lengkapi kalimat yang hilang!\n\nFormat: !tebakkalimat\nContoh: !tebakkalimat\n\nJawab dengan mengetik jawaban yang tepat!',
     isAdmin: false,
     isBotAdmin: false,
     isOwner: false,
