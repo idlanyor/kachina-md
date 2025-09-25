@@ -208,11 +208,18 @@ export const handleFamily100Answer = async (sock, m) => {
 
 export const handleCerdasCermatAnswer = async (sock, m) => {
     try {
+        // CerdasCermat game uses its own handleAnswer function from the plugin
+        // This handler should delegate to the plugin's handleAnswer function
         if (!global.cerdasCermatGame || !global.cerdasCermatGame[m.chat]) {
             return false;
         }
 
         let room = global.cerdasCermatGame[m.chat];
+        
+        // Check if game is active and has minimum duration (race condition prevention)
+        if (!room.isActive || (Date.now() - room.startTime) < 2000) {
+            return false;
+        }
 
         let text = '';
         if (m.message?.conversation) {
@@ -222,42 +229,17 @@ export const handleCerdasCermatAnswer = async (sock, m) => {
         }
 
         text = text?.toLowerCase().trim();
-        if (!text || text.length < 2) return false;
+        if (!text || text.length < 1) return false;
 
-        let isCorrect = false;
-        for (let correctAnswer of room.jawaban) {
-            if (text === correctAnswer.toLowerCase().trim()) {
-                isCorrect = true;
-                break;
-            }
+        // Validate answer format for cerdasCermat (a, b, c, d)
+        const validAnswers = ['a', 'b', 'c', 'd'];
+        if (!validAnswers.includes(text)) {
+            return false;
         }
 
-        if (isCorrect) {
-            let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
-            let reward = room.winScore + (timeBonus * 50);
-            
-            try {
-                await User.addBalance(m.sender, reward, 'CerdasCermat game win');
-            } catch (error) {
-                console.error('Error adding balance:', error);
-            }
-
-            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
-            correctMsg += `✅ Jawaban: *${room.jawaban[0]}*\n`;
-            correctMsg += `💰 +Rp ${reward.toLocaleString('id-ID')}\n`;
-            correctMsg += `⚡ Bonus waktu: +${timeBonus * 50} poin\n`;
-            correctMsg += `🏆 Selamat @${m.sender.split('@')[0]}!`;
-
-            await sock.sendMessage(m.chat, {
-                text: correctMsg,
-                mentions: [m.sender]
-            }, { quoted: m });
-
-            delete global.cerdasCermatGame[m.chat];
-            return true;
-        }
-
-        return false;
+        // Use the plugin's handleAnswer function
+        const { handleAnswer } = await import('../plugins/game-cerdasCermat.js');
+        return await handleAnswer(sock, m, text);
 
     } catch (error) {
         console.error('Error handling cerdasCermat answer:', error);
