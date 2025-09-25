@@ -1,6 +1,6 @@
 import User from '../database/models/User.js'
 
-export default {
+export const handler = {
   name: 'setname',
   aliases: ['setname'],
   category: 'user',
@@ -8,8 +8,8 @@ export default {
   help: 'Set atau ubah nama pengguna',
   use: '<nama_baru>',
   example: '.setname John Doe',
-  
-  async execute(sock, m, { args, command }) {
+
+  async exec({ sock, m, args }) {
     try {
       // Cek apakah user sudah terdaftar
       const isRegistered = await User.isRegistered(m.sender)
@@ -23,37 +23,37 @@ export default {
       }
 
       const newName = args
-      
+
       // Set nama baru
       await User.setName(m.sender, newName)
-      
+
       // Konfirmasi berhasil
       m.reply(`✅ *Nama berhasil diubah!*\n\n📝 *Nama baru:* ${newName}\n\n💡 *Tips:* Gunakan *.profile* untuk melihat profil lengkapmu`)
-      
+
     } catch (error) {
       console.error('Error in setname command:', error)
-      
+
       // Handle error yang spesifik
       if (error.message.includes('must be registered')) {
         return m.reply('❌ Kamu harus mendaftar terlebih dahulu! Ketik *.register* untuk mendaftar.')
       }
-      
+
       if (error.message.includes('at least 2 characters')) {
         return m.reply('❌ Nama harus minimal 2 karakter!')
       }
-      
+
       if (error.message.includes('less than 50 characters')) {
         return m.reply('❌ Nama harus kurang dari 50 karakter!')
       }
-      
+
       if (error.message.includes('invalid characters')) {
         return m.reply('❌ Nama mengandung karakter yang tidak diperbolehkan!')
       }
-      
+
       if (error.message.includes('valid string')) {
         return m.reply('❌ Nama harus berupa teks yang valid!')
       }
-      
+
       // Error umum
       m.reply('❌ Terjadi kesalahan saat mengubah nama. Silakan coba lagi.')
     }
