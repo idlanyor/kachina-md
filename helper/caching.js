@@ -1,14 +1,12 @@
 import NodeCache from 'node-cache';
 
-// Gunakan NodeCache untuk konsistensi dengan bot.js
 const groupCache = new NodeCache({ 
-    stdTTL: 300, // 5 menit TTL
-    checkperiod: 60, // Check expired keys setiap 60 detik
+    stdTTL: 300, 
+    checkperiod: 60,
     useClones: false
 });
 
 export async function cacheGroupMetadata(sock, id) {
-    // Cek cache terlebih dahulu
     const cached = groupCache.get(id);
     if (cached) {
         return cached;
@@ -17,7 +15,6 @@ export async function cacheGroupMetadata(sock, id) {
     try {
         const metadata = await sock.groupMetadata(id);
         if (metadata) {
-            // Simpan ke cache dengan TTL otomatis dari NodeCache
             groupCache.set(id, metadata);
             console.log(`Group metadata cached for: ${id}`);
         }
@@ -28,10 +25,8 @@ export async function cacheGroupMetadata(sock, id) {
     }
 }
 
-// Export cache instance untuk debugging atau manual management
 export { groupCache };
 
-// Fungsi untuk clear cache secara manual jika diperlukan
 export function clearGroupCache(jid = null) {
     if (jid) {
         groupCache.del(jid);
@@ -42,7 +37,6 @@ export function clearGroupCache(jid = null) {
     }
 }
 
-// Fungsi untuk mendapatkan statistik cache
 export function getCacheStats() {
     return {
         keys: groupCache.keys().length,
