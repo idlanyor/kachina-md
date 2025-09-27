@@ -1,7 +1,7 @@
 export const handler = {
     command: ['get'],
     category:'tools',
-    help: 'Mengambil data dari URL\n*Contoh:* !get https://api.example.com/data',
+    help: 'Mengambil data dari URL',
     exec: async ({ sock, m, args }) => {
       try {
         if (!args) {
@@ -16,8 +16,21 @@ export const handler = {
         });
   
         const response = await fetch(url);
-        const contentType = response.headers.get('content-type');
-        const fileName = url.split('/').pop() || 'file';
+        const contentType = response.headers.get('content-type') || '';
+        const contentDisposition = response.headers.get('content-disposition');
+        
+        let fileName = 'file';
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          if (filenameMatch) {
+            fileName = filenameMatch[1].replace(/['"]/g, '');
+          }
+        } else {
+          const urlFileName = url.split('/').pop();
+          if (urlFileName && urlFileName.includes('.')) {
+            fileName = urlFileName;
+          }
+        }
   
         if (contentType.includes('application/json')) {
           const jsonData = await response.json();
@@ -83,13 +96,39 @@ export const handler = {
               }
             }
           });
-        } else if (contentType.includes('application') || contentType.includes('text/csv')) {
+        } else if (contentType.includes('application') || contentType.includes('text/csv') || contentType.includes('octet-stream')) {
           const buffer = await response.arrayBuffer();
+          
+          // Determine appropriate mimetype for octet-stream based on file extension
+          let mimetype = contentType;
+          if (contentType.includes('octet-stream')) {
+            const ext = fileName.split('.').pop()?.toLowerCase();
+            switch (ext) {
+              case 'pdf':
+                mimetype = 'application/pdf';
+                break;
+              case 'zip':
+                mimetype = 'application/zip';
+                break;
+              case 'rar':
+                mimetype = 'application/x-rar-compressed';
+                break;
+              case 'exe':
+                mimetype = 'application/x-msdownload';
+                break;
+              case 'apk':
+                mimetype = 'application/vnd.android.package-archive';
+                break;
+              default:
+                mimetype = 'application/octet-stream';
+            }
+          }
+          
           await sock.sendMessage(m.chat, {
             document: Buffer.from(buffer),
-            mimetype: contentType,
+            mimetype: mimetype,
             fileName: fileName,
-            caption: `🛜 *GET Request - Document*\n📃 *Type:* ${contentType}`,
+            caption: `🛜 *GET Request - Document*\n📃 *Type:* ${mimetype}\n📁 *File:* ${fileName}`,
             contextInfo: {
               externalAdReply: {
                 title: '乂 API Request 乂',
