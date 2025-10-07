@@ -12,11 +12,23 @@ export const handler = {
     async exec({ m, sock }) {
         try {
             const cmd = m.command;
+            await fs.ensureDir('./temp')
             
-            // Cek apakah ada audio yang di-reply
-            if (!m.quoted || !m.quoted.message?.audioMessage) {
-                await m.reply('❌ Reply audio yang ingin dikonversi!');
-                return;
+            // Validasi media yang di-reply
+            const hasAudio = !!m.quoted?.message?.audioMessage
+            const hasVideo = !!m.quoted?.message?.videoMessage
+
+            if (cmd === 'tomp3') {
+                if (!m.quoted || (!hasAudio && !hasVideo)) {
+                    await m.reply('❌ Reply video atau audio yang ingin dikonversi ke MP3!')
+                    return
+                }
+            } else {
+                // tovn: dukung audio/voice note atau video untuk diubah ke VN
+                if (!m.quoted || (!hasAudio && !hasVideo)) {
+                    await m.reply('❌ Reply video atau audio/voice note yang ingin dikonversi ke VN!')
+                    return
+                }
             }
 
             await sock.sendMessage(m.chat, {
@@ -24,35 +36,44 @@ export const handler = {
             });
 
             const audio = await m.quoted.download();
-            const inputPath = `./temp/${m.chat}_input.${cmd === 'tovn' ? 'mp3' : 'opus'}`;
-            const outputPath = `./temp/${m.chat}_output.${cmd === 'tovn' ? 'opus' : 'mp3'}`;
+            const mime = (m.quoted?.message?.audioMessage?.mimetype || m.quoted?.message?.videoMessage?.mimetype || '')
+            let inExt = 'bin'
+            if (/ogg|opus/i.test(mime)) inExt = 'ogg'
+            else if (/mpeg|mp3/i.test(mime)) inExt = 'mp3'
+            else if (/wav/i.test(mime)) inExt = 'wav'
+            else if (/mp4|quicktime/i.test(mime)) inExt = 'mp4'
+            else if (/3gpp/i.test(mime)) inExt = '3gp'
+
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.${inExt}`;
+            const outputPath = `./temp/${m.chat}_${suffix}.out.${cmd === 'tovn' ? 'ogg' : 'mp3'}`;
 
             await fs.promises.writeFile(inputPath, audio);
 
             // Proses konversi sesuai command
             if (cmd === 'tovn') {
                 // Konversi ke format opus dengan bitrate yang sesuai untuk VN
-                await execAsync(`ffmpeg -i ${inputPath} -af "silenceremove=1:0:-50dB" -c:a libopus -b:a 128k ${outputPath}`);
+                await execAsync(`ffmpeg -y -i "${inputPath}" -vn -af "silenceremove=1:0:-50dB" -c:a libopus -b:a 96k -ar 48000 -ac 1 "${outputPath}"`);
                 
                 await sock.sendMessage(m.chat, {
                     audio: { url: outputPath },
-                    mimetype: 'audio/mp4',
+                    mimetype: 'audio/ogg; codecs=opus',
                     ptt: true // Set true untuk mengirim sebagai voice note
                 }, { quoted: m });
             } else {
                 // Konversi ke format MP3 dengan kualitas yang lebih baik
-                await execAsync(`ffmpeg -i ${inputPath} -acodec libmp3lame -ab 320k ${outputPath}`);
+                await execAsync(`ffmpeg -y -i "${inputPath}" -vn -acodec libmp3lame -b:a 192k "${outputPath}"`);
                 
                 await sock.sendMessage(m.chat, {
                     audio: { url: outputPath },
-                    mimetype: 'audio/mp4',
+                    mimetype: 'audio/mpeg',
                     ptt: false // Set false untuk mengirim sebagai MP3
                 }, { quoted: m });
             }
 
             // Hapus file temporary
-            fs.unlinkSync(inputPath);
-            fs.unlinkSync(outputPath);
+            try { fs.unlinkSync(inputPath); } catch {}
+            try { fs.unlinkSync(outputPath); } catch {}
 
             await sock.sendMessage(m.chat, {
                 react: { text: '✅', key: m.key }

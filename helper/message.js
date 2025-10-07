@@ -74,6 +74,22 @@ export function addMessageHandler(m, sock) {
         };
     }
 
+    const baseMessage = m.message?.ephemeralMessage?.message || m.message;
+    const ctxs = [
+        baseMessage?.extendedTextMessage?.contextInfo,
+        baseMessage?.imageMessage?.contextInfo,
+        baseMessage?.videoMessage?.contextInfo,
+        baseMessage?.audioMessage?.contextInfo,
+        baseMessage?.documentMessage?.contextInfo
+    ].filter(Boolean);
+    m.mentionedJid = ctxs.reduce((acc, ci) => {
+        const list = Array.isArray(ci?.mentionedJid) ? ci.mentionedJid : [];
+        for (const jid of list) {
+            if (!acc.includes(jid)) acc.push(jid);
+        }
+        return acc;
+    }, []);
+
     m.download = async () => {
         return await getMedia({
             message: m.message,

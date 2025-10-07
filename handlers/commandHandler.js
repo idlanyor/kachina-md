@@ -20,20 +20,57 @@ export class CommandHandler {
                 return await this.handleExec(sock, m, args);
             
             case 'bass':
-                return await AudioEffectsHandler.handleBass(sock, m, args);
+                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae bass (reply audio)');
+                return true;
             
             case 'nightcore':
-                return await AudioEffectsHandler.handleNightcore(sock, m, args);
+                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae nightcore (reply audio)');
+                return true;
             
             case 'slow':
-                return await AudioEffectsHandler.handleSlow(sock, m, args);
+                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae slow (reply audio)');
+                return true;
             
             case 'robot':
-                return await AudioEffectsHandler.handleRobot(sock, m, args);
+                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae robot (reply audio)');
+                return true;
             
             case 'reverse':
-                return await AudioEffectsHandler.handleReverse(sock, m, args);
+                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae reverse (reply audio)');
+                return true;
             
+            case 'ae': {
+                const sub = (args[0] || '').toLowerCase();
+                const help = '📋 Penggunaan: .ae <efek> (reply audio)\n\nEfek tersedia:\n- bass (bassboost)\n- 8d\n- vaporwave\n- nightcore\n- phaser\n- tremolo\n- vibrato\n- surround\n- pulsator\n- subboost\n- reverse\n- remove (hapus efek: normalize)';
+                if (!sub) {
+                    await m.reply(help);
+                    return true;
+                }
+
+                const filters = {
+                    bass: 'bass=g=20,dynaudnorm=f=200',
+                    '8d': 'apulsator=hz=0.08',
+                    vaporwave: 'aresample=48000,asetrate=48000*0.8',
+                    nightcore: 'aresample=48000,asetrate=48000*1.25',
+                    phaser: 'aphaser=in_gain=0.4',
+                    tremolo: 'tremolo',
+                    vibrato: 'vibrato=f=6.5',
+                    surround: 'surround',
+                    pulsator: 'apulsator=hz=1',
+                    subboost: 'asubboost',
+                    reverse: 'areverse',
+                    remove: 'dynaudnorm=f=200'
+                };
+
+                const chain = filters[sub];
+                if (!chain) {
+                    await m.reply(help);
+                    return true;
+                }
+
+                return await AudioEffectsHandler.applyFilter(sock, m, sub, chain);
+            }
+
             case 'tovn':
                 return await AudioEffectsHandler.handleToVn(sock, m, args);
             

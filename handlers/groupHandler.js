@@ -69,9 +69,9 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
 
             const groupMetadata = await cacheGroupMetadata(sock, id);
             const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
-            const botIsAdmin = groupMetadata.participants.find(p => p.id === botNumber)?.admin;
-
-            if (!botIsAdmin) return;
+            // Note: Admin privilege is NOT required to send welcome/leave messages,
+            // so we no longer bail out when the bot isn't admin.
+            // We still avoid acting on our own join/leave events below.
 
             for (const participant of participants) {
                 if (participant === botNumber) continue;
@@ -95,7 +95,13 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
             const contact = await sock.onWhatsApp(participant);
             const memberName = contact[0]?.notify || participant.split('@')[0];
 
-            const welcomeImage = await Welcome(sock, participant, groupMetadata.subject, memberName);
+            let welcomeImage = null;
+            try {
+                welcomeImage = await Welcome(sock, participant, groupMetadata.subject, memberName);
+            } catch (e) {
+                // Fallback to text-only when image generation fails
+                logger.warn('Welcome image generation failed, sending text-only message');
+            }
 
             let welcomeMessage = group.welcomeMessage && group.welcomeMessage.trim() !== ''
                 ? group.welcomeMessage
@@ -109,11 +115,18 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
                 `• Umur :\n` +
                 `• Hobi atau minat :\n`;
 
-            await sock.sendMessage(groupId, {
-                image: welcomeImage,
-                caption: welcomeMessage,
-                mentions: [participant]
-            });
+            if (welcomeImage) {
+                await sock.sendMessage(groupId, {
+                    image: welcomeImage,
+                    caption: welcomeMessage,
+                    mentions: [participant]
+                });
+            } else {
+                await sock.sendMessage(groupId, {
+                    text: welcomeMessage,
+                    mentions: [participant]
+                });
+            }
         } catch (error) {
             logger.error('Error handling welcome:', error);
         }
@@ -127,7 +140,13 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
             const contact = await sock.onWhatsApp(participant);
             const memberName = contact[0]?.notify || participant.split('@')[0];
 
-            const leaveImage = await Leave(sock, participant, groupMetadata.subject, memberName);
+            let leaveImage = null;
+            try {
+                leaveImage = await Leave(sock, participant, groupMetadata.subject, memberName);
+            } catch (e) {
+                // Fallback to text-only when image generation fails
+                logger.warn('Leave image generation failed, sending text-only message');
+            }
 
             let leaveMessage = group.leaveMessage && group.leaveMessage.trim() !== ''
                 ? group.leaveMessage
@@ -137,11 +156,18 @@ Jika mencapai 3 warning, kamu akan dikeluarkan dari grup.`);
                 `@${participant.split('@')[0]} telah meninggalkan grup *${groupMetadata.subject}*\n\n` +
                 `Semoga sukses selalu! 🙏`;
 
-            await sock.sendMessage(groupId, {
-                image: leaveImage,
-                caption: leaveMessage,
-                mentions: [participant]
-            });
+            if (leaveImage) {
+                await sock.sendMessage(groupId, {
+                    image: leaveImage,
+                    caption: leaveMessage,
+                    mentions: [participant]
+                });
+            } else {
+                await sock.sendMessage(groupId, {
+                    text: leaveMessage,
+                    mentions: [participant]
+                });
+            }
         } catch (error) {
             logger.error('Error handling leave:', error);
         }

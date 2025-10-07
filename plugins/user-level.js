@@ -1,5 +1,4 @@
 import User from '../database/models/User.js'
-// gak usah diganti anjir
 import canvafy from 'canvafy'
 
 export const handler = {
@@ -12,19 +11,25 @@ export const handler = {
         try {
             // Tentukan target user
             const targetJid = m.mentionedJid?.[0] || m.sender
+            const viewer = await User.getById(m.sender)
             const user = await User.getById(targetJid)
 
-            if (!user) {
-                return m.reply('❌ User tidak ditemukan! Silakan daftar terlebih dahulu dengan `.daftar`')
+            // Set locale berdasarkan preferensi pengguna pemanggil
+            const userLang = viewer?.preferences?.language || 'id'
+            globalThis.localization.setLocale(userLang)
+
+            // Validasi pendaftaran target
+            if (!user?.registered) {
+                if (targetJid === m.sender) {
+                    return m.reply('❌ Kamu belum terdaftar. Ketik .register untuk mendaftar.')
+                } else {
+                    return m.reply('❌ User tersebut belum terdaftar!')
+                }
             }
 
             // Dapatkan info level dan ranking
             const levelInfo = await User.getLevelInfo(targetJid)
             const rankInfo = await User.getUserRankInfo(targetJid)
-
-            if (!rankInfo) {
-                return m.reply('❌ User belum terdaftar! Silakan daftar terlebih dahulu dengan `.daftar`')
-            }
 
             // Get user profile picture
             let avatarUrl

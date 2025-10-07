@@ -45,7 +45,8 @@
     "cooldown": "Tunggu {{time}} detik sebelum menggunakan perintah ini lagi."
   },
   "user": {
-    "not_registered": "Anda belum terdaftar. Ketik !daftar untuk mendaftar.",
+    "not_registered": "Pengguna belum terdaftar.",
+    "please_register": "Kamu belum terdaftar. Ketik .register untuk mendaftar.",
     "already_registered": "Anda sudah terdaftar.",
     "register_success": "Pendaftaran berhasil! Selamat datang {{name}}!",
     "register_failed": "Gagal mendaftar. Silakan coba lagi.",

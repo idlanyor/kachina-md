@@ -8,7 +8,7 @@ export const handler = {
     exec: async ({ sock, m, args }) => {
         try {
             if (!args) {
-                return await m.reply('❌ *Cara penggunaan:*\n!transfer @user [jumlah]\n\nContoh: !transfer @user 5000')
+                return await m.reply('❌ *Cara penggunaan:*\n.transfer @user [jumlah]\n\nContoh: .transfer @user 5000')
             }
             
             const targetJid = m.mentionedJid?.[0]
@@ -18,7 +18,7 @@ export const handler = {
                 return await m.reply('❌ Mention user yang ingin ditransfer!')
             }
             
-            if (!amount || amount < 100) {
+            if (!Number.isFinite(amount) || amount < 100) {
                 return await m.reply('❌ Jumlah transfer minimal Rp 100!')
             }
             
@@ -45,8 +45,10 @@ export const handler = {
             
         } catch (error) {
             console.error('Error in transfer command:', error)
-            if (error.message.includes('Insufficient balance')) {
+            if (/insufficient balance/i.test(error.message)) {
                 await m.reply('❌ Balance Anda tidak mencukupi!')
+            } else if (/invalid/i.test(error.message)) {
+                await m.reply('❌ Permintaan tidak valid. Pastikan format dan jumlah benar.')
             } else {
                 await m.reply(`❌ ${error.message}`)
             }

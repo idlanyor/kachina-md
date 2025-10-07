@@ -8,15 +8,20 @@ export const handler = {
     exec: async ({ sock, m, args }) => {
         try {
             const targetJid = m.mentionedJid?.[0] || m.sender
+            const viewer = await User.getById(m.sender)
             const user = await User.getById(targetJid)
             const isOwnProfile = targetJid === m.sender
 
             // Set user's language for localization
-            const userLang = user.preferences?.language || 'id'
+            const userLang = viewer?.preferences?.language || 'id'
             globalThis.localization.setLocale(userLang)
 
-            if (!user.registered && !isOwnProfile) {
-                return await m.reply(t('user.not_registered'))
+            if (!user?.registered) {
+                if (isOwnProfile) {
+                    return await m.reply('❌ Kamu belum terdaftar. Ketik .register untuk mendaftar.')
+                } else {
+                    return await m.reply(t('user.not_registered'))
+                }
             }
             
             // Get level info

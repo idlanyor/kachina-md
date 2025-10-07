@@ -58,15 +58,22 @@ export const handler = {
                         categories[category] = []
                     }
 
-                    const commands = Array.isArray(plugin.handler.command) ?
+                    let commands = Array.isArray(plugin.handler.command) ?
                         plugin.handler.command :
                         [plugin.handler.command]
 
-                    categories[category].push({
-                        commands,
-                        help: plugin.handler.help || 'Tidak ada deskripsi',
-                        tags: plugin.handler.tags || []
-                    })
+                    // Sembunyikan perintah efek lama (deprecated)
+                    if (file.endsWith('tool-audio.js')) {
+                        commands = commands.filter(c => c === 'ae')
+                    }
+
+                    if (commands.length > 0) {
+                        categories[category].push({
+                            commands,
+                            help: plugin.handler.help || 'Tidak ada deskripsi',
+                            tags: plugin.handler.tags || []
+                        })
+                    }
                 } catch (err) {
                     console.error(`Error loading plugin ${file}:`, err)
                 }

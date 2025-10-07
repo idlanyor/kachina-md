@@ -28,6 +28,9 @@ export const handler = {
                 users = numbers.map(num => num.replace('@', '').replace(/[^0-9]/g, '') + '@s.whatsapp.net')
             }
 
+            // Deduplicate
+            users = Array.from(new Set(users.filter(Boolean)))
+
             if (users.length === 0) {
                 await m.reply('📋 Format: !kick @user1 @user2 atau reply pesan user')
                 return
@@ -35,30 +38,38 @@ export const handler = {
 
             // Get group metadata
             const groupMeta = await sock.groupMetadata(id)
-            const botNumber = sock.user.jid
+            const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net'
 
             // Filter out invalid numbers and check permissions
-            console.log(users)
-            const validUsers = users.filter(user => {
-                // Check if user is in group
-                // if (!groupMeta.participants.find(p => p.id === user)) {
-                //     m.reply(`❌ @${user.split('@')[0]} tidak ada dalam grup`)
-                //     return false
-                // }
-                // Prevent kicking group creator
+            const validUsers = []
+            const skipped = []
+            for (const user of users) {
+                const participant = groupMeta.participants.find(p => p.id === user)
+                if (!participant) {
+                    skipped.push({ user, reason: 'not_in_group' })
+                    continue
+                }
                 if (user === groupMeta.owner) {
-                    m.reply(`❌ Tidak dapat mengeluarkan owner grup`)
-                    return false
+                    skipped.push({ user, reason: 'owner' })
+                    continue
                 }
-                // Prevent kicking the bot
                 if (user === botNumber) {
-                    m.reply(`❌ Tidak dapat mengeluarkan bot`)
-                    return false
+                    skipped.push({ user, reason: 'bot' })
+                    continue
                 }
-                return true
-            })
+                // Prevent kicking admins
+                if (participant.admin) {
+                    skipped.push({ user, reason: 'admin' })
+                    continue
+                }
+                validUsers.push(user)
+            }
 
             if (validUsers.length === 0) {
+                const msg = skipped.length
+                    ? '❌ Tidak ada target yang valid untuk di-kick.'
+                    : '❌ Tidak ada pengguna yang disebut.'
+                await m.reply(msg)
                 return
             }
 
@@ -67,7 +78,21 @@ export const handler = {
 
             // Send success message
             const kickedUsers = validUsers.map(user => `@${user.split('@')[0]}`).join(', ')
-            await m.reply(`✅ Berhasil mengeluarkan ${kickedUsers}`)
+            let replyMsg = `✅ Berhasil mengeluarkan ${kickedUsers}`
+            if (skipped.length) {
+                const detail = skipped.map(s => {
+                    const tag = `@${s.user.split('@')[0]}`
+                    switch (s.reason) {
+                        case 'not_in_group': return `${tag} (bukan anggota)`
+                        case 'owner': return `${tag} (owner grup)`
+                        case 'bot': return `${tag} (bot)`
+                        case 'admin': return `${tag} (admin)`
+                        default: return `${tag}`
+                    }
+                }).join(', ')
+                replyMsg += `\n\nℹ️ Dilewati: ${detail}`
+            }
+            await m.reply(replyMsg)
 
         } catch (error) {
             console.error('Error in kick:', error)

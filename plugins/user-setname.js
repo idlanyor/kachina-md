@@ -9,7 +9,7 @@ export const handler = {
   use: '<nama_baru>',
   example: '.setname John Doe',
 
-  async exec({ sock, m, args }) {
+  async exec({ sock, m, args, cmd }) {
     try {
       // Cek apakah user sudah terdaftar
       const isRegistered = await User.isRegistered(m.sender)
@@ -18,11 +18,12 @@ export const handler = {
       }
 
       // Cek apakah nama disediakan
-      if (!args.length) {
-        return m.reply(`❌ Masukkan nama yang ingin diset!\n\n*Contoh:* ${command} John Doe\n\n*Aturan nama:*\n• Minimal 2 karakter\n• Maksimal 50 karakter\n• Tidak boleh mengandung karakter khusus (<>"'&)`)
+      const nameArg = (Array.isArray(args) ? args.join(' ') : args || '').trim()
+      if (!nameArg) {
+        return m.reply(`❌ Masukkan nama yang ingin diset!\n\n*Contoh:* .setname John Doe\n\n*Aturan nama:*\n• Minimal 2 karakter\n• Maksimal 50 karakter\n• Tidak boleh mengandung karakter khusus (<>"'&)`)
       }
 
-      const newName = args
+      const newName = nameArg
 
       // Set nama baru
       await User.setName(m.sender, newName)

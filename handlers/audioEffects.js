@@ -5,6 +5,37 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 export class AudioEffectsHandler {
+    static async applyFilter(sock, m, filterName, filterChain) {
+        try {
+            if (!m.quoted || !m.quoted.message?.audioMessage) {
+                await m.reply('❌ Reply audio/voice note yang ingin diberi efek!');
+                return true;
+            }
+
+            await m.reply(`⏳ Menerapkan efek: ${filterName} ...`);
+            const audio = await m.quoted.download();
+            await fs.ensureDir('./temp')
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.mp3`;
+            const outputPath = `./temp/${m.chat}_${suffix}.${filterName}.mp3`;
+
+            await fs.promises.writeFile(inputPath, audio);
+            await execAsync(`ffmpeg -y -i "${inputPath}" -af "${filterChain}" "${outputPath}"`);
+
+            await sock.sendMessage(m.chat, {
+                audio: { url: outputPath },
+                mimetype: 'audio/mpeg',
+                ptt: false
+            }, { quoted: m });
+
+            try { fs.unlinkSync(inputPath); } catch {}
+            try { fs.unlinkSync(outputPath); } catch {}
+            return true;
+        } catch (error) {
+            await m.reply(`❌ Error menerapkan efek ${filterName}: ${error.message}`);
+            return true;
+        }
+    }
     static async handleBass(sock, m, args) {
         try {
             if (!m.quoted || !m.quoted.message?.audioMessage) {
@@ -14,15 +45,17 @@ export class AudioEffectsHandler {
 
             await m.reply('⏳ Sedang memproses audio...');
             const audio = await m.quoted.download();
-            const inputPath = `./temp/${m.chat}_input.mp3`;
-            const outputPath = `./temp/${m.chat}_bass.mp3`;
+            await fs.ensureDir('./temp')
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.mp3`;
+            const outputPath = `./temp/${m.chat}_${suffix}.bass.mp3`;
 
             await fs.promises.writeFile(inputPath, audio);
             await execAsync(`ffmpeg -i ${inputPath} -af "bass=g=15:f=110:w=0.6" ${outputPath}`);
 
             await sock.sendMessage(m.chat, {
                 audio: { url: outputPath },
-                mimetype: 'audio/mp4',
+                mimetype: 'audio/mpeg',
                 ptt: false
             }, { quoted: m });
 
@@ -42,15 +75,17 @@ export class AudioEffectsHandler {
 
             await m.reply('⏳ Sedang memproses audio...');
             const audio = await m.quoted.download();
-            const inputPath = `./temp/${m.chat}_input.mp3`;
-            const outputPath = `./temp/${m.chat}_nightcore.mp3`;
+            await fs.ensureDir('./temp')
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.mp3`;
+            const outputPath = `./temp/${m.chat}_${suffix}.nightcore.mp3`;
 
             await fs.promises.writeFile(inputPath, audio);
             await execAsync(`ffmpeg -i ${inputPath} -af "asetrate=44100*1.25,aresample=44100,atempo=1.05" ${outputPath}`);
 
             await sock.sendMessage(m.chat, {
                 audio: { url: outputPath },
-                mimetype: 'audio/mp4',
+                mimetype: 'audio/mpeg',
                 ptt: false
             }, { quoted: m });
 
@@ -70,15 +105,17 @@ export class AudioEffectsHandler {
 
             await m.reply('⏳ Sedang memproses audio...');
             const audio = await m.quoted.download();
-            const inputPath = `./temp/${m.chat}_input.mp3`;
-            const outputPath = `./temp/${m.chat}_slow.mp3`;
+            await fs.ensureDir('./temp')
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.mp3`;
+            const outputPath = `./temp/${m.chat}_${suffix}.slow.mp3`;
 
             await fs.promises.writeFile(inputPath, audio);
             await execAsync(`ffmpeg -i ${inputPath} -af "atempo=0.8" ${outputPath}`);
 
             await sock.sendMessage(m.chat, {
                 audio: { url: outputPath },
-                mimetype: 'audio/mp4',
+                mimetype: 'audio/mpeg',
                 ptt: false
             }, { quoted: m });
 
@@ -98,15 +135,17 @@ export class AudioEffectsHandler {
 
             await m.reply('⏳ Sedang memproses audio...');
             const audio = await m.quoted.download();
-            const inputPath = `./temp/${m.chat}_input.mp3`;
-            const outputPath = `./temp/${m.chat}_robot.mp3`;
+            await fs.ensureDir('./temp')
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.mp3`;
+            const outputPath = `./temp/${m.chat}_${suffix}.robot.mp3`;
 
             await fs.promises.writeFile(inputPath, audio);
             await execAsync(`ffmpeg -i ${inputPath} -af "afftfilt=real='hypot(re,im)*sin(0)':imag='hypot(re,im)*cos(0)':win_size=512:overlap=0.75" ${outputPath}`);
 
             await sock.sendMessage(m.chat, {
                 audio: { url: outputPath },
-                mimetype: 'audio/mp4',
+                mimetype: 'audio/mpeg',
                 ptt: false
             }, { quoted: m });
 
@@ -126,15 +165,17 @@ export class AudioEffectsHandler {
 
             await m.reply('⏳ Sedang memproses audio...');
             const audio = await m.quoted.download();
-            const inputPath = `./temp/${m.chat}_input.mp3`;
-            const outputPath = `./temp/${m.chat}_reverse.mp3`;
+            await fs.ensureDir('./temp')
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.mp3`;
+            const outputPath = `./temp/${m.chat}_${suffix}.reverse.mp3`;
 
             await fs.promises.writeFile(inputPath, audio);
             await execAsync(`ffmpeg -i ${inputPath} -af "areverse" ${outputPath}`);
 
             await sock.sendMessage(m.chat, {
                 audio: { url: outputPath },
-                mimetype: 'audio/mp4',
+                mimetype: 'audio/mpeg',
                 ptt: false
             }, { quoted: m });
 
@@ -157,11 +198,13 @@ export class AudioEffectsHandler {
             });
 
             const audio = await m.quoted.download();
-            const inputPath = `./temp/${m.chat}_input.mp3`;
-            const outputPath = `./temp/${m.chat}_vn.ogg`;
+            await fs.ensureDir('./temp')
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.mp3`;
+            const outputPath = `./temp/${m.chat}_${suffix}.vn.ogg`;
 
             await fs.promises.writeFile(inputPath, audio);
-            await execAsync(`ffmpeg -i ${inputPath} -af "silenceremove=1:0:-50dB" -c:a libopus -b:a 128k ${outputPath}`);
+            await execAsync(`ffmpeg -y -i "${inputPath}" -vn -af "silenceremove=1:0:-50dB" -c:a libopus -b:a 96k -ar 48000 -ac 1 "${outputPath}"`);
 
             await sock.sendMessage(m.chat, {
                 audio: { url: outputPath },
@@ -196,15 +239,17 @@ export class AudioEffectsHandler {
             });
 
             const audio = await m.quoted.download();
-            const inputPath = `./temp/${m.chat}_input.opus`;
-            const outputPath = `./temp/${m.chat}_audio.mp3`;
+            await fs.ensureDir('./temp')
+            const suffix = Date.now()
+            const inputPath = `./temp/${m.chat}_${suffix}.in.ogg`;
+            const outputPath = `./temp/${m.chat}_${suffix}.audio.mp3`;
 
             await fs.promises.writeFile(inputPath, audio);
             await execAsync(`ffmpeg -i ${inputPath} -acodec libmp3lame -ab 320k ${outputPath}`);
 
             await sock.sendMessage(m.chat, {
                 audio: { url: outputPath },
-                mimetype: 'audio/mp4',
+                mimetype: 'audio/mpeg',
                 ptt: false
             }, { quoted: m });
 

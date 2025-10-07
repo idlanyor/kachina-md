@@ -45,7 +45,8 @@
     "cooldown": "Wait {{time}} seconds before using this command again."
   },
   "user": {
-    "not_registered": "You are not registered. Type !register to register.",
+    "not_registered": "User is not registered.",
+    "please_register": "You are not registered. Type .register to register.",
     "already_registered": "You are already registered.",
     "register_success": "Registration successful! Welcome {{name}}!",
     "register_failed": "Failed to register. Please try again.",
