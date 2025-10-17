@@ -1,0 +1,20 @@
+[Unit]
+Description=Kachina MD WhatsApp Bot (Bun runtime)
+After=network.target
+
+[Service]
+Type=simple
+User=roy
+Group=roy
+WorkingDirectory=/home/roy/kachina-md
+Environment=NODE_ENV=production
+# Pastikan Bun bisa ditemukan oleh systemd (sesuaikan jika beda)
+Environment=PATH=/home/roy/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+EnvironmentFile=/home/roy/kachina-md/.env
+ExecStart=/usr/bin/env bun /home/roy/kachina-md/main.js
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
