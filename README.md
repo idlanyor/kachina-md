@@ -3,7 +3,7 @@
 <h2 style="color:#1496DC">Presented By Roy</h2>
 
 ![Ukuran Repo GitHub](https://img.shields.io/github/repo-size/idlanyor/kachina-md)
-![Bintang GitHub](https://img.shields.io/github/stars/idlanyor/kachina-dd?style=social)
+![Bintang GitHub](https://img.shields.io/github/stars/idlanyor/kachina-md?style=social)
 ![Lisensi GitHub](https://img.shields.io/github/license/idlanyor/kachina-md)
 
 ![Kachina](kachina.jpg)
@@ -15,24 +15,25 @@ sebuah bot whatsapp sederhana yang dibangun diatas runtime [Bun](https://bun.sh)
 
 ## Fitur
 
-- Pengunduh
+- Downloader
 - Stiker
 - AI
-- Bot Chat
-- Permainan
+- Game
 - Musik
+- Kreasi Gambar
 - Alat
+- Dll
 
 
 ## Persyaratan
 
-Untuk menjalankan proyek ini, Anda perlu menginstal [Bun](https://bun.sh) di sistem Anda. Anda dapat menginstalnya dengan menjalankan perintah berikut di terminal:
+Untuk menjalankan proyek ini, Anda perlu menginstal [Bun](https://bun.sh) di sistem Anda(Versi terbaru sudah mendukung kompatibilitas NodeJS). Anda dapat menginstalnya dengan menjalankan perintah berikut di terminal:
 
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
-Setelah itu, klon repositori ini ke sistem Anda:
+Setelah itu, clone repo ini :
 
 ```bash
 git clone https://github.com/idlanyor/kachina-md.git
@@ -54,7 +55,7 @@ bun install
 
 salin file `global.example.js` menjadi `global.js`
 
-edit file `global.js` sesuia kebutuhan
+edit file `global.js` sesuai kebutuhan
 
 
 Setelah menginstal dependensi, Anda dapat menjalankan proyek ini dengan menjalankan perintah berikut:
@@ -74,7 +75,8 @@ bun .
 - [Ryzumi](https://api.ryzumi.vip)
 - [FastURL](https://api.fasturl.link)
 - [SiputZX](https://api.siputzx.my.id)
-- [Nurutomo](https://api.nurutomo.my.id)
+- [NekoLabs](https://api.nekolabs.my.id)
+- [Gemini](https://aistudio.google.com)
 
 ## Lisensi
 
