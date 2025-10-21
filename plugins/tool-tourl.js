@@ -43,7 +43,7 @@ export const handler = {
             form.append('file', buffer, { filename: `${base}.${ext}`, contentType: mime })
             form.append('folder', 'documents/2024')
 
-            const uploadRes = await axios.post('https://s3.antidonasi.web.id/upload', form, {
+            const uploadRes = await axios.post('https://s3.kanata.web.id/upload', form, {
                 headers: { ...form.getHeaders() },
                 timeout: 120000
             })

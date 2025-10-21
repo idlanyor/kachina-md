@@ -6,9 +6,9 @@
   "type": "module",
   "private": "true",
   "scripts": {
-    "start": "node --max-old-space-size=4096 main.js",
+    "start": "bun run main.js",
     "dev": "nodemon --max-old-space-size=4096 main.js",
-    "pm2": "pm2 start 'node--max-old-space-size=4096'"
+    "pm2": "pm2 start 'bun run main.js'"
   },
   "keywords": [],
   "author": "Roynaldi",
@@ -36,7 +36,6 @@
     "groq-sdk": "^0.29.0",
     "horoscope": "^2.0.1",
     "jimp": "^1.6.0",
-    "knights-canvas": "^1.3.7-a",
     "lowdb": "^7.0.1",
     "moment": "^2.30.1",
     "ms": "^2.1.3",
