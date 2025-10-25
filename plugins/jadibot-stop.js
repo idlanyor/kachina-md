@@ -1,7 +1,7 @@
 import jadiBotManager from '../lib/jadibot.js';
 
 export const handler = {
-    command: ['stopjadibot', 'stopbot', 'sjb'],
+    command: ['stopjadibot'],
     category: 'jadibot',
     help: 'Hentikan bot Anda',
     isOwner: false,
@@ -13,38 +13,49 @@ export const handler = {
             // Check if user has a bot
             const status = jadiBotManager.getStatus(userJid);
             if (!status.exists) {
-                return await m.reply(
-                    `❌ *BOT TIDAK DITEMUKAN*\n\n` +
-                    `Anda tidak memiliki bot yang aktif.\n\n` +
-                    `💡 Gunakan .jadibot untuk membuat bot baru.`
-                );
+                return await sock.sendButtons(m.chat, {
+                    text: `❌ BOT TIDAK DITEMUKAN\n\nAnda tidak memiliki bot aktif.`,
+                    footer: 'Buat bot baru?',
+                    buttons: [
+                        { id: 'jadibot', text: 'Buat Jadibot' },
+                        { id: 'jadibotinfo', text: 'Info Jadibot' }
+                    ]
+                }, { quoted: m });
             }
 
             // Stop bot
             const result = await jadiBotManager.stopBot(userJid, sock, m.chat);
 
             if (result.success) {
-                await m.reply(
-                    `✅ *BOT BERHASIL DIHENTIKAN*\n\n` +
-                    `Bot Anda telah dinonaktifkan.\n\n` +
-                    `💡 *Informasi:*\n` +
-                    `• Sesi masih tersimpan\n` +
-                    `• Gunakan .jadibot untuk mengaktifkan kembali\n` +
-                    `• Gunakan .deletejadibot untuk hapus sesi\n\n` +
-                    `📊 *Statistik:*\n` +
-                    `• Uptime terakhir: ${status.uptime}\n` +
-                    `• Dibuat: ${status.createdAt}`
-                );
+                await sock.sendButtons(m.chat, {
+                    text: `✅ BOT BERHASIL DIHENTIKAN\n\nSesi masih tersimpan.`,
+                    footer: 'Aksi berikutnya:',
+                    buttons: [
+                        { id: 'jadibot', text: 'Aktifkan Kembali' },
+                        { id: 'deletejadibot', text: 'Hapus Sesi' },
+                        { id: 'statusjadibot', text: 'Cek Status' }
+                    ]
+                }, { quoted: m });
             } else {
-                await m.reply(result.message);
+                await sock.sendButtons(m.chat, {
+                    text: result.message,
+                    buttons: [
+                        { id: 'statusjadibot', text: 'Cek Status' }
+                    ]
+                }, { quoted: m });
             }
 
         } catch (error) {
             console.error('Error in stopjadibot command:', error);
-            await m.reply(`❌ Terjadi kesalahan: ${error.message}`);
+            await sock.sendButtons(m.chat, {
+                text: `❌ Terjadi kesalahan: ${error.message}`,
+                buttons: [
+                    { id: 'statusjadibot', text: 'Cek Status' },
+                    { id: 'jadibotinfo', text: 'Info Jadibot' }
+                ]
+            }, { quoted: m });
         }
     }
 };
 
 export default handler;
-

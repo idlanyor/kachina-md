@@ -81,6 +81,18 @@ export class MessageHandler {
             const matchedHandler = pluginLoader.getPlugin(cmd);
 
             if (matchedHandler) {
+                // Blokir fitur kategori 'jadibot' pada bot child (jadibot)
+                if ((matchedHandler.category === 'jadibot' || matchedHandler.category === 'JADIBOT') && sock.isChildBot) {
+                    await sock.sendButtons(m.chat, {
+                        text: '🚫 Fitur ini hanya tersedia di bot induk.',
+                        footer: 'Gunakan bot utama untuk akses jadibot',
+                        buttons: [
+                            { id: 'statusjadibot', text: 'Cek Status (Induk)' },
+                            { id: 'jadibotinfo', text: 'Info Jadibot' }
+                        ]
+                    }, { quoted: m });
+                    return;
+                }
                 // Validasi permission
                 if (matchedHandler.isAdmin && !(await m.isAdmin)) {
                     await m.reply('❌ *Akses ditolak*\nHanya admin yang dapat menggunakan perintah ini!');

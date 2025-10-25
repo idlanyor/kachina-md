@@ -1,5 +1,5 @@
 export const handler = {
-    command: ['jadibotinfo', 'infojb', 'aboutjadibot'],
+    command: ['jadibotinfo'],
     category: 'jadibot',
     help: 'Informasi lengkap tentang fitur jadibot',
     isOwner: false,
@@ -99,26 +99,26 @@ export const handler = {
                           
                           `🚀 Siap mencoba? Ketik .jadibot sekarang!`;
 
-            await sock.sendMessage(m.chat, {
+            await sock.sendButtons(m.chat, {
                 text: message,
-                contextInfo: {
-                    externalAdReply: {
-                        title: '🤖 Jadibot - Jadikan WhatsApp Anda Bot!',
-                        body: 'Fitur canggih untuk semua pengguna',
-                        thumbnailUrl: globalThis.ppUrl,
-                        sourceUrl: globalThis.newsletterUrl,
-                        mediaType: 1,
-                        renderLargerThumbnail: true
-                    }
-                }
+                footer: 'Mulai sekarang dengan tombol di bawah',
+                buttons: [
+                    { id: 'jadibot', text: 'Buat Jadibot' },
+                    { id: 'statusjadibot', text: 'Cek Status' }
+                ]
             }, { quoted: m });
 
         } catch (error) {
             console.error('Error in jadibotinfo command:', error);
-            await m.reply(`❌ Terjadi kesalahan: ${error.message}`);
+            await sock.sendButtons(m.chat, {
+                text: `❌ Terjadi kesalahan: ${error.message}`,
+                buttons: [
+                    { id: 'jadibot', text: 'Buat Jadibot' },
+                    { id: 'statusjadibot', text: 'Cek Status' }
+                ]
+            }, { quoted: m });
         }
     }
 };
 
 export default handler;
-

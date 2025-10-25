@@ -1,7 +1,7 @@
 import jadiBotManager from '../lib/jadibot.js';
 
 export const handler = {
-    command: ['deletejadibot', 'delbot', 'hapusbot'],
+    command: ['deletejadibot'],
     category: 'jadibot',
     help: 'Hapus sesi bot Anda secara permanen',
     isOwner: false,
@@ -13,34 +13,40 @@ export const handler = {
             // Check if user has a bot
             const status = jadiBotManager.getStatus(userJid);
             if (!status.exists) {
-                return await m.reply(
-                    `❌ *SESI TIDAK DITEMUKAN*\n\n` +
-                    `Anda tidak memiliki sesi bot yang tersimpan.\n\n` +
-                    `💡 Gunakan .jadibot untuk membuat bot baru.`
-                );
+                return await sock.sendButtons(m.chat, {
+                    text: `❌ SESI TIDAK DITEMUKAN\n\nAnda tidak memiliki sesi bot yang tersimpan.`,
+                    footer: 'Buat bot baru?',
+                    buttons: [
+                        { id: 'jadibot', text: 'Buat Jadibot' },
+                        { id: 'jadibotinfo', text: 'Info Jadibot' }
+                    ]
+                }, { quoted: m });
             }
 
             // Send confirmation message
-            await m.reply(
-                `⚠️ *KONFIRMASI HAPUS SESI*\n\n` +
-                `Anda yakin ingin menghapus sesi bot?\n\n` +
-                `📊 *Info Bot:*\n` +
-                `• Nomor: ${status.phoneNumber}\n` +
-                `• Status: ${status.status}\n` +
-                `• Uptime: ${status.uptime}\n\n` +
-                `⚠️ *PERINGATAN:*\n` +
-                `• Sesi akan dihapus permanen\n` +
-                `• Bot akan logout otomatis\n` +
-                `• Perlu scan QR lagi jika ingin membuat bot baru\n\n` +
-                `Balas dengan "ya" untuk konfirmasi atau abaikan untuk membatalkan.\n\n` +
-                `⏰ Tunggu konfirmasi dalam 30 detik...`
-            );
+            await sock.sendButtons(m.chat, {
+                text: `⚠️ KONFIRMASI HAPUS SESI\n\n` +
+                      `• Nomor: ${status.phoneNumber}\n` +
+                      `• Status: ${status.status}\n` +
+                      `• Uptime: ${status.uptime}\n\n` +
+                      `Sesi akan dihapus permanen. Lanjutkan?`,
+                footer: 'Pilih salah satu:',
+                buttons: [
+                    { id: 'confirm_delete_session', text: 'Ya, Hapus' },
+                    { id: 'statusjadibot', text: 'Cek Status' }
+                ]
+            }, { quoted: m });
 
             // Wait for confirmation
             const filter = (msg) => {
-                return msg.key.remoteJid === m.chat && 
-                       msg.key.participant === userJid &&
-                       msg.message?.conversation?.toLowerCase() === 'ya';
+                const irm = msg.message?.interactiveResponseMessage?.nativeFlowResponseMessage;
+                if (!irm) return false;
+                try {
+                    const params = JSON.parse(irm.paramsJson);
+                    const sameChat = msg.key.remoteJid === m.chat;
+                    const sameUser = msg.key.participant ? (msg.key.participant === userJid) : (msg.key.remoteJid === userJid);
+                    return sameChat && sameUser && params?.id === 'confirm_delete_session';
+                } catch { return false; }
             };
 
             // Create a promise to wait for the next message
@@ -67,36 +73,47 @@ export const handler = {
             const confirmed = await waitForMessage();
 
             if (!confirmed) {
-                return await m.reply(
-                    `❌ *DIBATALKAN*\n\n` +
-                    `Penghapusan sesi dibatalkan.\n` +
-                    `Bot Anda masih tersimpan.`
-                );
+                return await sock.sendButtons(m.chat, {
+                    text: `❌ DIBATALKAN\n\nPenghapusan sesi dibatalkan. Bot Anda masih tersimpan.`,
+                    buttons: [
+                        { id: 'statusjadibot', text: 'Cek Status' },
+                        { id: 'deletejadibot', text: 'Hapus Lagi' }
+                    ]
+                }, { quoted: m });
             }
 
             // Delete session
             const result = await jadiBotManager.deleteSession(userJid);
 
             if (result.success) {
-                await m.reply(
-                    `✅ *SESI BERHASIL DIHAPUS*\n\n` +
-                    `Sesi bot Anda telah dihapus permanen.\n\n` +
-                    `💡 *Informasi:*\n` +
-                    `• Bot telah logout\n` +
-                    `• Semua data sesi dihapus\n` +
-                    `• Gunakan .jadibot untuk membuat bot baru\n\n` +
-                    `Terima kasih telah menggunakan layanan jadibot!`
-                );
+                await sock.sendButtons(m.chat, {
+                    text: `✅ SESI BERHASIL DIHAPUS\n\nBot telah logout dan data sesi dihapus.`,
+                    footer: 'Aksi cepat:',
+                    buttons: [
+                        { id: 'jadibot', text: 'Buat Jadibot Baru' },
+                        { id: 'jadibotinfo', text: 'Info Jadibot' }
+                    ]
+                }, { quoted: m });
             } else {
-                await m.reply(result.message);
+                await sock.sendButtons(m.chat, {
+                    text: result.message,
+                    buttons: [
+                        { id: 'statusjadibot', text: 'Cek Status' }
+                    ]
+                }, { quoted: m });
             }
 
         } catch (error) {
             console.error('Error in deletejadibot command:', error);
-            await m.reply(`❌ Terjadi kesalahan: ${error.message}`);
+            await sock.sendButtons(m.chat, {
+                text: `❌ Terjadi kesalahan: ${error.message}`,
+                buttons: [
+                    { id: 'statusjadibot', text: 'Cek Status' },
+                    { id: 'jadibotinfo', text: 'Info Jadibot' }
+                ]
+            }, { quoted: m });
         }
     }
 };
 
 export default handler;
-

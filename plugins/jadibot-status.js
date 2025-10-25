@@ -1,7 +1,7 @@
 import jadiBotManager from '../lib/jadibot.js';
 
 export const handler = {
-    command: ['statusjadibot', 'cekbot', 'botinfo'],
+    command: ['statusjadibot'],
     category: 'jadibot',
     help: 'Cek status bot Anda',
     isOwner: false,
@@ -14,17 +14,14 @@ export const handler = {
             const status = jadiBotManager.getStatus(userJid);
 
             if (!status.exists) {
-                return await m.reply(
-                    `❌ *BOT TIDAK DITEMUKAN*\n\n` +
-                    `Anda tidak memiliki bot yang aktif.\n\n` +
-                    `💡 *Cara membuat bot:*\n` +
-                    `Gunakan perintah .jadibot untuk membuat bot baru.\n\n` +
-                    `📋 *Fitur Jadibot:*\n` +
-                    `• WhatsApp Anda jadi bot\n` +
-                    `• Semua fitur tersedia\n` +
-                    `• Mudah digunakan\n` +
-                    `• GRATIS (untuk sementara)`
-                );
+                return await sock.sendButtons(m.chat, {
+                    text: `❌ BOT TIDAK DITEMUKAN\n\nAnda belum memiliki bot aktif.`,
+                    footer: 'Buat bot sekarang atau lihat info',
+                    buttons: [
+                        { id: 'jadibot', text: 'Buat Jadibot' },
+                        { id: 'jadibotinfo', text: 'Info Jadibot' }
+                    ]
+                }, { quoted: m });
             }
 
             // Status emoji
@@ -42,34 +39,32 @@ export const handler = {
                 'disconnected': 'Terputus'
             };
 
-            await m.reply(
-                `${statusEmoji[status.status] || '❓'} *STATUS BOT ANDA*\n\n` +
-                `📊 *Informasi Bot:*\n` +
-                `• Status: ${statusText[status.status] || status.status}\n` +
-                `• Nomor: ${status.phoneNumber}\n` +
-                `• Uptime: ${status.uptime}\n` +
-                `• Dibuat: ${status.createdAt}\n` +
-                `• Mode: Self-Me 🔒\n\n` +
-                `🔒 *Mode Self-Me:*\n` +
-                `• HANYA ANDA yang bisa pakai bot ini\n` +
-                `• Berlaku di private chat dan grup\n` +
-                `• Orang lain tidak bisa akses command\n\n` +
-                `💡 *Perintah Tersedia:*\n` +
-                `• .stopjadibot - Hentikan bot\n` +
-                `• .deletejadibot - Hapus sesi bot\n` +
-                `• .listjadibot - List semua bot (owner)\n\n` +
-                `⚠️ *Catatan:*\n` +
-                `• Bot aktif selama WhatsApp tersambung\n` +
-                `• Jangan logout dari WhatsApp\n` +
-                `• Pastikan koneksi internet stabil`
-            );
+            await sock.sendButtons(m.chat, {
+                text: `${statusEmoji[status.status] || '❓'} STATUS BOT ANDA\n\n` +
+                      `• Status: ${statusText[status.status] || status.status}\n` +
+                      `• Nomor: ${status.phoneNumber}\n` +
+                      `• Uptime: ${status.uptime}\n` +
+                      `• Dibuat: ${status.createdAt}\n` +
+                      `• Mode: Self-Me 🔒`,
+                footer: 'Aksi cepat:',
+                buttons: [
+                    { id: 'stopjadibot', text: 'Hentikan Bot' },
+                    { id: 'deletejadibot', text: 'Hapus Sesi' },
+                    { id: 'listjadibot', text: 'List Jadibot' }
+                ]
+            }, { quoted: m });
 
         } catch (error) {
             console.error('Error in statusjadibot command:', error);
-            await m.reply(`❌ Terjadi kesalahan: ${error.message}`);
+            await sock.sendButtons(m.chat, {
+                text: `❌ Terjadi kesalahan: ${error.message}`,
+                buttons: [
+                    { id: 'jadibotinfo', text: 'Info Jadibot' },
+                    { id: 'jadibot', text: 'Buat Jadibot' }
+                ]
+            }, { quoted: m });
         }
     }
 };
 
 export default handler;
-

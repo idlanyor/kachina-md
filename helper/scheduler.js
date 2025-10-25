@@ -18,8 +18,8 @@ class AutoNotification {
     }
 
     startDailyNotification() {
-        if (this.scheduledJobs.has('daily_12pm')) {
-            this.scheduledJobs.get('daily_12pm').destroy();
+        if (this.scheduledJobs.has('daily_07am')) {
+            this.scheduledJobs.get('daily_07am').destroy();
         }
 
         const job = cron.schedule('0 07 * * *', async () => {
@@ -29,9 +29,9 @@ class AutoNotification {
             timezone: 'Asia/Jakarta'
         });
 
-        this.scheduledJobs.set('daily_12pm', job);
+        this.scheduledJobs.set('daily_07am', job);
         this.isRunning = true;
-        logger.info('⏰ Daily anime notification scheduled for 12:00 PM (Asia/Jakarta)');
+        logger.info('⏰ Daily anime notification scheduled for 07:00 AM (Asia/Jakarta)');
     }
 
     async fetchAnimeData() {
@@ -211,7 +211,7 @@ class AutoNotification {
         return {
             isRunning: this.isRunning,
             activeJobs: Array.from(this.scheduledJobs.keys()),
-            nextRun: this.isRunning ? 'Daily at 12:00 PM (Asia/Jakarta)' : 'Not scheduled',
+            nextRun: this.isRunning ? 'Daily at 07:00 AM (Asia/Jakarta)' : 'Not scheduled',
             apiEndpoint: this.apiEndpoint,
             currentDay: this.getCurrentDayName()
         };

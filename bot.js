@@ -6,6 +6,7 @@ import { startBot } from "./main.js";
 import { logger } from './helper/logger.js';
 import autoNotification from './helper/scheduler.js';
 import qrcode from 'qrcode-terminal'
+import initFunction from 'buttons-warpper';
 
 // Global state to prevent multiple simultaneous restarts
 let isRestarting = false;
@@ -139,6 +140,10 @@ class Kachina {
             }
 
             this.sock = makeWASocket(socketConfig);
+            await initFunction(this.sock)
+            // Mark this socket as the main/parent bot
+            this.sock.isParentBot = true;
+            this.sock.isChildBot = false;
             store?.bind(this.sock.ev);
             this.sock.ev.on("creds.update", saveCreds);
 
@@ -149,7 +154,7 @@ class Kachina {
                     if (qr) {
                         logger.info('\n🔗 QR Code diterima!');
                         logger.info('📱 Scan QR code berikut dengan WhatsApp:');
-                        qrcode.generate(qr)
+                        qrcode.generate(qr,{small:true})
                         logger.info('\n⏰ QR Code akan expired dalam 40 detik');
                         logger.info('💡 Jika QR tidak muncul, coba restart aplikasi\n');
                     }

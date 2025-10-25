@@ -19,7 +19,7 @@ export const handler =  {
                           `• \`.autonotif preview\` - Preview anime hari ini\n` +
                           `• \`.autonotif restart\` - Restart scheduler\n` +
                           `• \`.autonotif stop\` - Stop scheduler\n\n` +
-                          `⏰ *Schedule:* Setiap hari jam 12.00 WIB\n` )
+                          `⏰ *Schedule:* Setiap hari jam 07.00 WIB\n` )
         }
         
         switch (action) {
@@ -27,11 +27,7 @@ export const handler =  {
                 try {
                     m.reply('🧪 Mengirim test anime notification...');
                     const success = await autoNotification.sendDailyAnimeNotification();
-                    if (success) {
-                        m.reply('✅ Test anime notification berhasil dikirim!');
-                    } else {
-                        m.reply('❌ Gagal mengirim test anime notification!');
-                    }
+                    
                 } catch (error) {
                     m.reply(`❌ Error: ${error.message}`);
                 }
