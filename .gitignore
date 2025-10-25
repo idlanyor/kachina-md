@@ -9,6 +9,5 @@ db.*
 *.zip
 *.tar.gz
 *.rar
-global.*
-global-*.js
+global.js
 *-sessions
