@@ -3,7 +3,7 @@ import User from '../database/models/User.js'
 export const handler = {
   command: ['lang', 'language', 'bahasa'],
   category: 'user',
-  help: 'Ubah bahasa bot untuk akun Anda. Contoh: .lang id atau .lang en',
+  help: 'Ubah bahasa bot untuk akun Anda.',
   isRegistered: true,
   async exec({ m, args }) {
     try {

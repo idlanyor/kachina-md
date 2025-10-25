@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 
 export const handler = {
     command: ['ssweb'],
-    help: 'Screenshot website dengan pilihan tampilan desktop/tablet/mobile. Gunakan !ssweb <url> [device]',
+    help: 'Screenshot website.',
     category:'tools',
 
     async exec({ m, args, sock }) {

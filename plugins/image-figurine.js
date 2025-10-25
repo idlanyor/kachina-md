@@ -1,141 +1,104 @@
-import axios from 'axios';
-import { fileTypeFromBuffer } from 'file-type';
-
-const GEMINI_API_BASE = process.env.GEMINI_API_BASE || 'http://localhost:3000';
+import axios from 'axios'
+import FormData from 'form-data'
+import { fileTypeFromBuffer } from 'file-type'
 
 export const handler = {
     command: ['figurine'],
     category: 'image',
-    help: 'AI Figure Maker',
-    exec: async ({ m, args, sock }) => {
+    help: 'Ubah gambar menjadi gaya figurine.\n\nCara pakai:\n- Reply gambar dengan .figurine\n- Atau .figurine <image_url>',
+    exec: async ({ sock, m, args }) => {
         try {
-            let imageUrl = '';
-            let buffer;
+            await sock.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-            // Tambahkan reaksi proses
-            await sock.sendMessage(m.chat, {
-                react: { text: '🗿', key: m.key }
-            });
-
-            // Check if URL provided in args
-            if (args && args.trim()) {
-                try {
-                    new URL(args.trim());
-                    imageUrl = args.trim();
-                } catch {
-                    await m.reply('❌ URL tidak valid! Pastikan URL lengkap dengan http:// atau https://');
-                    return;
+            // Ambil URL dari argumen jika ada
+            let imageUrl = ''
+            let hasArgUrl = false
+            if (Array.isArray(args) && args.length > 0) {
+                const a = args.join(' ').trim()
+                if (/^https?:\/\//i.test(a)) {
+                    imageUrl = a
+                    hasArgUrl = true
                 }
-            } else {
-                // Handle image dari quoted message atau message langsung
-                if (m.quoted && m.quoted.message?.imageMessage) {
-                    buffer = await m.quoted.download();
-                } else if (m.message && m.message.imageMessage) {
-                    buffer = await m.download();
-                } else {
-                    await m.reply(`🗿 *FIGURINE GENERATOR*\n\nCara penggunaan:\n1. Kirim gambar dengan caption .figurine\n2. Reply gambar dengan .figurine\n3. .figurine <url_gambar>\n\n✨ Fitur:\n• Convert gambar menjadi figurine realistis\n• Menggunakan AI untuk transformasi\n• Hasil berkualitas tinggi\n• Mendukung URL gambar\n\n📸 Format yang didukung:\n• JPG, PNG, WEBP`);
-                    return;
+            }
+
+            // Jika tidak ada URL argumen, coba ambil media dari reply/kirim
+            if (!hasArgUrl) {
+                let ref = m
+                if (m.quoted) ref = m.quoted
+                const refMsg = ref.message || {}
+                const refType = Object.keys(refMsg)[0]
+
+                const allowed = ['imageMessage', 'stickerMessage']
+                if (!allowed.includes(refType)) {
+                    await m.reply('❌ Reply/kirim gambar (atau stiker) dengan caption .figurine, atau berikan URL gambar')
+                    return
                 }
 
+                const buffer = await ref.download()
                 if (!buffer) {
-                    throw new Error('Gagal mengunduh gambar!');
+                    await m.reply('❌ Gagal mengunduh media')
+                    return
                 }
 
-                // Validate file type
-                const fileType = await fileTypeFromBuffer(buffer);
-                if (!fileType || !fileType.mime.startsWith('image/')) {
-                    throw new Error('File harus berupa gambar!');
+                // Upload ke S3 Kanata untuk mendapatkan URL
+                const type = await fileTypeFromBuffer(buffer)
+                const ext = type?.ext || 'png'
+                const mime = type?.mime || 'image/png'
+                let base = 'image'
+                try {
+                    const meta = refMsg[refType]
+                    base = meta?.fileName?.split('.')?.[0] || meta?.mimetype?.split('/')?.[0] || base
+                } catch {}
+
+                const form = new FormData()
+                form.append('file', buffer, { filename: `${base}.${ext}`, contentType: mime })
+                form.append('folder', 'kachina')
+
+                const uploadRes = await axios.post('https://s3.kanata.web.id/upload', form, {
+                    headers: { ...form.getHeaders() },
+                    timeout: 120000
+                })
+
+                if (!uploadRes?.data?.success || !uploadRes?.data?.data?.fileUrl) {
+                    throw new Error('Upload gagal atau respons tidak valid')
                 }
 
-                // Upload to Ryzumi API to get URL
-                const FormData = (await import('form-data')).default;
-                const formData = new FormData();
-                formData.append('file', buffer, {
-                    filename: `image.${fileType.ext}`,
-                    contentType: fileType.mime
-                });
-
-                const uploadResponse = await axios.post('https://api.ryzumi.vip/api/uploader/ryzencdn', formData, {
-                    headers: {
-                        'accept': 'application/json',
-                        ...formData.getHeaders()
-                    },
-                    timeout: 60000
-                });
-
-                if (!uploadResponse.data || !uploadResponse.data.success || !uploadResponse.data.url) {
-                    throw new Error('Gagal upload gambar ke server');
-                }
-
-                imageUrl = uploadResponse.data.url;
+                imageUrl = uploadRes.data.data.fileUrl
             }
 
-            // Call Nekolabs API untuk konversi gambar ke figurine
-            const response = await axios.get(`https://api.nekolabs.my.id/tools/convert/tofigure`, {
-                params: {
-                    imageUrl: imageUrl
+            // Panggil Nekolabs tofigure API
+            const apiUrl = `https://api.nekolabs.my.id/tools/convert/tofigure?imageUrl=${encodeURIComponent(imageUrl)}`
+            const { data: apiData } = await axios.get(apiUrl, { timeout: 120000 })
+
+            if (!apiData?.success || !apiData?.result) {
+                throw new Error('API gagal atau hasil tidak tersedia')
+            }
+
+            // Ambil hasil gambar dan kirim ke chat
+            const resultUrl = apiData.result
+            const { data: imgData } = await axios.get(resultUrl, {
+                responseType: 'arraybuffer',
+                headers: {
+                    'accept': 'image/png,image/jpeg',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                 },
-                timeout: 180000 // 3 menit timeout
-            });
+                timeout: 120000
+            })
 
-            // Check if response contains result URL
-            if (response.data && response.data.status && response.data.result) {
-                // Download image from result URL
-                const imageResponse = await axios.get(response.data.result, {
-                    responseType: 'arraybuffer'
-                });
-                
-                // Send processed image
-                await sock.sendMessage(m.chat, {
-                    image: Buffer.from(imageResponse.data),
-                    caption: `🗿 *FIGURINE GENERATED*\n\n✨ Gambar berhasil diubah menjadi figurine realistis!\n🔗 *Source:* ${imageUrl}\n⏰ *Processed:* ${new Date().toLocaleString('id-ID')}`,
-                    contextInfo: {
-                        externalAdReply: {
-                            title: '🗿 Figurine Generator',
-                            body: 'AI-powered image transformation',
-                            thumbnailUrl: `${globalThis.ppUrl}`,
-                            sourceUrl: `${globalThis.newsletterUrl}`,
-                            mediaType: 1,
-                            renderLargerThumbnail: true
-                        }
-                    }
-                });
+            await sock.sendMessage(m.chat, {
+                image: Buffer.from(imgData),
+                caption: '🎎 Converted to figurine style'
+            }, { quoted: m })
 
-                // Tambahkan reaksi sukses
-                await sock.sendMessage(m.chat, {
-                    react: { text: '✅', key: m.key }
-                });
-            } else {
-                throw new Error('Tidak ada data gambar yang diterima');
-            }
+            await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
         } catch (error) {
-            console.error('Error in figurine command:', error);
-            
-            // Add error reaction
-            await sock.sendMessage(m.chat, {
-                react: { text: '❌', key: m.key }
-            });
-            
-            let errorMessage = '❌ Gagal membuat figurine!';
-            
-            if (error.message.includes('Gagal mengunduh gambar')) {
-                errorMessage = '❌ Gagal mengunduh gambar. Pastikan gambar valid.';
-            } else if (error.message.includes('File harus berupa gambar')) {
-                errorMessage = '❌ File yang dikirim bukan gambar. Gunakan format JPG, PNG, atau WEBP.';
-            } else if (error.code === 'ECONNREFUSED') {
-                errorMessage += '\n\n*Penyebab:* Server API tidak dapat diakses.';
-            } else if (error.response?.status === 400) {
-                errorMessage += '\n\n*Penyebab:* URL gambar tidak valid atau tidak dapat diakses.';
-            } else if (error.response?.status === 429) {
-                errorMessage += '\n\n*Penyebab:* Terlalu banyak request, coba lagi nanti.';
-            } else {
-                errorMessage += `\n\n*Error:* ${error.message}`;
-            }
-
-            await m.reply(errorMessage);
+            console.error('Error in figurine:', error)
+            await sock.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+            await m.reply('❌ Gagal convert ke figurine: ' + (error?.message || 'Unknown error'))
         }
     }
-};
+}
 
-export default handler;
+export default handler
+

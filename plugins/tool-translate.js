@@ -168,21 +168,177 @@ async function translate(text, targetLang = 'id', sourceLang = 'auto') {
             }
         }
 
+        // Generate simple phonetic pronunciation
+        const phoneticPronunciation = generatePhoneticPronunciation(translatedText, targetLang, transliteration);
+
+        // Get context and nuances
+        const contextNotes = getContextNotes(sourceLang, targetLang, text);
+
         return {
             text: translatedText,
             transliteration: transliteration,
+            phoneticPronunciation: phoneticPronunciation,
+            contextNotes: contextNotes,
             from: ISO_LANGUAGES[data[2]] || 'Unknown',
-            to: ISO_LANGUAGES[targetLang] || 'Unknown'
+            to: ISO_LANGUAGES[targetLang] || 'Unknown',
+            fromCode: data[2] || sourceLang,
+            toCode: targetLang
         };
     } catch (error) {
         throw new Error(`Translation failed: ${error.message}`);
     }
 }
 
+function generatePhoneticPronunciation(text, langCode, transliteration = null) {
+    // Simple phonetic pronunciation for common languages
+    const phoneticMap = {
+        'es': {
+            'hola': 'oh-lah',
+            'buenos días': 'bway-nohs dee-ahs',
+            'gracias': 'grah-see-ahs',
+            'adiós': 'ah-dee-ohs'
+        },
+        'fr': {
+            'bonjour': 'bon-zhoor',
+            'merci': 'mair-see',
+            'au revoir': 'oh reh-vwar',
+            'oui': 'wee'
+        },
+        'de': {
+            'hallo': 'hah-loh',
+            'danke': 'dahn-kuh',
+            'auf wiedersehen': 'owf vee-der-zay-en',
+            'ja': 'yah'
+        },
+        'it': {
+            'ciao': 'chah-oh',
+            'grazie': 'grah-tsee-eh',
+            'arrivederci': 'ar-ree-veh-dair-chee',
+            'si': 'see'
+        },
+        'pt': {
+            'olá': 'oh-lah',
+            'obrigado': 'oh-bree-gah-doo',
+            'de nada': 'jee nah-dah',
+            'sim': 'seeng'
+        },
+        'ja': {
+            'こんにちは': 'kohn-nee-chee-wah',
+            'ありがとう': 'ah-ree-gah-toh',
+            'さようなら': 'sah-yoh-nah-rah',
+            'はい': 'hah-ee'
+        },
+        'ko': {
+            '안녕하세요': 'an-nyeong-hah-seh-yo',
+            '감사합니다': 'kam-sah-ham-ni-da',
+            '안녕히 가세요': 'an-nyeong-hee gah-seh-yo',
+            '네': 'neh'
+        },
+        'zh': {
+            '你好': 'nee-how',
+            '谢谢': 'sheh-sheh',
+            '再见': 'dzay-dzyen',
+            '是': 'shuh'
+        },
+        'ar': {
+            'مرحبا': 'mar-hah-bah',
+            'شكرا': 'shoo-kran',
+            'وداعا': 'wah-dah-an',
+            'نعم': 'nah-am'
+        },
+        'hi': {
+            'नमस्ते': 'nah-mas-tay',
+            'धन्यवाद': 'dhan-yah-vahd',
+            'अलविदा': 'al-vee-dah',
+            'हाँ': 'hahn'
+        },
+        'ru': {
+            'привет': 'pree-vyét',
+            'спасибо': 'spah-see-bah',
+            'до свидания': 'dah svee-dah-nee-yah',
+            'да': 'dah'
+        }
+    };
+
+    // If text is in our phonetic map, return the phonetic version
+    if (phoneticMap[langCode] && phoneticMap[langCode][text.toLowerCase()]) {
+        return phoneticMap[langCode][text.toLowerCase()];
+    }
+
+    // For non-Latin scripts, return transliteration if available
+    if (NON_LATIN_SCRIPTS.includes(langCode)) {
+        return transliteration || 'N/A';
+    }
+
+    // For other cases, return a simplified version or N/A
+    return 'N/A';
+}
+
+function getContextNotes(sourceLang, targetLang, text) {
+    // Provide context and nuances for specific language pairs
+    const contexts = {
+        'en-es': {
+            'you': 'In Spanish, "you" can be "tú" (informal) or "usted" (formal). The translation depends on the context and relationship.',
+            'love': 'In Spanish, "love" can be "amor" (noun) or "amar/querer" (verb). "Te quiero" is commonly used for affection, while "te amo" is deeper.'
+        },
+        'en-fr': {
+            'you': 'In French, "you" can be "tu" (informal) or "vous" (formal/plural). The choice depends on familiarity and number of people.',
+            'love': 'In French, "love" can be "amour" (noun) or "aimer" (verb). "Je t\'aime" expresses love, while "Je t\'adore" is more like "I adore you."'
+        },
+        'en-de': {
+            'you': 'In German, "you" can be "du" (informal), "ihr" (plural informal), or "Sie" (formal). Formality is important in German culture.',
+            'love': 'In German, "love" is "Liebe" (noun) or "lieben" (verb). "Ich liebe dich" is for romantic love, while "Ich habe dich lieb" is for platonic affection.'
+        },
+        'en-ja': {
+            'you': 'Japanese often omits pronouns like "you" (あなた) when context is clear. Using it too much can sound unnatural.',
+            'love': 'Japanese has several words for love: "愛" (ai) for deep love, "好き" (suki) for liking, and "恋" (koi) for romantic longing.'
+        },
+        'id-en': {
+            'kamu': 'Indonesian "kamu" (you) is informal. "Anda" is formal/standard, while "Engkau" is poetic/intimate.',
+            'cinta': 'Indonesian "cinta" is romantic love, while "sayang" can mean both love/dear and is used for family members too.'
+        }
+    };
+
+    const key = `${sourceLang}-${targetLang}`;
+    const reverseKey = `${targetLang}-${sourceLang}`;
+
+    // Check for specific notes about this text
+    const lowerText = text.toLowerCase();
+    if (contexts[key] && contexts[key][lowerText]) {
+        return contexts[key][lowerText];
+    }
+    if (contexts[reverseKey] && contexts[reverseKey][lowerText]) {
+        return contexts[reverseKey][lowerText];
+    }
+
+    // General notes for language pairs
+    const generalNotes = {
+        'en-es': 'Spanish uses gendered nouns and adjectives. Articles (el/la) must match the gender of the noun.',
+        'en-fr': 'French nouns have gender (masculine/feminine) which affects articles and adjectives.',
+        'en-de': 'German has three grammatical genders (masculine, feminine, neuter) and four cases (nominative, accusative, dative, genitive).',
+        'en-ja': 'Japanese is a context-dependent language with varying levels of politeness (keigo).',
+        'en-ko': 'Korean uses honorifics to show respect and has different speech levels based on relationship.',
+        'en-zh': 'Chinese is a tonal language where the same syllable can have different meanings based on tone.',
+        'en-ar': 'Arabic is written right-to-left and has different forms depending on position in a word.',
+        'en-hi': 'Hindi uses Devanagari script and has formal/informal distinctions.',
+        'en-ru': 'Russian uses the Cyrillic alphabet and has six cases for nouns.',
+        'id-en': 'Indonesian has no verb conjugations, tenses, or grammatical gender, making it simpler than English.'
+    };
+
+    if (generalNotes[key]) {
+        return generalNotes[key];
+    }
+    if (generalNotes[reverseKey]) {
+        return generalNotes[reverseKey];
+    }
+
+    return 'N/A';
+}
+
 export const handler = {
     command: ['translate'],
-    help: 'Menerjemahkan teks ke berbagai bahasa. Gunakan !tr <kode_bahasa> <teks> atau reply pesan dengan !tr <kode_bahasa>',
-   category:'tools',
+    help: 'Menerjemahkan teks ke berbagai bahasa.',
+    category: 'tools',
 
     async exec({ m, args, sock }) {
         try {
@@ -236,17 +392,18 @@ export const handler = {
             // Terjemahkan
             const result = await translate(text, targetLang, sourceLang);
 
-            // Format pesan hasil
-            let response = `🌐 *TRANSLATE*\n\n` +
-                `*From:* ${result.from}\n` +
-                `*To:* ${result.to}\n\n` +
-                `*Original:*\n${text}\n\n` +
-                `*Translation:*\n${result.text}`;
-
-            // Tambahkan transliterasi jika bahasa target menggunakan aksara non-latin
-            if (NON_LATIN_SCRIPTS.includes(targetLang) && result.transliteration) {
-                response += `\n\n*Latin:*\n${result.transliteration}`;
-            }
+            // Format pesan hasil sesuai dengan format yang diminta
+            let response = `**Input Text:** "${text}"\n`;
+            response += `**Target Language:** ${result.to} (${result.toCode})\n\n`;
+            response += `---\n### **Source Language Detection**\n`;
+            response += `- **Language:** ${result.from}\n`;
+            response += `- **ISO Code:** ${result.fromCode}\n\n`;
+            response += `---\n### **Translation**\n`;
+            response += `- **Result:** ${result.text}\n\n`;
+            response += `---\n### **Pronunciation Guide**\n`;
+            response += `- **Phonetics:** ${result.phoneticPronunciation}\n\n`;
+            response += `---\n### **Context & Nuances (Optional)**\n`;
+            response += `- **Notes:** ${result.contextNotes}`;
 
             await m.reply(response);
 

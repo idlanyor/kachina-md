@@ -3,7 +3,7 @@ import axios from 'axios';
 export const handler = {
     command: ['chord'],
     category:'search',
-    help: 'Mencari chord/kunci gitar lagu. Gunakan !chord <judul lagu> atau reply pesan dengan !chord',
+    help: 'Mencari chord/kunci gitar lagu. ',
 
     async exec({ m, args, sock }) {
         try {

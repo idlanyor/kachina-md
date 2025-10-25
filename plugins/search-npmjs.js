@@ -3,7 +3,7 @@ import axios from 'axios';
 export const handler = {
     command: ['npmjs'],
     category:'search',
-    help: 'Cari package di npmjs. Gunakan !npmjs <nama package> atau keyword.',
+    help: 'Cari package di npmjs.',
 
     async exec({ m, args, sock }) {
         try {

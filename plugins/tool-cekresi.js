@@ -53,7 +53,7 @@ function parseExpedition(arg) {
 export const handler = {
   command: ['cekresi'],
   category: 'tools',
-  help: 'Cek status resi pengiriman.\n\nFormat:\n- .cekresi <resi> → tampilkan pilihan ekspedisi\n- .cekresi <resi> <nomor|slug-ekspedisi> → cek langsung',
+  help: 'Cek status resi pengiriman.',
   exec: async ({ sock, m, args }) => {
     try {
       const input = Array.isArray(args) ? args.join(' ').trim() : (args || '').trim()

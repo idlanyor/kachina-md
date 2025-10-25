@@ -7,7 +7,7 @@ import { fileTypeFromBuffer } from 'file-type'
 export const handler = {
     command: ['upload'],
    category:'tools',
-    help: 'Upload file ke catbox.moe\n\nFormat: Kirim/Reply file dengan caption !upload',
+    help: 'Upload file ke catbox.moe',
     exec: async ({ sock, m }) => {
         const catbox = new Catbox();
 

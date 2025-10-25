@@ -11,5 +11,4 @@ db.*
 *.rar
 global.*
 global-*.js
-
-furina
+*-sessions

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const handler = {
     command: ['checkhosting', 'hosting', 'checkhost'],
-    help: 'Mengecek informasi hosting dari domain. Gunakan !checkhosting <domain> atau reply pesan dengan !checkhosting',
+    help: 'Mengecek informasi hosting dari domain.',
     category:'tools',
 
     async exec({ m, args, sock }) {

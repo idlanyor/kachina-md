@@ -16,7 +16,7 @@ function parseDMS(decimal) {
 
 export const handler = {
     command: ['koordinat'],
-    help: 'Ambil koordinat dari link Google Maps (short/long). Contoh: !koordinat <link maps>',
+    help: 'Ambil koordinat dari link Google Maps',
     category:'tools',
     async exec({ m, args, sock }) {
         try {

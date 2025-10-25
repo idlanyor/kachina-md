@@ -6,7 +6,7 @@ const execAsync = promisify(exec);
 
 export const handler = {
     command: ['tovn', 'tomp3'],
-    help: 'Konversi format audio\n\nPerintah:\n!tovn - Konversi audio ke voice note\n!tomp3 - Konversi voice note ke MP3',
+    help: 'Konversi format audio',
     category:'tools',
     
     async exec({ m, sock }) {

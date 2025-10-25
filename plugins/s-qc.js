@@ -3,7 +3,7 @@ import { Sticker, StickerTypes } from "wa-sticker-formatter";
 
 export const handler = {
     command: ["qc", "quotly", "quote"],
-    help: "Membuat stiker quote dari teks. Gunakan !qc <teks> atau reply pesan dengan !qc",
+    help: "Membuat stiker quote dari teks.",
      category:'sticker',
 
     async exec({ m, args, sock }) {

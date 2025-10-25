@@ -5,7 +5,7 @@ import { fileTypeFromBuffer } from 'file-type'
 export const handler = {
     command: ['tourl'],
     category: 'tools',
-    help: 'Upload media ke S3 dan dapatkan URL.\n\nFormat: Kirim/Reply media dengan caption .tourl',
+    help: 'Upload media ke S3.',
     exec: async ({ sock, m }) => {
         try {
             await sock.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })

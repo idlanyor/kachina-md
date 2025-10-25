@@ -6,7 +6,7 @@ import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 export const handler = {
     command: ['smeme'],
     category: 'sticker',
-    help: 'Buat sticker meme dari gambar.\n\nCara pakai:\n1) Reply gambar dengan .smeme <textB>\n   - Contoh: .smeme kanata (hanya teks bawah)\n2) Reply gambar dengan .smeme <textT>.<textB>\n   - Contoh: .smeme kanata.puki (atas=kanata, bawah=puki)\n3) Bisa juga kirim gambar dengan caption .smeme <...>',
+    help: 'Buat sticker meme dari gambar.',
     exec: async ({ sock, m, args }) => {
         try {
             // Parse teks

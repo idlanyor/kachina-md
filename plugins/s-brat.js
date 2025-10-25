@@ -4,7 +4,7 @@ import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 export const handler = {
     command: ['brat'],
     category:'sticker',
-    help: 'Generate gambar/brat text dengan Ryzumi API.\nContoh: !brat hello world',
+    help: 'Generate gambar/brat text',
     exec: async ({ sock, m, args }) => {
         try {
             if (!args || args.length === 0) {

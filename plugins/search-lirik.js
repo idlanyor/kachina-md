@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const handler = {
     command: ['lirik'],
-    help: 'Mencari lirik lagu. Gunakan !lirik <judul lagu> atau reply pesan dengan !lirik',
+    help: 'Mencari lirik lagu.',
     category:'search',
 
     async exec({ m, args, sock }) {

@@ -3,7 +3,7 @@ import { downloadMediaMessage } from 'baileys'
 export const handler = {
     command: ['toimg'],
     category:'sticker',
-    help: 'Mengkonversi stiker menjadi gambar\n\nCara pakai:\n1. Reply stiker dengan !toimg\n2. Kirim stiker dengan caption !toimg',
+    help: 'Mengkonversi stiker menjadi gambar',
     exec: async ({ sock, m }) => {
         try {
             let quotedMsg

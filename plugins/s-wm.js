@@ -4,7 +4,7 @@ import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 export const handler = {
     command: ['swm'],
     category: 'sticker',
-    help: 'Ubah watermark stiker (pack/author).\n\nCara pakai:\n1. Reply stiker dengan .swm <pack>\n   Contoh: .swm kanata (pack menjadi kanata)\n2. Reply stiker dengan .swm <pack>.<author>\n   Contoh: .swm love.kanata (pack love, author kanata)\n3. Bisa juga kirim stiker dengan caption .swm <pack[.author]>',
+    help: 'Ubah watermark stiker',
     exec: async ({ sock, m, args }) => {
         try {
             // Pastikan ada argumen
