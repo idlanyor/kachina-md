@@ -11,3 +11,6 @@ db.*
 *.rar
 global.js
 *-sessions
+test-*
+CHANGELOG-*
+docs

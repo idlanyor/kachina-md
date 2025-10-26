@@ -115,13 +115,15 @@ const Database = {
           antiLink: false,
           antiToxic: false,
           welcomeMessage: '',
-          leaveMessage: ''
+          leaveMessage: '',
+          prayerNotification: false // Fitur notifikasi adzan
         }
         await db.write()
       } else {
         // Pastikan field custom message selalu ada
         if (!('welcomeMessage' in db.data.groups[id])) db.data.groups[id].welcomeMessage = '';
         if (!('leaveMessage' in db.data.groups[id])) db.data.groups[id].leaveMessage = '';
+        if (!('prayerNotification' in db.data.groups[id])) db.data.groups[id].prayerNotification = false;
       }
       return db.data.groups[id]
     } catch (error) {
@@ -272,6 +274,62 @@ const Database = {
     } catch (error) {
       console.error('Error in isMessageAllowed:', error)
       return false
+    }
+  },
+
+  // Prayer Notification methods
+  async enablePrayerNotification(groupId) {
+    try {
+      const group = await this.getGroup(groupId);
+      if (group) {
+        group.prayerNotification = true;
+        await this.updateGroup(groupId, { prayerNotification: true });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error in enablePrayerNotification:', error);
+      return false;
+    }
+  },
+
+  async disablePrayerNotification(groupId) {
+    try {
+      const group = await this.getGroup(groupId);
+      if (group) {
+        group.prayerNotification = false;
+        await this.updateGroup(groupId, { prayerNotification: false });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error in disablePrayerNotification:', error);
+      return false;
+    }
+  },
+
+  async isPrayerNotificationEnabled(groupId) {
+    try {
+      const group = await this.getGroup(groupId);
+      return group ? group.prayerNotification === true : false;
+    } catch (error) {
+      console.error('Error in isPrayerNotificationEnabled:', error);
+      return false;
+    }
+  },
+
+  async getAllPrayerNotificationGroups() {
+    try {
+      const groups = [];
+      for (const [groupId, groupData] of Object.entries(db.data.groups)) {
+        if (groupData.prayerNotification === true) {
+          groups.push(groupId);
+        }
+      }
+      return groups;
+    } catch (error) {
+      console.error('Error in getAllPrayerNotificationGroups:', error);
+      return [];
     }
   }
 }

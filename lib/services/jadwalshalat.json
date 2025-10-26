@@ -1,0 +1,21 @@
+{
+  "total": 1,
+  "schedules": [
+    {
+      "lokasi": "KAB. PURBALINGGA",
+      "daerah": "JAWA TENGAH",
+      "jadwal": {
+        "tanggal": "Minggu, 26/10/2025",
+        "imsak": "03:49",
+        "subuh": "03:59",
+        "terbit": "05:13",
+        "dhuha": "15:41",
+        "dzuhur": "15:54",
+        "ashar": "14:41",
+        "maghrib": "17:40",
+        "isya": "18:51",
+        "date": "2025-10-26"
+      }
+    }
+  ]
+}
