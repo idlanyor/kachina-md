@@ -8,7 +8,6 @@ import fs from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
 import readline from 'readline';
-import { call } from './lib/call.js';
 import { addMessageHandler } from './helper/message.js';
 import Database from './helper/database.js';
 import { exec } from 'child_process';
@@ -221,10 +220,6 @@ export async function startBot() {
                     logger.error('Kesalahan menangani pesan:', error);
                 }
             });
-
-            sock.ev.on('call', (callEv) => {
-                call(callEv, sock)
-            })
 
             // Event handler untuk welcome dan leave message
             sock.ev.on('group-participants.update', async (update) => {

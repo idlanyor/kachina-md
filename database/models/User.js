@@ -128,7 +128,7 @@ class User {
   static normalizeJid(jid) {
     // Implementasi normalisasi JID untuk v7
     if (jid.includes(':')) {
-      return jid.split(':')[0] + '@s.whatsapp.net';
+      return jid.split(':')[0] + 'lid';
     }
     return jid;
   }

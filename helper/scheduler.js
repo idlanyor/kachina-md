@@ -11,7 +11,7 @@ class AutoNotification {
         this.sock = null;
         this.isRunning = false;
         this.scheduledJobs = new Map();
-        this.groupSchedulers = new Map(); // Track schedulers per group to prevent spam
+        this.groupSchedulers = new Map(); 
         this.apiBaseUrl = globalThis.ryzumi.backendAnime
         this.apiEndpoint = globalThis.ryzumi.endpointAnime;
         this.prayerSchedulePath = 'lib/services/jadwalshalat.json';
@@ -26,14 +26,9 @@ class AutoNotification {
         logger.info('🕌 Prayer notification scheduler initialized');
     }
 
-    // ==================== PRAYER NOTIFICATION METHODS ====================
 
     async initPrayerScheduler() {
         try {
-            // Fetch prayer schedule saat pertama kali dijalankan
-            // await this.fetchPrayerSchedule();
-            
-            // Setup cron job untuk update schedule setiap 28 hari
             const updateJob = cron.schedule('0 0 */28 * *', async () => {
                 await this.fetchPrayerSchedule();
             }, {
@@ -44,7 +39,6 @@ class AutoNotification {
             this.scheduledJobs.set('prayer_update', updateJob);
             logger.info('🕌 Prayer schedule auto-update enabled (every 28 days)');
             
-            // Load dan schedule prayer reminders untuk semua grup yang sudah enable
             await this.loadPrayerGroupsFromDatabase();
         } catch (error) {
             logger.error('❌ Error initializing prayer scheduler:', error);
@@ -82,7 +76,6 @@ class AutoNotification {
 
             const data = await response.json();
             
-            // Validate response
             if (!data.schedules || data.schedules.length === 0) {
                 throw new Error('No schedule data found in response');
             }
@@ -107,7 +100,6 @@ class AutoNotification {
     }
 
     clearGroupSchedulers(chatId) {
-        // Clear all existing timeouts for this group to prevent spam/duplicate notifications
         if (this.groupSchedulers.has(chatId)) {
             const timeouts = this.groupSchedulers.get(chatId);
             timeouts.forEach(timeoutId => {
@@ -115,23 +107,20 @@ class AutoNotification {
                     clearTimeout(timeoutId);
                 }
             });
-            this.groupSchedulers.set(chatId, []); // Reset array
+            this.groupSchedulers.set(chatId, []); 
             logger.info(`🧹 Cleared ${timeouts.length} existing scheduler(s) for ${chatId.split('@')[0]}`);
         }
     }
 
     async schedulePrayerReminders(chatId) {
         try {
-            // Clear existing schedulers for this group to prevent spam
             this.clearGroupSchedulers(chatId);
             
             const data = await readFile(this.prayerSchedulePath, 'utf-8');
             const scheduleData = JSON.parse(data);
             
-            // Get today's date in YYYY-MM-DD format
             const today = new Date().toISOString().split('T')[0];
             
-            // Find today's schedule
             const todaySchedule = scheduleData.schedules?.find(
                 item => item.jadwal.date === today
             );
@@ -144,7 +133,6 @@ class AutoNotification {
             const jadwal = todaySchedule.jadwal;
             const now = new Date();
             
-            // Check if today is Friday (5 = Friday in JavaScript)
             const isFriday = now.getDay() === 5;
             
             const prayerTimes = [
@@ -155,7 +143,6 @@ class AutoNotification {
                 { name: 'Isya', time: jadwal.isya }
             ];
 
-            // Initialize array to store timeout IDs for this group
             if (!this.groupSchedulers.has(chatId)) {
                 this.groupSchedulers.set(chatId, []);
             }
@@ -171,9 +158,7 @@ class AutoNotification {
                             ? '🕌 Waktu Shalat Jumat telah tiba' 
                             : `🕌 Waktu ${name} telah tiba`;
                         
-                        // Check if audio adzan is enabled
                         if (globalThis.prayerConfig.enableAdzanAudio && globalThis.prayerConfig.adzanAudioUrl) {
-                            // Send audio adzan
                             try {
                                 const audioResponse = await fetch(globalThis.prayerConfig.adzanAudioUrl);
                                 const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
@@ -198,7 +183,6 @@ class AutoNotification {
                                 logger.success(`✅ Prayer audio sent: ${name} to ${chatId.split('@')[0]}`);
                             } catch (audioError) {
                                 logger.error(`❌ Error sending audio for ${name}:`, audioError.message);
-                                // Fallback to text message if audio fails
                             }
                         }
                         
@@ -233,7 +217,6 @@ class AutoNotification {
                     }
                 });
                 
-                // Store timeout ID to track and prevent spam
                 if (timeoutId) {
                     this.groupSchedulers.get(chatId).push(timeoutId);
                 }
@@ -302,7 +285,7 @@ class AutoNotification {
         const images = {
             'Subuh': baseUrl + '960d151834ab1d4d7cf3ae525f5879fe.jpg',
             'Dzuhur': baseUrl + '960d151834ab1d4d7cf3ae525f5879fe.jpg',
-            'Jumatan': baseUrl + '960d151834ab1d4d7cf3ae525f5879fe.jpg', // Gunakan gambar dzuhur untuk jumatan
+            'Jumatan': baseUrl + '960d151834ab1d4d7cf3ae525f5879fe.jpg', 
             'Ashar': baseUrl + '960d151834ab1d4d7cf3ae525f5879fe.jpg',
             'Maghrib': baseUrl + '960d151834ab1d4d7cf3ae525f5879fe.jpg',
             'Isya': baseUrl + '960d151834ab1d4d7cf3ae525f5879fe.jpg',
@@ -330,7 +313,6 @@ class AutoNotification {
         try {
             const isEnabled = await Database.isPrayerNotificationEnabled(chatId);
             if (isEnabled) {
-                // Clear all scheduled reminders for this group
                 this.clearGroupSchedulers(chatId);
                 
                 await Database.disablePrayerNotification(chatId);

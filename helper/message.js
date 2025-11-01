@@ -10,10 +10,16 @@ const thumbPath = resolve(import.meta.dirname, '../media/thumbnail.jpg')
 
 export function addMessageHandler(m, sock) {
     m.chat = m.key.remoteJid;
-    m.sender = m.key.fromMe ? sock.user.id : (m.key.participant || m.key.remoteJid);
-    m.senderNumber = m.sender.split('@')[0];
-    m.pushName = m.pushName || 'No Name';
     m.isGroup = m.chat.endsWith('@g.us');
+    if (m.isGroup) {
+        m.sender = (m.key.addressingMode === "lid") ? m.key.participant : m.key.participantAlt;
+    }
+    else {
+        m.sender = (m.key.addressingMode === "lid") ? m.key.remoteJid : m.key.remoteJidAlt;
+    }
+    // console.log(m)
+    m.senderNumber = m.sender?.split('@')[0];
+    m.pushName = m.pushName || 'No Name';
     m.type = getMessageType(m.message);
     m.groupMetadata = m.isGroup ? cacheGroupMetadata(sock, m.chat) : null;
     m.ephemeralDuration = m.isGroup ? m.groupMetadata?.ephemeralDuration : 0
