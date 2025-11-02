@@ -3,6 +3,9 @@ import { logger } from '../helper/logger.js';
 
 export async function handleAutoXP(sock, m) {
     try {
+        // Skip jika m.sender tidak ada
+        if (!m.sender) return;
+
         // Skip jika pesan dari bot sendiri
         const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
         if (m.sender === botId) return;

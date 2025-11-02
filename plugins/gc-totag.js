@@ -22,7 +22,7 @@ export const handler = {
             // Forward pesan yang direply dengan mentions
             await sock.sendMessage(id, {
                 forward: m.quoted,
-                mentions: participants.map(a => a.lid)
+                mentions: participants.map(a => a.id)
             })
 
         } catch (error) {

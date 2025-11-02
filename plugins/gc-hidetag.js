@@ -17,7 +17,7 @@ export const handler = {
             let teks = args || ''
             await sock.sendMessage(id, {
                 text: teks,
-                mentions: participants.map(a => a.lid || a.id).filter(Boolean)
+                mentions: participants.map(a => a.id)
             }, { quoted: m })
 
         } catch (error) {

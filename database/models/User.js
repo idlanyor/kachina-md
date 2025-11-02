@@ -117,6 +117,9 @@ class User {
     // Update untuk v7: support LID
     const normalizedJid = this.normalizeJid(jid);
 
+    // Return null if jid is invalid
+    if (!normalizedJid) return null;
+
     if (!db.data.users[normalizedJid]) {
       return await this.create({ jid: normalizedJid })
     }
@@ -127,6 +130,7 @@ class User {
   // Tambahkan method untuk normalize JID
   static normalizeJid(jid) {
     // Implementasi normalisasi JID untuk v7
+    if (!jid) return null;
     if (jid.includes(':')) {
       return jid.split(':')[0] + 'lid';
     }

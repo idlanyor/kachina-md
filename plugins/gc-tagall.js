@@ -24,12 +24,12 @@ export const handler = {
             // Loop through participants
             console.log(group)
             for (let mem of participants) {
-                teks += `${themeemoji} @${mem.lid.split('@')[0]}\n`
+                teks += `${themeemoji} @${mem.id.split('@')[0]}\n`
             }
 
             await sock.sendMessage(id, {
                 text: teks,
-                mentions: participants.map(a => a.lid)
+                mentions: participants.map(a => a.id)
             }, { quoted: m })
 
         } catch (error) {
