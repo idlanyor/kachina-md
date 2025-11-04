@@ -50,8 +50,7 @@ export const handler = {
                     const plugin = await import(pathToFileURL(file).href)
                     if (!plugin.handler) continue
 
-                    // Gunakan handler.category atau 'main' sebagai default
-                    const category = plugin.handler.category || 'main'
+                    const category = plugin.handler.category || 'downloader'
                     if (category.toUpperCase() === 'HIDDEN') continue
 
                     if (!categories[category]) {
@@ -81,7 +80,6 @@ export const handler = {
 
             // Definisi icon kategori
             const categoryIcons = {
-                'main': '⚡',
                 'ai': '🤖',
                 'converter': '🔄',
                 'downloader': '📥',
@@ -102,7 +100,7 @@ export const handler = {
             if (args && args.length > 0) {
                 const searchArg = args.toLowerCase()
                 let found = false
-                
+
                 // Cek apakah args adalah kategori
                 for (const [category, plugins] of Object.entries(categories)) {
                     if (category.toLowerCase() === searchArg) {
@@ -170,7 +168,7 @@ export const handler = {
 
 
             const categoryOrder = [
-                'main', 'ai', 'downloader', 'search', 'converter',
+                'ai', 'downloader', 'search', 'converter',
                 'sticker', 'tools', 'group', 'moderation', 'game',
                 'misc', 'owner'
             ]
@@ -197,13 +195,13 @@ export const handler = {
                 for (const plugin of plugins) {
                     commandCount += plugin.commands.length
                 }
-                
+
                 menuText += `┃ ☰ _*MENU ${category.toUpperCase()} (${commandCount} CMD)*_\n`
             }
             menuText += `╰━━━━━━━━━━━━━━━━━━╼\n`
 
             menuText += `\n_*❏ I N F O  B O T*_\n`
-            menuText += `▧ Total Kategori: ${orderedCategories.filter(c => categories[c] && categories[c].length > 0).length}\n`
+            menuText += `▧ Total Kategori: ${orderedCategories.filter(c => categories[c] && categories[c].length > 0 && c.toUpperCase() !== 'HIDDEN').length}\n`
             menuText += `▧ Total Commands: ${totalCommands}\n`
             menuText += `▧ Prefix: ${prefix}\n`
             menuText += `▧ Mode: ${settings.botMode}\n`

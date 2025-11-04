@@ -1,14 +1,14 @@
 import localization from './helper/localization.js';
 
 // variabel dasar
-globalThis.owner = "Antidonasi Universe";
+globalThis.owner = "Your Bot Owner Name";
 globalThis.botName = "Kachina-MD";
-globalThis.ownerNumber = ["79444496625700"]
-// globalThis.botNumber = "6282234857033"
-globalThis.botNumber = "628157695152"
+globalThis.ownerNumber = ["YOUR_OWNER_NUMBER"]
+// globalThis.botNumber = "YOUR_BOT_NUMBER"
+globalThis.botNumber = "YOUR_BOT_NUMBER"
 globalThis.sessionName = 'kachina-bot'
 globalThis.WEBHOOK_PORT = 3036
-globalThis.WEBHOOK_SECRET = 'kanatadesu'
+globalThis.WEBHOOK_SECRET = 'YOUR_WEBHOOK_SECRET'
 
 // Localization
 globalThis.t = localization.t.bind(localization);
@@ -25,34 +25,46 @@ globalThis.newsletterUrl = 'https://whatsapp.com/channel/0029VagADOLLSmbaxFNswH1
 // Store Configuration
 globalThis.storeConfig = {
     pterodactyl: {
-        url: "",
-        apiKey: "",
-        adminApiKey: "",
-        emailSuffix: ""
+        url: "https://your-panel-url.com",
+        apiKey: "YOUR_PTERODACTYL_CLIENT_API_KEY",
+        adminApiKey: "YOUR_PTERODACTYL_ADMIN_API_KEY",
+        emailSuffix: "your-domain.com"
     },
     qris: {
         // Add your QRIS image URL here
-        imageUrl: "https://files.catbox.moe/lv9y7c.jpeg"
+        imageUrl: "YOUR_QRIS_IMAGE_URL"
     },
     admin: {
-        owner: "62895395590009",
-        storeAdmin: "62895395590009"
+        owner: "YOUR_OWNER_NUMBER",
+        storeAdmin: "YOUR_STORE_ADMIN_NUMBER"
     }
 }
 globalThis.premiumConfig = {
 
     qris: {
         // Add your QRIS image URL here
-        imageUrl: "https://files.catbox.moe/lv9y7c.jpeg"
+        imageUrl: "YOUR_QRIS_IMAGE_URL"
     },
     admin: {
-        owner: "62895395590009",
-        storeAdmin: "62895395590009"
+        owner: "YOUR_OWNER_NUMBER",
+        storeAdmin: "YOUR_STORE_ADMIN_NUMBER"
     }
 }
 globalThis.ryzumi = {
     backendAnime: "https://backend.ryzumi.vip/",
     endpointAnime: "https://backend.ryzumi.vip/anime?type=ongoing",
+}
+
+// Prayer Schedule Configuration
+globalThis.prayerConfig = {
+    apiUrl: "https://api.ryzumi.vip/api/search/jadwal-sholat",
+    city: "Purbalingga",  // Bisa diganti sesuai lokasi
+    // Untuk gambar tetap gunakan hikaru
+    imageBaseUrl: "https://s3.nevaobjects.id/kanata-s3/kachina/prayer/",
+    // Audio adzan (URL ke file MP3)
+    adzanAudioUrl: "https://s3.nevaobjects.id/kanata-s3/kachina/prayer/adzan-full.mp3",
+    // Enable/disable audio adzan
+    enableAdzanAudio: true
 }
 // Products Configuration
 globalThis.products = {
@@ -129,27 +141,27 @@ if (!global.sinonimGame) {
 
 // variabel apikey
 globalThis.apiKey = {
-    gemini: 'GEMINI_API_KEY',
-    gpt: 'GPT_API_KEY',
-    ytdl: 'LEAVE BLANK',
-    fasturl: 'NOAPIKEY',
-    mistral: 'MISTRAL_API_KEY',
-    removeBG: 'REMOVEBG_API_KEY',
-    groq: 'USE YOUR OWN',
+    gemini: 'YOUR_GEMINI_API_KEY',
+    gpt: 'YOUR_GPT_API_KEY',
+    ytdl: 'YOUR_YTDL_API_KEY',
+    fasturl: 'YOUR_FASTURL_API_KEY',
+    mistral: 'YOUR_MISTRAL_API_KEY',
+    removeBG: 'YOUR_REMOVEBG_API_KEY',
+    groq: 'YOUR_GROQ_API_KEY',
     pdf: {
-        secret: '',
-        public: ''
+        secret: 'YOUR_PDF_SECRET_KEY',
+        public: 'YOUR_PDF_PUBLIC_KEY'
     }
 }
 // variabel paired apikey with baseurl
 globalThis.apiHelper = {
     medanpedia: {
-        apiId: '',
-        apiKey: ''
+        apiId: 'YOUR_MEDANPEDIA_API_ID',
+        apiKey: 'YOUR_MEDANPEDIA_API_KEY'
     },
     lolhuman: {
 
-        apikey: '',
+        apikey: 'YOUR_LOLHUMAN_API_KEY',
 
         baseUrl: 'https://api.lolhuman.xyz/api/'
 
@@ -157,7 +169,7 @@ globalThis.apiHelper = {
 
     betabotz: {
 
-        apikey: '',
+        apikey: 'YOUR_BETABOTZ_API_KEY',
 
         baseUrl: 'https://api.betabotz.eu.org/api/'
 
@@ -165,15 +177,14 @@ globalThis.apiHelper = {
 
     skizotech: {
 
-        apikey: '',
+        apikey: 'YOUR_SKIZOTECH_API_KEY',
 
         baseUrl: 'https://skizo.tech/api/'
 
     },
     nyxs: {
-        apikey: '',
+        apikey: 'YOUR_NYXS_API_KEY',
         baseUrl: 'https://api.nyxs.pw/api/'
     }
 
 }
-
