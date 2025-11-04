@@ -8,15 +8,34 @@ import { cacheGroupMetadata, groupCache } from './caching.js';
 
 const thumbPath = resolve(import.meta.dirname, '../media/thumbnail.jpg')
 
+/**
+ * Normalize JID to handle @lid format
+ * When addressingMode is "lid", WhatsApp uses alternative JID format
+ * We need to use the Alt version which has standard @s.whatsapp.net format
+ * Reference: https://github.com/WhiskeySockets/Baileys/issues/2013
+ */
+export function normalizeJid(key, isGroup = false) {
+    if (key.addressingMode === "lid") {
+        if (isGroup) {
+            return key.participantAlt || key.participant;
+        } else {
+            return key.remoteJidAlt || key.remoteJid;
+        }
+    }
+
+    if (isGroup) {
+        return key.participant;
+    }
+
+    return key.remoteJid;
+}
+
 export function addMessageHandler(m, sock) {
-    m.chat = m.key.remoteJid;
+    // Normalize chat and sender JID (handle @lid format)
+    // Reference: https://github.com/WhiskeySockets/Baileys/issues/2013
+    m.chat = normalizeJid(m.key, false);
     m.isGroup = m.chat.endsWith('@g.us');
-    if (m.isGroup) {
-        m.sender = (m.key.addressingMode === "lid") ? m.key.participant : m.key.participantAlt;
-    }
-    else {
-        m.sender = (m.key.addressingMode === "lid") ? m.key.remoteJid : m.key.remoteJidAlt;
-    }
+    m.sender = normalizeJid(m.key, m.isGroup);
     // console.log(m)
     m.senderNumber = m.sender?.split('@')[0];
     m.pushName = m.pushName || 'No Name';
@@ -39,7 +58,7 @@ export function addMessageHandler(m, sock) {
         async () => {
             const metadata = await m.groupMetadata;
             return metadata?.participants?.find(p => {
-                return p.id === m.key.participant
+                return p.id === m.sender
             })?.admin !== null;
         }
     )() : false;
@@ -47,29 +66,37 @@ export function addMessageHandler(m, sock) {
     m.quoted = null;
     if (m.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
         const quotedMsg = m.message.extendedTextMessage.contextInfo.quotedMessage;
+        const ctxInfo = m.message.extendedTextMessage.contextInfo;
+
         // Cek jika quoted message adalah view once
         const viewOnceMsg = quotedMsg?.viewOnceMessageV2?.message;
         const actualMsg = viewOnceMsg || quotedMsg;
+
+        // Normalize quoted sender (handle @lid format)
+        const quotedSender = ctxInfo.addressingMode === "lid"
+            ? (ctxInfo.participantAlt || ctxInfo.participant)
+            : ctxInfo.participant;
 
         m.quoted = {
             message: actualMsg,
             key: {
                 remoteJid: m.chat,
                 // Update untuk v7: tambahkan remoteJidAlt jika ada
-                ...(m.message.extendedTextMessage.contextInfo.remoteJidAlt && {
-                    remoteJidAlt: m.message.extendedTextMessage.contextInfo.remoteJidAlt
+                ...(ctxInfo.remoteJidAlt && {
+                    remoteJidAlt: ctxInfo.remoteJidAlt
                 }),
-                fromMe: m.message.extendedTextMessage.contextInfo.participant === sock.user.id,
-                id: m.message.extendedTextMessage.contextInfo.stanzaId,
-                participant: m.message.extendedTextMessage.contextInfo.participant,
+                fromMe: quotedSender === sock.user.id,
+                id: ctxInfo.stanzaId,
+                participant: ctxInfo.participant,
                 // Update untuk v7: tambahkan participantAlt jika ada
-                ...(m.message.extendedTextMessage.contextInfo.participantAlt && {
-                    participantAlt: m.message.extendedTextMessage.contextInfo.participantAlt
-                })
+                ...(ctxInfo.participantAlt && {
+                    participantAlt: ctxInfo.participantAlt
+                }),
+                addressingMode: ctxInfo.addressingMode
             },
             type: getMessageType(actualMsg),
-            sender: m.message.extendedTextMessage.contextInfo.participant,
-            senderNumber: m.message.extendedTextMessage.contextInfo.participant.split('@')[0],
+            sender: quotedSender,
+            senderNumber: quotedSender?.split('@')[0],
             text: getQuotedText(actualMsg),
             download: async () => {
                 return await getMedia({

@@ -70,6 +70,14 @@ const defaultSettings = {
     bannedMembers: [],
     warnedMembers: {},
     
+    // Auto open/close settings
+    autoOpen: false,
+    autoOpenTime: '05:00', // Format: HH:MM
+    autoClose: false,
+    autoCloseTime: '21:00', // Format: HH:MM
+    lastAutoOpenExecuted: null, // Timestamp of last auto open execution
+    lastAutoCloseExecuted: null, // Timestamp of last auto close execution
+
     // Timestamps
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -289,6 +297,29 @@ class Group {
         if (logGroup) {
             await this.updateSetting(groupId, 'logGroup', logGroup)
         }
+        return await this.getSettings(groupId)
+    }
+
+    // Auto open/close management
+    static async setAutoOpen(groupId, enabled, time = '05:00') {
+        await this.updateSetting(groupId, 'autoOpen', enabled)
+        await this.updateSetting(groupId, 'autoOpenTime', time)
+        return await this.getSettings(groupId)
+    }
+
+    static async setAutoClose(groupId, enabled, time = '21:00') {
+        await this.updateSetting(groupId, 'autoClose', enabled)
+        await this.updateSetting(groupId, 'autoCloseTime', time)
+        return await this.getSettings(groupId)
+    }
+
+    static async updateLastAutoOpenExecuted(groupId) {
+        await this.updateSetting(groupId, 'lastAutoOpenExecuted', new Date().toISOString())
+        return await this.getSettings(groupId)
+    }
+
+    static async updateLastAutoCloseExecuted(groupId) {
+        await this.updateSetting(groupId, 'lastAutoCloseExecuted', new Date().toISOString())
         return await this.getSettings(groupId)
     }
 

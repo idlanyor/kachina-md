@@ -13,13 +13,19 @@ import Database from './helper/database.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import autoNotification from './helper/scheduler.js';
+import groupScheduler from './services/groupScheduler.js';
 import { MessageHandler } from './handlers/messageHandler.js';
 import { GroupHandler } from './handlers/groupHandler.js';
+import jadiBotManager from './lib/jadibot.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const execAsync = promisify(exec);
+
+// Message deduplication cache
+const processedMessages = new Set();
+const MESSAGE_CACHE_TIMEOUT = 5000; // 5 seconds
 
 export function findJsFiles(dir) {
     let results = [];
@@ -147,10 +153,30 @@ export async function startBot() {
             logger.divider();
 
             autoNotification.init(sock);
+            groupScheduler.init(sock);
+
+            // Auto-reconnect jadibot sessions
+            logger.info('Loading jadibot sessions...');
+            await jadiBotManager.loadPersistence(sock);
 
             sock.ev.on('messages.upsert', async chatUpdate => {
                 try {
                     let m = chatUpdate.messages[0];
+
+                    // Prevent duplicate message processing
+                    const messageId = m.key.id;
+                    if (processedMessages.has(messageId)) {
+                        return; // Skip already processed message
+                    }
+
+                    // Add to processed messages cache
+                    processedMessages.add(messageId);
+
+                    // Remove from cache after timeout to prevent memory leak
+                    setTimeout(() => {
+                        processedMessages.delete(messageId);
+                    }, MESSAGE_CACHE_TIMEOUT);
+
                     m = addMessageHandler(m, sock);
                     // if (!m.key?.fromMe) return
                     await Database.addMessage();
@@ -159,10 +185,10 @@ export async function startBot() {
                         await Database.addCommand();
                     }
 
-                    const { remoteJid } = m.key;
-                    const sender = m.pushName || remoteJid;
-                    const id = remoteJid;
-                    const noTel = (id.endsWith('@g.us')) ? m.key.participant?.split('@')[0]?.replace(/[^0-9]/g, '') : id.split('@')[0]?.replace(/[^0-9]/g, '');
+                    // Use normalized chat and sender (already handles @lid format)
+                    const id = m.chat;
+                    const sender = m.pushName || m.sender;
+                    const noTel = m.senderNumber;
                     const mediaTypes = ['image', 'video', 'audio'];
 
                     // Untuk grup, gunakan cached group metadata

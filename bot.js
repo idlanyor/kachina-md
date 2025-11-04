@@ -393,15 +393,16 @@ async function clearMessages(m) {
     try {
         if (m === "undefined") return;
         let data;
+        // Use normalized m.chat and m.sender (already handles @lid format)
         if (m.message?.conversation) {
             const text = m.message?.conversation.trim();
-            if (m.key.remoteJid.endsWith("g.us")) {
+            if (m.chat.endsWith("g.us")) {
                 data = {
                     chatsFrom: "group",
-                    remoteJid: m.key.remoteJid,
+                    remoteJid: m.chat,
                     participant: {
                         fromMe: m.key.fromMe,
-                        number: m.key.participant,
+                        number: m.sender,
                         pushName: m.pushName,
                         message: text,
                     },
@@ -409,7 +410,7 @@ async function clearMessages(m) {
             } else {
                 data = {
                     chatsFrom: "private",
-                    remoteJid: m.key.remoteJid,
+                    remoteJid: m.chat,
                     fromMe: m.key.fromMe,
                     pushName: m.pushName,
                     message: text,
@@ -422,13 +423,13 @@ async function clearMessages(m) {
             }
         } else if (m.message?.extendedTextMessage) {
             const text = m.message?.extendedTextMessage.text.trim();
-            if (m.key.remoteJid.endsWith("g.us")) {
+            if (m.chat.endsWith("g.us")) {
                 data = {
                     chatsFrom: "group",
-                    remoteJid: m.key.remoteJid,
+                    remoteJid: m.chat,
                     participant: {
                         fromMe: m.key.fromMe,
-                        number: m.key.participant,
+                        number: m.sender,
                         pushName: m.pushName,
                         message: text,
                     },
@@ -436,7 +437,7 @@ async function clearMessages(m) {
             } else {
                 data = {
                     chatsFrom: "private",
-                    remoteJid: m.key.remoteJid,
+                    remoteJid: m.chat,
                     fromMe: m.key.fromMe,
                     pushName: m.pushName,
                     message: text,

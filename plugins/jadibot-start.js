@@ -19,7 +19,8 @@ export const handler = {
                         text: `⚠️ BOT SUDAH AKTIF\n\n` +
                               `📱 Nomor: ${status.phoneNumber}\n` +
                               `⏰ Uptime: ${status.uptime}\n` +
-                              `🔌 Status: ${status.status}`,
+                              `🔌 Status: ${status.status}\n\n` +
+                              `💾 Bot akan auto-reconnect saat restart!`,
                         footer: 'Pilih aksi cepat:',
                         buttons: [
                             { id: 'statusjadibot', text: 'Cek Status' },
@@ -27,7 +28,7 @@ export const handler = {
                             { id: 'deletejadibot', text: 'Hapus Sesi' }
                         ]
                     }, { quoted: m });
-                } else if (status.status === 'connecting') {
+                } else if (status.status === 'connecting' || status.status === 'reconnecting') {
                     return await sock.sendButtons(m.chat, {
                         text: `⏳ BOT SEDANG TERSAMBUNG\n\nBot Anda sedang dalam proses koneksi.`,
                         footer: 'Tunggu atau batalkan',
