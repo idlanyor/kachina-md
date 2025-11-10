@@ -99,24 +99,11 @@ export const handler = {
                           
                           `🚀 Siap mencoba? Ketik .jadibot sekarang!`;
 
-            await sock.sendButtons(m.chat, {
-                text: message,
-                footer: 'Mulai sekarang dengan tombol di bawah',
-                buttons: [
-                    { id: 'jadibot', text: 'Buat Jadibot' },
-                    { id: 'statusjadibot', text: 'Cek Status' }
-                ]
-            }, { quoted: m });
+            await m.reply(message);
 
         } catch (error) {
             console.error('Error in jadibotinfo command:', error);
-            await sock.sendButtons(m.chat, {
-                text: `❌ Terjadi kesalahan: ${error.message}`,
-                buttons: [
-                    { id: 'jadibot', text: 'Buat Jadibot' },
-                    { id: 'statusjadibot', text: 'Cek Status' }
-                ]
-            }, { quoted: m });
+            await m.reply(`❌ Terjadi kesalahan: ${error.message}`);
         }
     }
 };

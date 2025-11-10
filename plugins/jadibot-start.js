@@ -15,43 +15,36 @@ export const handler = {
             const status = jadiBotManager.getStatus(userJid);
             if (status.exists) {
                 if (status.status === 'connected') {
-                    return await sock.sendButtons(m.chat, {
-                        text: `⚠️ BOT SUDAH AKTIF\n\n` +
-                              `📱 Nomor: ${status.phoneNumber}\n` +
-                              `⏰ Uptime: ${status.uptime}\n` +
-                              `🔌 Status: ${status.status}\n\n` +
-                              `💾 Bot akan auto-reconnect saat restart!`,
-                        footer: 'Pilih aksi cepat:',
-                        buttons: [
-                            { id: 'statusjadibot', text: 'Cek Status' },
-                            { id: 'stopjadibot', text: 'Hentikan Bot' },
-                            { id: 'deletejadibot', text: 'Hapus Sesi' }
-                        ]
-                    }, { quoted: m });
+                    return await m.reply(
+                        `⚠️ BOT SUDAH AKTIF\n\n` +
+                        `📱 Nomor: ${status.phoneNumber}\n` +
+                        `⏰ Uptime: ${status.uptime}\n` +
+                        `🔌 Status: ${status.status}\n\n` +
+                        `💾 Bot akan auto-reconnect saat restart!\n\n` +
+                        `Ketik .statusjadibot untuk cek status\n` +
+                        `Ketik .stopjadibot untuk hentikan bot\n` +
+                        `Ketik .deletejadibot untuk hapus sesi`
+                    );
                 } else if (status.status === 'connecting' || status.status === 'reconnecting') {
-                    return await sock.sendButtons(m.chat, {
-                        text: `⏳ BOT SEDANG TERSAMBUNG\n\nBot Anda sedang dalam proses koneksi.`,
-                        footer: 'Tunggu atau batalkan',
-                        buttons: [
-                            { id: 'statusjadibot', text: 'Cek Status' },
-                            { id: 'stopjadibot', text: 'Batalkan (Stop)' }
-                        ]
-                    }, { quoted: m });
+                    return await m.reply(
+                        `⏳ BOT SEDANG TERSAMBUNG\n\n` +
+                        `Bot Anda sedang dalam proses koneksi.\n\n` +
+                        `Ketik .statusjadibot untuk cek status\n` +
+                        `Ketik .stopjadibot untuk batalkan`
+                    );
                 }
             }
 
             // Get phone number from args
             const phoneNumber = args.trim().replace(/[^0-9]/g, '');
-            
+
             if (!phoneNumber) {
-                return await sock.sendInteractiveMessage(m.chat, {
-                    text: '📱 Cara membuat Jadibot\n\nFormat: .jadibot <nomor>\nContoh: .jadibot 628123456789',
-                    footer: 'Gunakan tombol di bawah untuk bantuan',
-                    interactiveButtons: [
-                        { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Salin Contoh', copy_code: '.jadibot 628123456789' }) },
-                        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Info Jadibot', id: 'jadibotinfo' }) }
-                    ]
-                }, { quoted: m });
+                return await m.reply(
+                    '📱 Cara membuat Jadibot\n\n' +
+                    'Format: .jadibot <nomor>\n' +
+                    'Contoh: .jadibot 628123456789\n\n' +
+                    'Ketik .jadibotinfo untuk info lengkap'
+                );
             }
 
             // Normalize phone number (add 62 if starts with 0 or 8)
@@ -64,49 +57,43 @@ export const handler = {
 
             // Validate phone number format
             if (!/^62\d{9,13}$/.test(normalizedNumber)) {
-                return await sock.sendButtons(m.chat, {
-                    text: `❌ NOMOR TIDAK VALID\n\nFormat nomor salah!`,
-                    footer: 'Pilih bantuan:',
-                    buttons: [
-                        { id: 'jadibotinfo', text: 'Info Jadibot' },
-                        { id: 'statusjadibot', text: 'Cek Status' }
-                    ]
-                }, { quoted: m });
+                return await m.reply(
+                    `❌ NOMOR TIDAK VALID\n\n` +
+                    `Format nomor salah!\n\n` +
+                    `Format yang benar: 628xxxxx\n` +
+                    `Contoh: 628123456789\n\n` +
+                    `Ketik .jadibotinfo untuk info lengkap`
+                );
             }
 
             // Send waiting message
-            await sock.sendButtons(m.chat, {
-                text: `🤖 MEMBUAT BOT BARU\n\n📱 Nomor: ${normalizedNumber}\n⏳ Menyiapkan bot Anda...\n🔐 Kode pairing akan dikirim segera`,
-                footer: 'Aksi cepat:',
-                buttons: [
-                    { id: 'statusjadibot', text: 'Cek Status' },
-                    { id: 'stopjadibot', text: 'Batalkan (Stop)' }
-                ]
-            }, { quoted: m });
+            await m.reply(
+                `🤖 MEMBUAT BOT BARU\n\n` +
+                `📱 Nomor: ${normalizedNumber}\n` +
+                `⏳ Menyiapkan bot Anda...\n` +
+                `🔐 Kode pairing akan dikirim segera\n\n` +
+                `Ketik .statusjadibot untuk cek status\n` +
+                `Ketik .stopjadibot untuk batalkan`
+            );
 
             // Create bot
             const result = await jadiBotManager.createBot(userJid, sock, chatId, normalizedNumber);
 
             if (!result.success) {
-                await sock.sendButtons(m.chat, {
-                    text: result.message,
-                    footer: 'Butuh bantuan?',
-                    buttons: [
-                        { id: 'jadibotinfo', text: 'Info Jadibot' },
-                        { id: 'statusjadibot', text: 'Cek Status' }
-                    ]
-                }, { quoted: m });
+                await m.reply(
+                    result.message + '\n\n' +
+                    'Ketik .jadibotinfo untuk info lengkap\n' +
+                    'Ketik .statusjadibot untuk cek status'
+                );
             }
 
         } catch (error) {
             console.error('Error in jadibot command:', error);
-            await sock.sendButtons(m.chat, {
-                text: `❌ Terjadi kesalahan: ${error.message}`,
-                buttons: [
-                    { id: 'jadibotinfo', text: 'Info Jadibot' },
-                    { id: 'statusjadibot', text: 'Cek Status' }
-                ]
-            }, { quoted: m });
+            await m.reply(
+                `❌ Terjadi kesalahan: ${error.message}\n\n` +
+                `Ketik .jadibotinfo untuk info lengkap\n` +
+                `Ketik .statusjadibot untuk cek status`
+            );
         }
     }
 };

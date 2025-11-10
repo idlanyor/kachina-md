@@ -119,7 +119,7 @@ export const handler = {
 
                     delete global.family100Game[id];
                 }
-            }, 60000); // 60 seconds
+            }, 90000); // 90 seconds
 
         } catch (error) {
             console.error('Error in family100 game:', error);

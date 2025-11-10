@@ -13,105 +13,47 @@ export const handler = {
             // Check if user has a bot
             const status = jadiBotManager.getStatus(userJid);
             if (!status.exists) {
-                return await sock.sendButtons(m.chat, {
-                    text: `❌ SESI TIDAK DITEMUKAN\n\nAnda tidak memiliki sesi bot yang tersimpan.`,
-                    footer: 'Buat bot baru?',
-                    buttons: [
-                        { id: 'jadibot', text: 'Buat Jadibot' },
-                        { id: 'jadibotinfo', text: 'Info Jadibot' }
-                    ]
-                }, { quoted: m });
+                return await m.reply(
+                    `❌ SESI TIDAK DITEMUKAN\n\n` +
+                    `Anda tidak memiliki sesi bot yang tersimpan.\n\n` +
+                    `Ketik .jadibot <nomor> untuk buat bot\n` +
+                    `Ketik .jadibotinfo untuk info lengkap`
+                );
             }
 
-            // Send confirmation message
-            await sock.sendButtons(m.chat, {
-                text: `⚠️ KONFIRMASI HAPUS SESI\n\n` +
-                      `• Nomor: ${status.phoneNumber}\n` +
-                      `• Status: ${status.status}\n` +
-                      `• Uptime: ${status.uptime}\n\n` +
-                      `Sesi akan dihapus permanen. Lanjutkan?`,
-                footer: 'Pilih salah satu:',
-                buttons: [
-                    { id: 'confirm_delete_session', text: 'Ya, Hapus' },
-                    { id: 'statusjadibot', text: 'Cek Status' }
-                ]
-            }, { quoted: m });
-
-            // Wait for confirmation
-            const filter = (msg) => {
-                const irm = msg.message?.interactiveResponseMessage?.nativeFlowResponseMessage;
-                if (!irm) return false;
-                try {
-                    const params = JSON.parse(irm.paramsJson);
-                    const sameChat = msg.key.remoteJid === m.chat;
-                    const sameUser = msg.key.participant ? (msg.key.participant === userJid) : (msg.key.remoteJid === userJid);
-                    return sameChat && sameUser && params?.id === 'confirm_delete_session';
-                } catch { return false; }
-            };
-
-            // Create a promise to wait for the next message
-            const waitForMessage = () => {
-                return new Promise((resolve) => {
-                    const timeout = setTimeout(() => {
-                        sock.ev.off('messages.upsert', handler);
-                        resolve(false);
-                    }, 30000); // 30 seconds timeout
-
-                    const handler = (update) => {
-                        const msg = update.messages[0];
-                        if (filter(msg)) {
-                            clearTimeout(timeout);
-                            sock.ev.off('messages.upsert', handler);
-                            resolve(true);
-                        }
-                    };
-
-                    sock.ev.on('messages.upsert', handler);
-                });
-            };
-
-            const confirmed = await waitForMessage();
-
-            if (!confirmed) {
-                return await sock.sendButtons(m.chat, {
-                    text: `❌ DIBATALKAN\n\nPenghapusan sesi dibatalkan. Bot Anda masih tersimpan.`,
-                    buttons: [
-                        { id: 'statusjadibot', text: 'Cek Status' },
-                        { id: 'deletejadibot', text: 'Hapus Lagi' }
-                    ]
-                }, { quoted: m });
-            }
+            // Send confirmation message with warning
+            await m.reply(
+                `⚠️ MENGHAPUS SESI BOT\n\n` +
+                `• Nomor: ${status.phoneNumber}\n` +
+                `• Status: ${status.status}\n` +
+                `• Uptime: ${status.uptime}\n\n` +
+                `Sedang menghapus sesi...`
+            );
 
             // Delete session
             const result = await jadiBotManager.deleteSession(userJid);
 
             if (result.success) {
-                await sock.sendButtons(m.chat, {
-                    text: `✅ SESI BERHASIL DIHAPUS\n\nBot telah logout dan data sesi dihapus.`,
-                    footer: 'Aksi cepat:',
-                    buttons: [
-                        { id: 'jadibot', text: 'Buat Jadibot Baru' },
-                        { id: 'jadibotinfo', text: 'Info Jadibot' }
-                    ]
-                }, { quoted: m });
+                await m.reply(
+                    `✅ SESI BERHASIL DIHAPUS\n\n` +
+                    `Bot telah logout dan data sesi dihapus.\n\n` +
+                    `Ketik .jadibot <nomor> untuk buat bot baru\n` +
+                    `Ketik .jadibotinfo untuk info lengkap`
+                );
             } else {
-                await sock.sendButtons(m.chat, {
-                    text: result.message,
-                    buttons: [
-                        { id: 'statusjadibot', text: 'Cek Status' }
-                    ]
-                }, { quoted: m });
+                await m.reply(
+                    result.message + '\n\n' +
+                    'Ketik .statusjadibot untuk cek status'
+                );
             }
 
         } catch (error) {
             console.error('Error in deletejadibot command:', error);
-            await sock.sendButtons(m.chat, {
-                text: `❌ Terjadi kesalahan: ${error.message}`,
-                buttons: [
-                    { id: 'statusjadibot', text: 'Cek Status' },
-                    { id: 'jadibotinfo', text: 'Info Jadibot' }
-                ]
-            }, { quoted: m });
+            await m.reply(
+                `❌ Terjadi kesalahan: ${error.message}\n\n` +
+                `Ketik .statusjadibot untuk cek status\n` +
+                `Ketik .jadibotinfo untuk info lengkap`
+            );
         }
     }
 };

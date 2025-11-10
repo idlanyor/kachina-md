@@ -113,7 +113,7 @@ export const handler = {
 
                     delete global.tekatekiGame[id];
                 }
-            }, 60000); // 60 seconds
+            }, 90000); // 90 seconds
 
         } catch (error) {
             console.error('Error in tekateki game:', error);

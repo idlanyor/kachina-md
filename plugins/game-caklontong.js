@@ -82,7 +82,7 @@ export const handler = {
 
                         delete global.caklontongGame[id];
                     }
-                }, 60000); // 60 seconds
+                }, 90000); // 60 seconds
 
             } catch (error) {
                 console.error('Error fetching caklontong questions:', error);

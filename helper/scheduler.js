@@ -29,6 +29,7 @@ class AutoNotification {
 
     async initPrayerScheduler() {
         try {
+            await this.fetchPrayerSchedule();
             const updateJob = cron.schedule('0 0 */28 * *', async () => {
                 await this.fetchPrayerSchedule();
             }, {
@@ -126,7 +127,7 @@ class AutoNotification {
             );
 
             if (!todaySchedule) {
-                logger.warn('⚠️  Jadwal shalat tidak ditemukan untuk hari ini');
+                logger.warning('⚠️  Jadwal shalat tidak ditemukan untuk hari ini');
                 return;
             }
 

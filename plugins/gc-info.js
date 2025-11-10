@@ -38,9 +38,16 @@ export const handler = {
 
             // Group statistics
             const totalMembers = groupMetadata.participants.length
-            const admins = groupMetadata.participants.filter(p => p.admin).length
+            const adminParticipants = groupMetadata.participants.filter(p => p.admin)
+            const admins = adminParticipants.length
             const bannedMembers = (settings.bannedMembers || []).length
             const totalWarnings = Object.values(settings.warnedMembers || {}).reduce((sum, warnings) => sum + warnings.length, 0)
+
+            // Format admin list
+            const adminList = adminParticipants.map((admin, index) => {
+                const phone = admin.id.split('@')[0]
+                return `${index + 1}. @${phone}`
+            }).join('\n')
 
             const infoMsg = `📊 *Group Information*
 
@@ -50,6 +57,9 @@ export const handler = {
 👮 *Admins:* ${admins}
 🚫 *Banned Members:* ${bannedMembers}
 ⚠️ *Total Warnings:* ${totalWarnings}
+
+👮 *Admin List:*
+${adminList}
 
 📈 *Group Statistics:*
 • Messages: ${(settings.stats || {}).messages || 0}
@@ -83,7 +93,7 @@ ${memberInfo.warningHistory.map((w, i) =>
 • \`!ban @user\` - Ban a member
 • \`!groupset\` - Configure settings`
 
-            await m.reply(infoMsg)
+            await m.reply(infoMsg, { mentions: adminParticipants.map(a => a.id) })
 
         } catch (error) {
             console.error('Group info error:', error)

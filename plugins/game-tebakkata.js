@@ -124,7 +124,7 @@ export const handler = {
 
                     delete global.tebakkataGame[id];
                 }
-            }, 60000); // 60 seconds
+            }, 90000); // 90 seconds
 
         } catch (error) {
             console.error('Error in tebakkata game:', error);

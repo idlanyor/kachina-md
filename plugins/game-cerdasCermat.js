@@ -185,7 +185,7 @@ export async function startQuestion(sock, m, chatId) {
             game.currentQuestion++;
             setTimeout(() => startQuestion(sock, m, chatId), 2000);
         }
-    }, 30000); // 30 seconds
+    }, 90000); // 30 seconds
 }
 
 // Function untuk handle jawaban dengan cooldown protection

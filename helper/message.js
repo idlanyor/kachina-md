@@ -17,9 +17,9 @@ const thumbPath = resolve(import.meta.dirname, '../media/thumbnail.jpg')
 export function normalizeJid(key, isGroup = false) {
     if (key.addressingMode === "lid") {
         if (isGroup) {
-            return key.participantAlt || key.participant;
+            return key.participant || key.participantAlt;
         } else {
-            return key.remoteJidAlt || key.remoteJid;
+            return key.remoteJid || key.remoteJidAlt;
         }
     }
 

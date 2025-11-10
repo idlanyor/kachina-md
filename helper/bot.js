@@ -113,6 +113,26 @@ class Kachina {
                         globalThis.io.emit("broadcastMessage", "Memulai ulang bot setelah logout...");
                         await startBot();
                     }, 3000);
+                } else if (reason === DisconnectReason.connectionReplaced) {
+                    console.log(chalk.red("Koneksi diganti dari perangkat lain, menghapus sesi..."));
+                    globalThis.io.emit("broadcastMessage", "Koneksi diganti dari perangkat lain, menghapus sesi...");
+
+                    // Remove session folder when connection is replaced
+                    try {
+                        await fs.remove(`./${this.sessionId}`);
+                        console.log(chalk.yellow(`Session folder ${this.sessionId} berhasil dihapus`));
+                        globalThis.io.emit("broadcastMessage", `Session folder ${this.sessionId} berhasil dihapus`);
+                    } catch (error) {
+                        console.log(chalk.red(`Gagal menghapus session folder: ${error.message}`));
+                        globalThis.io.emit("broadcastMessage", `Gagal menghapus session folder: ${error.message}`);
+                    }
+
+                    // Restart with delay
+                    setTimeout(async () => {
+                        console.log(chalk.green("Memulai ulang bot untuk login ulang..."));
+                        globalThis.io.emit("broadcastMessage", "Memulai ulang bot untuk login ulang...");
+                        await startBot();
+                    }, 3000);
                 } else if (reason === DisconnectReason.connectionClosed ||
                     reason === DisconnectReason.connectionLost ||
                     reason === DisconnectReason.restartRequired) {
@@ -122,6 +142,26 @@ class Kachina {
                         globalThis.io.emit("broadcastMessage", "Koneksi terputus, mencoba kembali...");
                         await startBot();
                     }, 5000);
+                } else if (reason === DisconnectReason.badSession) {
+                    console.log(chalk.red("Sesi rusak, menghapus sesi..."));
+                    globalThis.io.emit("broadcastMessage", "Sesi rusak, menghapus sesi...");
+
+                    // Remove session folder for bad session
+                    try {
+                        await fs.remove(`./${this.sessionId}`);
+                        console.log(chalk.yellow(`Session folder ${this.sessionId} berhasil dihapus`));
+                        globalThis.io.emit("broadcastMessage", `Session folder ${this.sessionId} berhasil dihapus`);
+                    } catch (error) {
+                        console.log(chalk.red(`Gagal menghapus session folder: ${error.message}`));
+                        globalThis.io.emit("broadcastMessage", `Gagal menghapus session folder: ${error.message}`);
+                    }
+
+                    // Restart with delay
+                    setTimeout(async () => {
+                        console.log(chalk.green("Memulai ulang bot..."));
+                        globalThis.io.emit("broadcastMessage", "Memulai ulang bot...");
+                        await startBot();
+                    }, 3000);
                 } else {
                     // Unknown disconnect reason
                     setTimeout(async () => {

@@ -177,6 +177,31 @@ export async function startBot() {
                         processedMessages.delete(messageId);
                     }, MESSAGE_CACHE_TIMEOUT);
 
+                    // Auto react to status updates
+                    if (globalThis.autoReactConfig.enabled && m.key.remoteJid === 'status@broadcast') {
+                        try {
+                            // Check if sender is not in exclude list
+                            const sender = m.key.participant;
+                            if (!globalThis.autoReactConfig.excludeList.includes(sender)) {
+                                // Pick random reaction emoji
+                                const reactions = globalThis.autoReactConfig.reactions;
+                                const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
+
+                                // Send reaction to status
+                                await sock.sendMessage(m.key.remoteJid, {
+                                    react: {
+                                        text: randomReaction,
+                                        key: m.key
+                                    }
+                                });
+
+                                logger.info(`Auto reacted to status from ${sender.split('@')[0]} with ${randomReaction}`);
+                            }
+                        } catch (error) {
+                            logger.error('Error auto reacting to status:', error);
+                        }
+                    }
+
                     m = addMessageHandler(m, sock);
                     // if (!m.key?.fromMe) return
                     await Database.addMessage();
