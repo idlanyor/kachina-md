@@ -17,7 +17,7 @@ export const handler = {
             else if (args) {
                 let mention = args.match(/\d{5,}/)
                 if (mention) {
-                    userJid = mention[0] + '@s.whatsapp.net'
+                    userJid = mention[0] + '@lid'
                 }
             }
             if (!userJid) {
@@ -36,11 +36,11 @@ export const handler = {
                 await m.reply('❌ User sudah menjadi admin!')
                 return
             }
+            await m.reply(`Berhasil menjadikan @${userJid.split('@')[0]} sebagai Admin`, false, true,[userJid])
             await sock.groupParticipantsUpdate(id, [userJid], 'promote')
-            await m.reply(`✅ Berhasil menjadikan @${userJid.split('@')[0]} sebagai Admin`, false, true)
         } catch (error) {
             console.error('Error in promote:', error)
-            await m.reply('❌ Gagal menaikkan pangkat member')
+            await m.reply('❌ Gagal menaikkan pangkat member',error)
         }
     }
 }

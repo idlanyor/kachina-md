@@ -8,7 +8,7 @@ export class AudioEffectsHandler {
     static async applyFilter(sock, m, filterName, filterChain) {
         try {
             if (!m.quoted || !m.quoted.message?.audioMessage) {
-                await m.reply('❌ Reply audio/voice note yang ingin diberi efek!');
+                await m.reply('Reply audio/voice note yang ingin diberi efek!');
                 return true;
             }
 

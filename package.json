@@ -38,7 +38,6 @@
     "gradient-string": "^3.0.0",
     "groq-sdk": "^0.29.0",
     "horoscope": "^2.0.1",
-    "jimp": "^1.6.0",
     "lowdb": "^7.0.1",
     "moment": "^2.30.1",
     "ms": "^2.1.3",
