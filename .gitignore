@@ -14,3 +14,4 @@ global.js
 test-*
 CHANGELOG-*
 docs
+*-logs.txt
