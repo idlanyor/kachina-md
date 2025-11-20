@@ -61,7 +61,6 @@ export class MessageHandler {
 
             // Improved command parsing logic
             if (command.startsWith('.') || command.startsWith('!')) {
-                const prefix = command.charAt(0);
                 cmd = command.toLowerCase().substring(1).split(' ')[0];
                 args = command.split(' ').slice(1);
 

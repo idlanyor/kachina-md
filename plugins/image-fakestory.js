@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const handler = {
     command: ["fakestory", "fs"],
-    help: "Membuat gambar fake story Instagram. Gunakan .fakestory <caption> atau reply pesan dengan .fakestory",
+    help: "fake story Instagram.",
     category: 'image',
 
     async exec({ m, args, sock }) {

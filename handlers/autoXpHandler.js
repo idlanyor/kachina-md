@@ -3,14 +3,11 @@ import { logger } from '../helper/logger.js';
 
 export async function handleAutoXP(sock, m) {
     try {
-        // Skip jika m.sender tidak ada
         if (!m.sender) return;
 
-        // Skip jika pesan dari bot sendiri
         const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';
         if (m.sender === botId) return;
 
-        // Skip jika pesan adalah command
         const messageText = m.message?.conversation || 
                            m.message?.extendedTextMessage?.text || 
                            m.message?.imageMessage?.caption || 
@@ -18,35 +15,29 @@ export async function handleAutoXP(sock, m) {
         
         if (messageText.startsWith('.') || messageText.startsWith('!')) return;
 
-        // Berikan XP untuk aktivitas chat
         const user = await User.getById(m.sender);
         if (!user) {
-            // Auto register user jika belum terdaftar
             await User.register(m.sender, m.pushName || 'Unknown');
         }
 
-        // Tambah XP berdasarkan tipe pesan
-        let xpGain = 1; // Default XP untuk text
+        let xpGain = 1; 
         
         if (m.type === 'image' || m.type === 'video') {
-            xpGain = 3; // Lebih banyak XP untuk media
+            xpGain = 3; 
         } else if (m.type === 'audio') {
             xpGain = 2;
         }
 
-        // Bonus XP untuk grup aktif
         if (m.isGroup) {
             xpGain += 1;
         }
 
         const result = await User.addExperience(m.sender, xpGain);
         
-        // Jika level up, kirim notifikasi
         if (result.leveledUp) {
             const userInfo = await User.getById(m.sender);
             const rankInfo = await User.getUserRankInfo(m.sender);
             
-            // Buat level up image dengan API canvas
             const canvasParams = {
                 avatar: 'https://telegra.ph/file/a6f3ef42e42b098b2c9c4.jpg',
                 name: userInfo.name,
@@ -55,7 +46,6 @@ export async function handleAutoXP(sock, m) {
             };
 
             try {
-                // Ambil avatar user dari WhatsApp
                 const avatarUrl = await sock.profilePictureUrl(m.sender, 'image').catch(() => null);
                 if (avatarUrl) {
                     canvasParams.avatar = avatarUrl;

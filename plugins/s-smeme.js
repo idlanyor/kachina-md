@@ -9,7 +9,6 @@ export const handler = {
     help: 'Buat sticker meme dari gambar.',
     exec: async ({ sock, m, args }) => {
         try {
-            // Parse teks
             let text = Array.isArray(args) ? args.join(' ').trim() : (args || '').trim()
             if (!text) {
                 await m.reply('Masukkan teks: .smeme <bawah> atau .smeme <atas>.<bawah>')
@@ -26,7 +25,6 @@ export const handler = {
                 bottomText = text
             }
 
-            // Ambil media (gambar) dari reply atau pesan saat ini
             let buffer = null
             let fileName = 'image'
             let messageRef = m
@@ -53,12 +51,10 @@ export const handler = {
                 return
             }
 
-            // Deteksi tipe file untuk upload
             const type = await fileTypeFromBuffer(buffer)
             const ext = type?.ext || 'png'
             const mime = type?.mime || 'image/png'
 
-            // Upload menggunakan endpoint S3 (emulasi curl multipart/form-data)
             const form = new FormData()
             form.append('file', buffer, { filename: `${fileName}.${ext}`, contentType: mime })
             form.append('folder', 'documents/2024')
@@ -76,8 +72,7 @@ export const handler = {
 
             const imageUrl = uploadRes.data.data.fileUrl
 
-            // Panggil API meme generator
-            const apiUrl = `https://api.nekolabs.my.id/canvas/meme?imageUrl=${encodeURIComponent(imageUrl)}&textT=${encodeURIComponent(topText)}&textB=${encodeURIComponent(bottomText)}`
+            const apiUrl = `https://api.nekolabs.web.id/canvas/meme?imageUrl=${encodeURIComponent(imageUrl)}&textT=${encodeURIComponent(topText)}&textB=${encodeURIComponent(bottomText)}`
             const { data } = await axios.get(apiUrl, {
                 responseType: 'arraybuffer',
                 headers: {
@@ -87,7 +82,6 @@ export const handler = {
                 timeout: 120000
             })
 
-            // Buat sticker dari hasil gambar meme
             const sticker = new Sticker(Buffer.from(data), {
                 pack: 'Meme',
                 author: 'KachinaBot',

@@ -1,10 +1,11 @@
 import { cacheGroupMetadata } from '../helper/caching.js';
+import { normalizeJid } from '../helper/message.js';
 
 export const handler = {
     command: ['getpp','getppgc'],
     category:'tools',
     help: 'Mendapatkan foto profil',
-    
+
     async exec({ m, args, sock }) {
         try {
             // Cek apakah command getppgc digunakan di grup
@@ -20,7 +21,8 @@ export const handler = {
             let who;
             if (m.command === 'getpp') {
                 if (m.quoted) {
-                    who = m.quoted.sender;
+                    // Use normalizeJid to properly handle @lid addressing mode
+                    who = normalizeJid(m.quoted.key, true);
                 } else if (args[0]) {
                     who = args[0].replace(/[^0-9]/g, '') + '@s.whatsapp.net';
                 } else {

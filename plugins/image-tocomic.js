@@ -5,7 +5,7 @@ import { fileTypeFromBuffer } from 'file-type'
 export const handler = {
     command: ['tocomic'],
     category: 'image',
-    help: 'Ubah gambar menjadi gaya komik.\n\nCara pakai:\n- Reply gambar dengan .tocomic\n- Atau .tocomic <image_url>',
+    help: 'Ubah gambar menjadi gaya komik.',
     exec: async ({ sock, m, args }) => {
         try {
             await sock.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
@@ -48,7 +48,7 @@ export const handler = {
                 try {
                     const meta = refMsg[refType]
                     base = meta?.fileName?.split('.')?.[0] || meta?.mimetype?.split('/')?.[0] || base
-                } catch {}
+                } catch { }
 
                 const form = new FormData()
                 form.append('file', buffer, { filename: `${base}.${ext}`, contentType: mime })
@@ -67,7 +67,7 @@ export const handler = {
             }
 
             // Panggil Nekolabs tocomic API
-            const apiUrl = `https://api.nekolabs.my.id/tools/convert/tocomic?imageUrl=${encodeURIComponent(imageUrl)}`
+            const apiUrl = `https://api.nekolabs.web.id/tools/convert/tocomic?imageUrl=${encodeURIComponent(imageUrl)}`
             const { data: apiData } = await axios.get(apiUrl, { timeout: 120000 })
 
             if (!apiData?.success || !apiData?.result) {

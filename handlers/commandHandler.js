@@ -11,34 +11,6 @@ const execAsync = promisify(exec);
 export class CommandHandler {
     static async handleBuiltinCommands(sock, m, cmd, args) {
         switch (cmd) {
-            case 'menu2':
-            case 'help2':
-            case 'h2':
-                return await this.handleMenu(sock, m);
-            
-            case '#':
-                return await this.handleExec(sock, m, args);
-            
-            case 'bass':
-                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae bass (reply audio)');
-                return true;
-            
-            case 'nightcore':
-                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae nightcore (reply audio)');
-                return true;
-            
-            case 'slow':
-                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae slow (reply audio)');
-                return true;
-            
-            case 'robot':
-                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae robot (reply audio)');
-                return true;
-            
-            case 'reverse':
-                await m.reply('⚠️ Perintah ini sudah deprecated. Gunakan: .ae reverse (reply audio)');
-                return true;
-            
             case 'ae': {
                 const sub = (args[0] || '').toLowerCase();
                 const help = '📋 Penggunaan: .ae <efek> (reply audio)\n\nEfek tersedia:\n- bass (bassboost)\n- 8d\n- vaporwave\n- nightcore\n- phaser\n- tremolo\n- vibrato\n- surround\n- pulsator\n- subboost\n- reverse\n- remove (hapus efek: normalize)';

@@ -5,6 +5,12 @@ export const getMedia = async (msg) => {
 
 
         // Penanganan media normal
+        // Unwrap ViewOnce messages
+        const viewOnce = msg.message?.viewOnceMessage?.message || msg.message?.viewOnceMessageV2?.message;
+        if (viewOnce) {
+            msg.message = viewOnce;
+        }
+
         const mediaTypes = ['imageMessage', 'videoMessage', 'audioMessage', 'stickerMessage', 'documentMessage'];
         let mediaMessage = null;
         let mediaType = null;
@@ -27,7 +33,7 @@ export const getMedia = async (msg) => {
 
         const stream = await downloadContentFromMessage(mediaMessage, mediaType.replace('Message', ''));
         if (!stream) return null;
-        
+
         let buffer = Buffer.from([]);
         for await (const chunk of stream) {
             buffer = Buffer.concat([buffer, chunk]);

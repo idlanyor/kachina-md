@@ -27,37 +27,39 @@ export const handler = {
                 global.family100Game = {};
             }
 
-            // Fetch family100 data from new API
+            // Fetch family100 data from GitHub database
             let family100Data;
             let retryCount = 0;
             const maxRetries = 3;
-            
+
             while (retryCount < maxRetries) {
                 try {
-                    const { data } = await axios.get('https://api.siputzx.my.id/api/games/family100', {
+                    const { data } = await axios.get('https://raw.githubusercontent.com/idlanyor/family100-database/refs/heads/main/family100.json', {
                         headers: {
-                            'accept': '*/*',
+                            'accept': 'application/json',
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
                         },
                         timeout: 10000 // 10 second timeout
                     });
-                    
-                    // Check if API response is successful
-                    if (data.status && data.data) {
-                        family100Data = data.data;
+
+                    // Check if response is an array with data
+                    if (Array.isArray(data) && data.length > 0) {
+                        // Randomly select one question from the array
+                        const randomIndex = Math.floor(Math.random() * data.length);
+                        family100Data = data[randomIndex];
                         break; // Success, exit retry loop
                     } else {
-                        throw new Error('API response status is false or data is missing');
+                        throw new Error('Invalid data format or empty array');
                     }
                 } catch (error) {
                     retryCount++;
                     console.log(`Attempt ${retryCount} failed:`, error.message);
-                    
+
                     if (retryCount >= maxRetries) {
                         console.log('All retry attempts failed:', error);
                         return await m.reply('❌ Gagal mengambil data game setelah beberapa percobaan. Jaringan tidak stabil atau server sedang bermasalah. Coba lagi nanti!');
                     }
-                    
+
                     // Wait before retrying
                     await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
                 }

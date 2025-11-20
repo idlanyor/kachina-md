@@ -36,14 +36,14 @@ export const handler = {
             try {
                 const meta = refMsg[refType]
                 base = meta?.fileName?.split('.')?.[0] || meta?.mimetype?.split('/')?.[0] || base
-            } catch {}
+            } catch { }
 
             // Siapkan form-data sesuai spesifikasi uploader
             const form = new FormData()
             form.append('file', buffer, { filename: `${base}.${ext}`, contentType: mime })
             form.append('folder', 'documents/2024')
 
-            const uploadRes = await axios.post('https://s3.kanata.web.id/upload', form, {
+            const uploadRes = await axios.post('https://s3.antidonasi.web.id/upload', form, {
                 headers: { ...form.getHeaders() },
                 timeout: 120000
             })

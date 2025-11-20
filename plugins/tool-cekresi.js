@@ -81,7 +81,7 @@ export const handler = {
 
       await sock.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-      const url = `https://api.nekolabs.my.id/tools/cekresi?receipt_num=${encodeURIComponent(resi)}&expedition=${encodeURIComponent(expedition)}`
+      const url = `https://api.nekolabs.web.id/tools/cekresi?receipt_num=${encodeURIComponent(resi)}&expedition=${encodeURIComponent(expedition)}`
       const { data } = await axios.get(url, { timeout: 120000 })
 
       if (!data?.success || !data?.result) {

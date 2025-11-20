@@ -48,13 +48,13 @@ export const handler = {
                 try {
                     const meta = refMsg[refType]
                     base = meta?.fileName?.split('.')?.[0] || meta?.mimetype?.split('/')?.[0] || base
-                } catch {}
+                } catch { }
 
                 const form = new FormData()
                 form.append('file', buffer, { filename: `${base}.${ext}`, contentType: mime })
                 form.append('folder', 'kachina')
 
-                const uploadRes = await axios.post('https://s3.kanata.web.id/upload', form, {
+                const uploadRes = await axios.post('https://s3.antidonasi.web.id/upload', form, {
                     headers: { ...form.getHeaders() },
                     timeout: 120000
                 })
@@ -66,15 +66,13 @@ export const handler = {
                 imageUrl = uploadRes.data.data.fileUrl
             }
 
-            // Panggil Nekolabs tofigure API
-            const apiUrl = `https://api.nekolabs.my.id/tools/convert/tofigure?imageUrl=${encodeURIComponent(imageUrl)}`
+            const apiUrl = `https://api.nekolabs.web.id/tools/convert/tofigure?imageUrl=${encodeURIComponent(imageUrl)}`
             const { data: apiData } = await axios.get(apiUrl, { timeout: 120000 })
 
             if (!apiData?.success || !apiData?.result) {
                 throw new Error('API gagal atau hasil tidak tersedia')
             }
 
-            // Ambil hasil gambar dan kirim ke chat
             const resultUrl = apiData.result
             const { data: imgData } = await axios.get(resultUrl, {
                 responseType: 'arraybuffer',

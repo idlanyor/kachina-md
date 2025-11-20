@@ -8,19 +8,16 @@ import autoNotification from './helper/scheduler.js';
 import qrcode from 'qrcode-terminal'
 import { initFunction } from 'buttons-warpper';
 
-// Global state to prevent multiple simultaneous restarts
 let isRestarting = false;
 let restartTimeout = null;
 
-// Singleton instance management
 let botInstance = null;
 let isInstanceRunning = false;
 
-// Group metadata cache - TTL 5 menit untuk menghindari data stale
 const groupMetadataCache = new NodeCache({
-    stdTTL: 300, // 5 menit
-    checkperiod: 60, // Check expired keys setiap 60 detik
-    useClones: false // Untuk performa yang lebih baik
+    stdTTL: 300,
+    checkperiod: 60,
+    useClones: false
 });
 
 class Kachina {
@@ -28,7 +25,7 @@ class Kachina {
         this.phoneNumber = data.phoneNumber;
         this.sessionId = data.sessionId;
         this.useStore = data.useStore;
-        this.loginMethod = data.loginMethod || 'qr'; // Default ke QR jika tidak ditentukan
+        this.loginMethod = data.loginMethod || 'qr';
         this.sock = null;
         this.isConnecting = false;
     }
@@ -67,7 +64,7 @@ class Kachina {
 
             const getMessageFromStore = async (key) => {
                 const maxRetries = 3;
-                const baseDelay = 2000; // 2 detik
+                const baseDelay = 2000;
 
                 for (let attempt = 0; attempt < maxRetries; attempt++) {
                     try {
@@ -78,12 +75,11 @@ class Kachina {
                         return undefined;
                     } catch (error) {
                         if (error.message === 'rate-overlimit' && attempt < maxRetries - 1) {
-                            // Exponential backoff
                             const delay = baseDelay * Math.pow(2, attempt);
                             await new Promise(resolve => setTimeout(resolve, delay));
                             continue;
                         }
-                        throw error; // Re-throw jika bukan rate-limit atau sudah max retries
+                        throw error;
                     }
                 }
                 return undefined;
@@ -93,7 +89,6 @@ class Kachina {
             let { state, saveCreds } = await this.validateAndRecoverSession();
             let { version } = await fetchLatestBaileysVersion();
 
-            // Konfigurasi socket berdasarkan metode login
             const socketConfig = {
                 version,
                 logger: P,
@@ -132,22 +127,19 @@ class Kachina {
                 },
                 getMessage: async (key) => await getMessageFromStore(key)
             };
-            // Set printQRInTerminal berdasarkan metode login
             if (this.loginMethod === 'qr') {
-                socketConfig.printQRInTerminal = false; // Kita akan handle QR secara manual
+                socketConfig.printQRInTerminal = false;
             } else {
-                socketConfig.printQRInTerminal = false; // Selalu false untuk pairing
+                socketConfig.printQRInTerminal = false;
             }
 
             this.sock = makeWASocket(socketConfig);
             await initFunction(this.sock)
-            // Mark this socket as the main/parent bot
             this.sock.isParentBot = true;
             this.sock.isChildBot = false;
             store?.bind(this.sock.ev);
             this.sock.ev.on("creds.update", saveCreds);
 
-            // Event handler untuk QR code
             if (this.loginMethod === 'qr') {
                 this.sock.ev.on('connection.update', (update) => {
                     const { qr } = update;
@@ -161,7 +153,6 @@ class Kachina {
                 });
             }
 
-            // Logic pairing code hanya untuk metode pairing
             if (this.loginMethod === 'pairing' && !this.sock.authState.creds.registered) {
                 logger.info("🔐 Memulai proses pairing code...");
                 const number = this.phoneNumber;
@@ -201,7 +192,6 @@ class Kachina {
                 }
             }
 
-            // Connection update handler
             this.sock.ev.on("connection.update", async (update) => {
                 const { connection, lastDisconnect } = update;
 
@@ -211,23 +201,19 @@ class Kachina {
                     logger.connection.connected("Soket terhubung");
                     this.isConnecting = false;
 
-                    // Clear any pending restart
                     if (restartTimeout) {
                         clearTimeout(restartTimeout);
                         restartTimeout = null;
                     }
                     isRestarting = false;
 
-                    // Initialize scheduler when connection is established
                     autoNotification.init(this.sock);
                 } else if (connection === "close") {
-                    // Stop scheduler when connection is lost
                     autoNotification.stop();
                     this.isConnecting = false;
                     logger.connection.disconnected("Koneksi terputus, mencoba kembali...");
                     const reason = lastDisconnect?.error?.output?.statusCode;
 
-                    // Prevent multiple simultaneous restart attempts
                     if (isRestarting) {
                         logger.warning("Restart already in progress, ignoring...");
                         return;
@@ -277,14 +263,11 @@ class Kachina {
         }
     }
 
-    // Clean up resources before restart
     async cleanup() {
         try {
             if (this.sock) {
-                // Remove all event listeners to prevent memory leaks
                 this.sock.ev.removeAllListeners();
 
-                // Close connection if still open
                 if (this.sock.ws && this.sock.ws.readyState === 1) {
                     this.sock.ws.close();
                 }
@@ -292,7 +275,6 @@ class Kachina {
                 this.sock = null;
             }
 
-            // Reset singleton state
             if (botInstance === this) {
                 botInstance = null;
                 isInstanceRunning = false;
@@ -302,12 +284,9 @@ class Kachina {
         }
     }
 
-    // Validate session and recover if corrupted
     async validateAndRecoverSession() {
         try {
             const { state, saveCreds } = await useMultiFileAuthState(this.sessionId);
-
-            // Basic validation of session state
             if (!state || !state.creds || !saveCreds) {
                 throw new Error('Invalid session state structure');
             }
@@ -315,17 +294,12 @@ class Kachina {
             return { state, saveCreds };
         } catch (error) {
             logger.warning(`Session validation failed: ${error.message}`);
-
-            // Attempt to backup and recreate session
             await this.backupCorruptedSession();
-
-            // Create fresh session
             const { state, saveCreds } = await useMultiFileAuthState(this.sessionId);
             return { state, saveCreds };
         }
     }
 
-    // Handle session corruption by backing up and cleaning
     async handleSessionCorruption() {
         try {
             await this.backupCorruptedSession();
@@ -336,7 +310,6 @@ class Kachina {
         }
     }
 
-    // Backup corrupted session for debugging
     async backupCorruptedSession() {
         try {
             const backupPath = `${this.sessionId}_corrupted_${Date.now()}`;
@@ -347,7 +320,6 @@ class Kachina {
             }
         } catch (error) {
             logger.error('Failed to backup corrupted session:', error);
-            // Continue anyway, just remove the corrupted session
             try {
                 await fs.remove(this.sessionId);
                 logger.info('Corrupted session removed');
@@ -357,7 +329,6 @@ class Kachina {
         }
     }
 
-    // Debounced restart with exponential backoff
     scheduleRestart(delay = 5000) {
         if (isRestarting) {
             logger.warning("Restart already scheduled, ignoring...");
@@ -366,7 +337,6 @@ class Kachina {
 
         isRestarting = true;
 
-        // Clear any existing timeout
         if (restartTimeout) {
             clearTimeout(restartTimeout);
         }
@@ -379,8 +349,7 @@ class Kachina {
                 await startBot();
             } catch (error) {
                 logger.error("Error during scheduled restart:", error);
-                // Exponential backoff - double the delay for next attempt
-                this.scheduleRestart(Math.min(delay * 2, 60000)); // Max 1 minute
+                this.scheduleRestart(Math.min(delay * 2, 60000));
             } finally {
                 isRestarting = false;
                 restartTimeout = null;
@@ -393,7 +362,6 @@ async function clearMessages(m) {
     try {
         if (m === "undefined") return;
         let data;
-        // Use normalized m.chat and m.sender (already handles @lid format)
         if (m.message?.conversation) {
             const text = m.message?.conversation.trim();
             if (m.chat.endsWith("g.us")) {

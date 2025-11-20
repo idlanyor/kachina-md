@@ -6,9 +6,9 @@
   "type": "module",
   "private": "true",
   "scripts": {
-    "start": "bun run main.js",
+    "start": "node main.js",
     "dev": "nodemon --max-old-space-size=4096 main.js",
-    "pm2": "pm2 start 'bun run main.js'"
+    "pm2": "pm2 start 'node main.js' --name kachina"
   },
   "keywords": [],
   "author": "Roynaldi",

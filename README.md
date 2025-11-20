@@ -75,7 +75,7 @@ bun .
 - [Ryzumi](https://api.ryzumi.vip)
 - [FastURL](https://api.fasturl.link)
 - [SiputZX](https://api.siputzx.my.id)
-- [NekoLabs](https://api.nekolabs.my.id)
+- [NekoLabs](https://api.nekolabs.web.id)
 - [Gemini](https://aistudio.google.com)
 
 ## Lisensi

@@ -78,6 +78,83 @@ export const handleSinonimAnswer = async (sock, m) => {
     }
 };
 
+export const handleAntonimAnswer = async (sock, m) => {
+    try {
+        if (!global.antonimGame || !global.antonimGame[m.chat]) {
+            return false;
+        }
+
+        let room = global.antonimGame[m.chat];
+
+        let text = '';
+        if (m.message?.conversation) {
+            text = m.message.conversation;
+        } else if (m.message?.extendedTextMessage?.text) {
+            text = m.message.extendedTextMessage.text;
+        }
+
+        text = text?.toUpperCase().trim();
+
+        if (!text) return false;
+
+        let isCorrect = false;
+        let answerIndex = -1;
+
+        for (let i = 0; i < room.antonim.length; i++) {
+            if (room.antonim[i].toUpperCase() === text && !room.terjawab[i]) {
+                isCorrect = true;
+                answerIndex = i;
+                break;
+            }
+        }
+
+        if (isCorrect) {
+            room.terjawab[answerIndex] = m.sender;
+
+            let timeBonus = Math.max(0, 60 - Math.floor((Date.now() - room.startTime) / 1000));
+            let points = Math.floor(room.winScore / room.antonim.length) + (timeBonus * 10);
+
+
+            let correctMsg = `🎉 *JAWABAN BENAR!*\n\n`;
+            correctMsg += `✅ *${room.antonim[answerIndex]}* adalah antonim dari *${room.kata}*\n`;
+            correctMsg += `💰 +${points.toLocaleString('id-ID')} money\n`;
+            correctMsg += `⚡ Bonus waktu: +${timeBonus * 10} poin\n\n`;
+
+            let allAnswered = room.terjawab.every(v => v !== false);
+            if (allAnswered) {
+                let winners = [...new Set(room.terjawab)];
+                correctMsg += `🏆 *GAME SELESAI!*\n`;
+                correctMsg += `🎊 Semua antonim berhasil ditebak!\n`;
+                correctMsg += `🏅 Pemenang: ${winners.map(w => `@${w.split('@')[0]}`).join(', ')}`;
+
+                delete global.antonimGame[m.chat];
+            } else {
+                let remaining = room.antonim.filter((_, i) => !room.terjawab[i]);
+                correctMsg += `📝 Sisa ${remaining.length} antonim lagi`;
+            }
+
+            try {
+                await User.addBalance(m.sender, points, 'Antonim game win');
+            } catch (error) {
+                console.error('Error adding balance:', error);
+            }
+
+            await sock.sendMessage(m.chat, {
+                text: correctMsg,
+                mentions: allAnswered ? [...new Set(room.terjawab)] : [m.sender]
+            }, { quoted: m });
+
+            return true;
+        }
+
+        return false;
+
+    } catch (error) {
+        console.error('Error handling antonim answer:', error);
+        return false;
+    }
+};
+
 export const handleCaklontongAnswer = async (sock, m) => {
     try {
         if (!global.caklontongGame || !global.caklontongGame[m.chat]) {
@@ -895,6 +972,7 @@ export const handleTebakkimiaAnswer = async (sock, m) => {
 export const handleGameAnswers = async (sock, m) => {
     const handlers = [
         handleSinonimAnswer,
+        handleAntonimAnswer,
         handleCaklontongAnswer,
         handleFamily100Answer,
         handleCerdasCermatAnswer,

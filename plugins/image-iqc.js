@@ -3,7 +3,7 @@ import axios from 'axios';
 export const handler = {
     command: ['iqc'],
     category: 'image',
-    help: 'Membuat gambar quote dengan teks yang diberikan. Gunakan .iqc <teks>',
+    help: 'Membuat gambar quote dengan teks',
     exec: async ({ m, args, sock }) => {
         try {
             // Validasi input
