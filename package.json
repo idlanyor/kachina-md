@@ -24,7 +24,7 @@
     "adm-zip": "^0.5.16",
     "axios": "^1.13.2",
     "baileys": "npm:@whiskeysockets/baileys@6.7.21",
-    "baileys-shard": "^0.0.6",
+    "baileys-shard": "^0.0.7",
     "buttons-warpper": "^1.2.0",
     "canvafy": "^7.2.1",
     "chalk": "^5.6.2",
