@@ -17,7 +17,7 @@ async function pinlens(buffer) {
             ...form.getHeaders(),
             'accept-encoding': 'gzip',
             'accept-language': 'id-ID',
-            authorization: `Bearer ${globalThis.pinAuth}`,
+            'authorization': `Bearer ${globalThis.pinAuth}`,
             'user-agent': 'Pinterest for Android/12.46.2 (Redmi Note 4; 10)',
             'x-node-id': 'true',
             'x-pinterest-app-type-detailed': '3',
