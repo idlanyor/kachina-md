@@ -1,4 +1,3 @@
-import { Catbox } from 'node-catbox'
 import FormData from 'form-data'
 import axios from 'axios'
 import fs from 'fs'
@@ -9,7 +8,6 @@ export const handler = {
    category:'tools',
     help: 'Upload file ke catbox.moe',
     exec: async ({ sock, m }) => {
-        const catbox = new Catbox();
 
         try {
             let buffer

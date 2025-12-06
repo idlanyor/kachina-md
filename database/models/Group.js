@@ -209,6 +209,19 @@ class Group {
 
     static async banMember(groupId, memberId, reason = '') {
         const settings = await this.getSettings(groupId)
+        
+        // Initialize bannedMembers if it doesn't exist
+        if (!settings.bannedMembers) {
+            settings.bannedMembers = []
+        }
+        
+        // Initialize stats if it doesn't exist
+        if (!settings.stats) {
+            settings.stats = { bans: 0 }
+        } else if (settings.stats.bans === undefined) {
+            settings.stats.bans = 0
+        }
+        
         const bannedMember = {
             id: memberId,
             bannedAt: new Date().toISOString(),
@@ -227,6 +240,12 @@ class Group {
 
     static async unbanMember(groupId, memberId) {
         const settings = await this.getSettings(groupId)
+        
+        // Initialize bannedMembers if it doesn't exist
+        if (!settings.bannedMembers) {
+            settings.bannedMembers = []
+        }
+        
         settings.bannedMembers = settings.bannedMembers.filter(m => m.id !== memberId)
         await this.updateSetting(groupId, 'bannedMembers', settings.bannedMembers)
         return settings
@@ -234,6 +253,19 @@ class Group {
 
     static async warnMember(groupId, memberId, reason = '') {
         const settings = await this.getSettings(groupId)
+        
+        // Initialize warnedMembers if it doesn't exist
+        if (!settings.warnedMembers) {
+            settings.warnedMembers = {}
+        }
+        
+        // Initialize stats if it doesn't exist
+        if (!settings.stats) {
+            settings.stats = { warnings: 0 }
+        } else if (settings.stats.warnings === undefined) {
+            settings.stats.warnings = 0
+        }
+        
         const warning = {
             id: memberId,
             warnedAt: new Date().toISOString(),
@@ -256,11 +288,17 @@ class Group {
 
     static async getMemberWarnings(groupId, memberId) {
         const settings = await this.getSettings(groupId)
-        return settings.warnedMembers[memberId] || []
+        return (settings.warnedMembers || {})[memberId] || []
     }
 
     static async clearMemberWarnings(groupId, memberId) {
         const settings = await this.getSettings(groupId)
+        
+        // Initialize warnedMembers if it doesn't exist
+        if (!settings.warnedMembers) {
+            settings.warnedMembers = {}
+        }
+        
         delete settings.warnedMembers[memberId]
         await this.updateSetting(groupId, 'warnedMembers', settings.warnedMembers)
         return settings
@@ -326,7 +364,7 @@ class Group {
     // Utility methods
     static async isMemberBanned(groupId, memberId) {
         const settings = await this.getSettings(groupId)
-        return settings.bannedMembers.some(m => m.id === memberId)
+        return (settings.bannedMembers || []).some(m => m.id === memberId)
     }
 
     static async getMemberWarningsCount(groupId, memberId) {

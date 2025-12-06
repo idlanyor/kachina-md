@@ -135,6 +135,7 @@ class Kachina {
 
             this.sock = makeWASocket(socketConfig);
             await initFunction(this.sock)
+            
             this.sock.isParentBot = true;
             this.sock.isChildBot = false;
             store?.bind(this.sock.ev);

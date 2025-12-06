@@ -21,7 +21,8 @@ export async function groupModerationMiddleware(sock, m, next) {
 
         // Check if member is banned
         if (await Group.isMemberBanned(groupId, m.sender)) {
-            await m.reply('🚫 *Access Denied*\nYou are banned from this group.')
+            // Don't delete the message, just notify they're banned
+            // The member should already be removed from the group when banned
             return
         }
 

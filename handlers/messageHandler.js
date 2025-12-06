@@ -5,11 +5,18 @@ import { CommandHandler } from './commandHandler.js';
 import Database from '../helper/database.js';
 import { logger } from '../helper/logger.js';
 import User from '../database/models/User.js';
+import { improvedGroupModerationMiddleware, handleGroupEvents, handleGroupLogging } from '../helper/improvedGroupMiddleware.js';
 
 export class MessageHandler {
     static async processMessage({ command, sock, m, id, sender, noTel, attf, mime }) {
         try {
             if (!command) return;
+
+            // --- IMPROVED GROUP MODERATION MIDDLEWARE ---
+            // This handles all group moderation features including anti-spam, anti-link, anti-toxic, etc.
+            await new Promise(resolve => {
+                improvedGroupModerationMiddleware(sock, m, resolve);
+            });
 
             // --- HANDLER GAME ANSWERS ---
             const gameHandled = await handleGameAnswers(sock, m);
@@ -25,6 +32,9 @@ export class MessageHandler {
                 return;
             }
 
+            // Note: Anti-link and anti-toxic are now handled in the improved middleware above
+            // Keeping the old handlers as fallback for now
+            /*
             // --- FITUR ANTILINK GRUP ---
             const antiLinkHandled = await GroupHandler.handleAntiLink(sock, m, command);
             if (antiLinkHandled) return;
@@ -32,6 +42,7 @@ export class MessageHandler {
             // --- FITUR ANTITOXIC GRUP ---
             const antiToxicHandled = await GroupHandler.handleAntiToxic(sock, m, command);
             if (antiToxicHandled) return;
+            */
 
             // Cek mode bot
             const settings = await Database.getSettings();

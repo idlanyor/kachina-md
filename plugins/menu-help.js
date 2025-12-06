@@ -109,7 +109,8 @@ export const handler = {
                         
                         for (const plugin of plugins) {
                             for (const cmd of plugin.commands) {
-                                categoryMenu += `┃ ☰ _*${prefix}${cmd} - ${plugin.help.trim()}*_\n`
+                                const helpText = typeof plugin.help === 'string' ? plugin.help.split('\n')[0].trim() : 'Tidak ada deskripsi'
+                            categoryMenu += `┃ ☰ _*${prefix}${cmd} - ${helpText}*_\n`
                             }
                         }
                         

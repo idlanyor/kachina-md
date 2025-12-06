@@ -16,6 +16,7 @@ import autoNotification from './helper/scheduler.js';
 import groupScheduler from './services/groupScheduler.js';
 import { MessageHandler } from './handlers/messageHandler.js';
 import { GroupHandler } from './handlers/groupHandler.js';
+import { handleGroupEvents } from './helper/improvedGroupMiddleware.js';
 import jadiBotManager from './lib/jadibot.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -208,7 +209,12 @@ export async function startBot() {
                         const buffer = m.message[messageType] ||
                             m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.[messageType];
 
+                        console.log('[DEBUG] main.js: Processing media type:', messageType);
+                        console.log('[DEBUG] main.js: buffer exists:', !!buffer);
+                        console.log('[DEBUG] main.js: buffer keys:', buffer ? Object.keys(buffer) : 'N/A');
+
                         if (buffer) {
+                            console.log('[DEBUG] main.js: Calling getMedia with message object:', { message: { [messageType]: buffer } });
                             const mediaBuffer = await getMedia({ message: { [messageType]: buffer } });
                             const caption = buffer.caption || m.message?.extendedTextMessage?.text;
                             const mime = buffer.mime || m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.[messageType]?.mime;
@@ -253,7 +259,11 @@ export async function startBot() {
 
             // Event handler untuk welcome dan leave message
             sock.ev.on('group-participants.update', async (update) => {
-                await GroupHandler.handleGroupParticipantsUpdate(sock, update);
+                // Use improved group event handler
+                await handleGroupEvents(sock, update);
+                
+                // Keep old handler as fallback for now
+                // await GroupHandler.handleGroupParticipantsUpdate(sock, update);
             });
 
         }).catch(error => {
