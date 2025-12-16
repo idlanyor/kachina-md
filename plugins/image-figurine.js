@@ -40,7 +40,7 @@ export const handler = {
                     return
                 }
 
-                // Upload ke S3 Kanata untuk mendapatkan URL
+                // Upload ke ryzencdn untuk mendapatkan URL
                 const type = await fileTypeFromBuffer(buffer)
                 const ext = type?.ext || 'png'
                 const mime = type?.mime || 'image/png'
@@ -52,33 +52,28 @@ export const handler = {
 
                 const form = new FormData()
                 form.append('file', buffer, { filename: `${base}.${ext}`, contentType: mime })
-                form.append('folder', 'kachina')
 
-                const uploadRes = await axios.post('https://s3.antidonasi.web.id/upload', form, {
-                    headers: { ...form.getHeaders() },
+                const uploadRes = await axios.post('https://api.ryzumi.vip/api/uploader/ryzencdn', form, {
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'multipart/form-data',
+                        ...form.getHeaders()
+                    },
                     timeout: 120000
                 })
 
-                if (!uploadRes?.data?.success || !uploadRes?.data?.data?.fileUrl) {
+                if (!uploadRes?.data?.success || !uploadRes?.data?.url) {
                     throw new Error('Upload gagal atau respons tidak valid')
                 }
 
-                imageUrl = uploadRes.data.data.fileUrl
+                imageUrl = uploadRes.data.url
             }
 
-            const apiUrl = `https://api.nekolabs.web.id/tools/convert/tofigure?imageUrl=${encodeURIComponent(imageUrl)}`
-            const { data: apiData } = await axios.get(apiUrl, { timeout: 120000 })
-
-            if (!apiData?.success || !apiData?.result) {
-                throw new Error('API gagal atau hasil tidak tersedia')
-            }
-
-            const resultUrl = apiData.result
-            const { data: imgData } = await axios.get(resultUrl, {
+            const apiUrl = `https://api.ryzumi.vip/api/ai/tofigure?imageUrl=${encodeURIComponent(imageUrl)}`
+            const { data: imgData } = await axios.get(apiUrl, {
                 responseType: 'arraybuffer',
                 headers: {
-                    'accept': 'image/png,image/jpeg',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    'accept': 'image/png'
                 },
                 timeout: 120000
             })

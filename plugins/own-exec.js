@@ -66,11 +66,6 @@ export const handler = {
 
             if (!result) result = '✅ Command executed successfully (no output)';
 
-            // Limit output length
-            if (result.length > 4000) {
-                result = result.substring(0, 4000) + '\n\n... (output dipotong karena terlalu panjang)';
-            }
-
             await m.reply(result);
             
             // Success reaction

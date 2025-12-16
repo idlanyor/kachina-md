@@ -11,12 +11,10 @@ export const handler = {
             let buffer;
             let prompt = args || 'buatkan design isometric untuk gambar ini, bernuansa warna instagram';
 
-            // Tambahkan reaksi proses
             await sock.sendMessage(m.chat, {
                 react: { text: '⏳', key: m.key }
             });
 
-            // Handle image dari quoted message atau message langsung
             if (m.quoted && m.quoted.message?.imageMessage) {
                 buffer = await m.quoted.download();
             } else if (m.message && m.message.imageMessage) {
@@ -30,16 +28,11 @@ export const handler = {
                 throw new Error('No image detected!');
             }
 
-            // Validate file type
             const fileType = await fileTypeFromBuffer(buffer);
             if (!fileType || !fileType.mime.startsWith('image/')) {
                 throw new Error('File harus berupa gambar!');
             }
 
-            // Kirim pesan proses
-            await m.reply('🔄 Sedang mengedit gambar dengan AI, harap tunggu...\n_Proses ini mungkin memakan waktu beberapa menit_');
-
-            // Buat FormData untuk request ke API
             const formData = new FormData();
             formData.append('image', buffer, {
                 filename: `image.${fileType.ext}`,
@@ -47,21 +40,18 @@ export const handler = {
             });
             formData.append('prompt', prompt);
 
-            // Kirim request ke API edit image
             const response = await axios.post('https://aduhai.kanata.web.id/api/ai/edit-image', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     ...formData.getHeaders()
                 },
-                timeout: 180000 // 3 menit timeout
+                timeout: 180000 
             });
 
-            // Validasi response
             if (!response.data || response.data.status !== 'success') {
                 throw new Error('Server tidak mengembalikan hasil yang valid');
             }
 
-            // Download gambar hasil edit
             const editedImage = response.data.editedImages[0];
             if (!editedImage || !editedImage.filePath) {
                 throw new Error('Tidak ada gambar hasil edit yang diterima');
@@ -72,9 +62,7 @@ export const handler = {
                 timeout: 60000
             });
 
-            // Check if response is image data
             if (imageResponse.data && imageResponse.data.byteLength > 0) {
-                // Send processed image
                 await sock.sendMessage(m.chat, {
                     image: Buffer.from(imageResponse.data),
                     caption: `✅ *GAMBAR BERHASIL DIEDIT!*\n\n📝 *Prompt:* ${prompt}\n🤖 *Provider:* ${response.data.provider}\n📊 *Ukuran File:* ${(editedImage.size / 1024 / 1024).toFixed(2)} MB\n⏰ *Processed:* ${new Date().toLocaleString('id-ID')}\n\n${response.data.text || ''}`,
@@ -90,7 +78,6 @@ export const handler = {
                     }
                 });
 
-                // Tambahkan reaksi sukses
                 await sock.sendMessage(m.chat, {
                     react: { text: '✅', key: m.key }
                 });
@@ -101,7 +88,6 @@ export const handler = {
         } catch (error) {
             console.error('Error in editimg command:', error);
 
-            // Tambahkan reaksi error
             await sock.sendMessage(m.chat, {
                 react: { text: '❌', key: m.key }
             });

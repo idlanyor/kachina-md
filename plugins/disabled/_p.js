@@ -12,11 +12,7 @@ export const handler = {
         try {
             // Array kata-kata random
             const randomWords = [
-                'anjay', 'wkwkwk', 'hehe', 'mantap', 'keren', 'asik',
-                'wow', 'nice', 'oke', 'siap', 'gas', 'betul',
-                'iya', 'gitu', 'emang', 'bener', 'sip', 'aman',
-                'santai', 'chill', 'relax', 'tenang', 'sabar',
-                'gokil', 'kece', 'top', 'bagus', 'solid'
+                'anjay', 'wkwkwk','apcb','apetuwoi'
             ];
             
             // Pilih kata random

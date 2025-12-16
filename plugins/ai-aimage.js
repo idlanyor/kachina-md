@@ -65,7 +65,7 @@ export const handler = {
             });
 
             // Simpan gambar ke file temporary
-            const tempDir = join(__dirname, '../../temp');
+            const tempDir = join(__dirname, '../temp');
             const tempFile = join(tempDir, `aimage_${Date.now()}.png`);
             await writeFile(tempFile, imageResponse.data);
 

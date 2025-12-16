@@ -1,5 +1,6 @@
 import QrCode from 'qrcode-reader';
-import { Jimp } from 'jimp';
+import pkg from 'jimp';
+const { Jimp } = pkg;
 
 async function qrScanner(buffer) {
     const image = await Jimp.read(buffer);
