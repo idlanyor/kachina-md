@@ -57,20 +57,19 @@ export const handler = {
 
             const form = new FormData()
             form.append('file', buffer, { filename: `${fileName}.${ext}`, contentType: mime })
-            form.append('folder', 'documents/2024')
 
-            const uploadRes = await axios.post('https://s3.antidonasi.web.id/upload', form, {
+            const uploadRes = await axios.post('https://api.nekolabs.web.id/uploader/nekolabs', form, {
                 headers: {
                     ...form.getHeaders()
                 },
                 timeout: 120000
             })
 
-            if (!uploadRes?.data?.success || !uploadRes?.data?.data?.fileUrl) {
+            if (!uploadRes?.data?.success || !uploadRes?.data?.result) {
                 throw new Error('Upload gagal atau response tidak valid')
             }
 
-            const imageUrl = uploadRes.data.data.fileUrl
+            const imageUrl = uploadRes.data.result
 
             const apiUrl = `https://api.nekolabs.web.id/canvas/meme?imageUrl=${encodeURIComponent(imageUrl)}&textT=${encodeURIComponent(topText)}&textB=${encodeURIComponent(bottomText)}`
             const { data } = await axios.get(apiUrl, {

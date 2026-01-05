@@ -1,9 +1,9 @@
-import Group from '../database/models/Group.js'
+import UnifiedGroup from '../database/models/UnifiedGroup.js'
 
 export const handler = {
     command: ['unban'],
     category: 'group',
-    help: 'Unban a member from the group',
+    help: 'Unban a member from group',
     isAdmin: true,
     isBotAdmin: true,
     isOwner: false,
@@ -11,43 +11,55 @@ export const handler = {
     exec: async ({ sock, m, args }) => {
         try {
             if (!m.isGroup) {
-                return await m.reply('❌ *Group Only*\nThis command can only be used in groups.')
+                return await m.reply('❌ *Hanya Grup*\nPerintah ini hanya dapat digunakan di dalam grup.')
             }
 
             if (!m.isAdmin) {
-                return await m.reply('❌ *Admin Only*\nOnly group admins can use this command.')
+                return await m.reply('❌ *Hanya Admin*\nHanya admin grup yang dapat menggunakan perintah ini.')
             }
 
             const targetJid = m.mentionedJid?.[0]
             if (!targetJid) {
-                return await m.reply('❌ *Invalid Usage*\nPlease mention a user to unban.\n\nUsage: !unban @user')
+                return await m.reply('❌ *Penggunaan Salah*\nSilakan sebutkan pengguna yang akan di-unban.\n\nPenggunaan: !unban @user')
             }
 
             const groupId = m.chat
 
-            // Check if member is banned
-            if (!(await Group.isMemberBanned(groupId, targetJid))) {
-                return await m.reply('❌ *Not Banned*\nThis member is not banned from the group.')
+            // Check if member is banned in database
+            if (!(await UnifiedGroup.isMemberBanned(groupId, targetJid))) {
+                return await m.reply('❌ *Tidak Dibanned*\nAnggota ini tidak dibanned dari grup.')
             }
 
-            // Add reaction
+            // Add loading reaction
             await sock.sendMessage(m.chat, {
                 react: { text: '⏳', key: m.key }
             })
 
             try {
-                // Unban the member
-                await Group.unbanMember(groupId, targetJid)
+                // Get ban info before unbanning for better message
+                const settings = await UnifiedGroup.getSettings(groupId)
+                const banInfo = settings.bannedMembers.find(m => m.id === targetJid)
+                const banReason = banInfo?.reason || 'Tidak ada alasan'
+                const banDate = banInfo?.bannedAt ? new Date(banInfo.bannedAt).toLocaleString('id-ID') : 'Tidak diketahui'
                 
-                const unbanMsg = `✅ *Member Unbanned Successfully*
+                // Unban member from database
+                await UnifiedGroup.unbanMember(groupId, targetJid)
                 
-👤 *User:* @${targetJid.split('@')[0]}
-👮 *Unbanned by:* @${m.sender.split('@')[0]}
-🕒 *Time:* ${new Date().toLocaleString('id-ID')}
+                const adminName = m.pushName || m.sender.split('@')[0]
+                
+                const unbanMsg = `┌───「 *ANGGOTA DI-UNBAN* 」
+│
+├ 👤 *User:* @${targetJid.split('@')[0]}
+├ 👮 *Di-unban oleh:* @${m.sender.split('@')[0]}
+├ 📝 *Alasan Ban Awal:* ${banReason}
+├ 🕒 *Waktu Ban:* ${banDate}
+├ 🕒 *Waktu Unban:* ${new Date().toLocaleString('id-ID')}
+│
+└ Anggota telah di-unban dan sekarang dapat mengirim pesan kembali.
 
-The member has been unbanned and can now rejoin the group.`
+🤖 _Powered by Kachina-MD_`
 
-                await m.reply(unbanMsg)
+                await m.reply(unbanMsg, { mentions: [targetJid, m.sender] })
                 
                 // Add success reaction
                 await sock.sendMessage(m.chat, {
@@ -56,7 +68,7 @@ The member has been unbanned and can now rejoin the group.`
 
             } catch (error) {
                 console.error('Unban error:', error)
-                await m.reply('❌ *Unban Failed*\nUnable to unban the member.')
+                await m.reply('❌ *Gagal Meng-unban*\nTidak dapat meng-unban anggota.')
                 
                 // Add error reaction
                 await sock.sendMessage(m.chat, {
@@ -66,7 +78,7 @@ The member has been unbanned and can now rejoin the group.`
 
         } catch (error) {
             console.error('Unban command error:', error)
-            await m.reply('❌ *Error*\nFailed to execute unban command. Please try again.')
+            await m.reply('❌ *Error*\nGagal menjalankan perintah unban. Silakan coba lagi.')
         }
     }
 }

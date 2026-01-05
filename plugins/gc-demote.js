@@ -1,6 +1,6 @@
 export const handler = {
     command: 'demote',
-    category:'group',
+    category: 'group',
     help: 'Menurunkan pangkat anggota grup dari Admin',
     isAdmin: true,
     isBotAdmin: true,
@@ -9,9 +9,10 @@ export const handler = {
     exec: async ({ sock, m, id, args }) => {
         try {
             let userJid
-            
+            console.log('quoted', m.quoted?.sender)
+
             if (m.quoted) {
-                userJid = m.quoted.participant
+                userJid = m.quoted.sender
             }
             // Jika tidak ada quoted, cek mention
             else if (args) {
@@ -24,7 +25,11 @@ export const handler = {
 
             // Cek apakah target adalah admin
             const groupMetadata = await sock.groupMetadata(id)
-            const isTargetAdmin = groupMetadata.participants.find(p => p.id === userJid)?.admin
+            const isTargetAdmin = groupMetadata.participants.find(p => {
+                console.log('participant id', p.id)
+                console.log('userjid', userJid)
+                return p.id === userJid
+            })?.admin
             if (!isTargetAdmin) {
                 await m.reply('Gagal: Pengguna yang ditag bukan admin!')
                 return
@@ -38,7 +43,7 @@ export const handler = {
 
             try {
                 await sock.groupParticipantsUpdate(id, [userJid], 'demote')
-                await m.reply(`Berhasil menurunkan @${userJid.split('@')[0]} dari admin`,true,true,[userJid])
+                await sock.sendMessage(id, { text: `Berhasil menurunkan @${userJid.split('@')[0]} dari admin`, mentions: [userJid] })
             } catch (updateError) {
                 if (updateError.toString().includes('forbidden')) {
                     await m.reply('Gagal: Bot tidak memiliki izin untuk menurunkan admin!')

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine.js Test</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .box {
+            padding: 20px;
+            background: #16213e;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #0f3460;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #e94560;
+        }
+    </style>
+</head>
+<body>
+    <h1>Alpine.js Test Page</h1>
+    
+    <div class="box" x-data="{ count: 0, message: 'Hello Alpine!' }">
+        <h2>Simple Counter</h2>
+        <p>Count: <strong x-text="count"></strong></p>
+        <button @click="count++">Increment</button>
+        <button @click="count--">Decrement</button>
+        <p x-text="message"></p>
+    </div>
+
+    <div class="box" x-data="testData()">
+        <h2>API Test</h2>
+        <p>Loading: <strong x-text="loading"></strong></p>
+        <p>Plugins: <strong x-text="plugins.length"></strong></p>
+        <button @click="loadData()">Load Plugins</button>
+        <div x-show="plugins.length > 0">
+            <h3>First 5 Plugins:</h3>
+            <ul>
+                <template x-for="plugin in plugins.slice(0, 5)" :key="plugin.fileName">
+                    <li x-text="plugin.name + ' - ' + plugin.category"></li>
+                </template>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function testData() {
+            return {
+                plugins: [],
+                loading: false,
+                
+                async loadData() {
+                    console.log('Loading...');
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/plugins');
+                        const result = await response.json();
+                        console.log('Result:', result);
+                        if (result.success) {
+                            this.plugins = result.data || [];
+                            console.log('Loaded:', this.plugins.length);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

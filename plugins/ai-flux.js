@@ -94,7 +94,7 @@ export const handler = {
             const imageResponse = await axios.get(response.url, { responseType: 'arraybuffer' });
 
             // Simpan gambar ke file temporary
-            const tempDir = join(__dirname, '../../temp');
+            const tempDir = join(__dirname, '../temp');
             const tempFile = join(tempDir, `flux_${Date.now()}.jpg`);
             await writeFile(tempFile, imageResponse.data);
 

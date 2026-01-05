@@ -1,8 +1,8 @@
-import Group from '../database/models/Group.js'
+import UnifiedGroup from '../database/models/UnifiedGroup.js'
 
 export const handler = {
     command: ['ban'],
-    help: 'Ban a member from the group',
+    help: 'Ban a member from group',
     category: 'group',
     isAdmin: true,
     isBotAdmin: true,
@@ -11,65 +11,70 @@ export const handler = {
     exec: async ({ sock, m, args }) => {
         try {
             if (!m.isGroup) {
-                return await m.reply('❌ *Group Only*\nThis command can only be used in groups.')
+                return await m.reply('❌ *Hanya Grup*\nPerintah ini hanya dapat digunakan di dalam grup.')
             }
 
             if (!m.isAdmin) {
-                return await m.reply('❌ *Admin Only*\nOnly group admins can use this command.')
+                return await m.reply('❌ *Hanya Admin*\nHanya admin grup yang dapat menggunakan perintah ini.')
             }
 
             const targetJid = m.mentionedJid?.[0]
             if (!targetJid) {
-                return await m.reply('❌ *Invalid Usage*\nPlease mention a user to ban.\n\nUsage: !ban @user [reason]')
+                return await m.reply('❌ *Penggunaan Salah*\nSilakan sebutkan pengguna yang akan dibanned.\n\nPenggunaan: !ban @user [alasan]')
             }
 
             if (targetJid === m.sender) {
-                return await m.reply('❌ *Cannot Ban Self*\nYou cannot ban yourself.')
+                return await m.reply('❌ *Tidak Dapat Membanned Diri Sendiri*\nAnda tidak dapat membanned diri sendiri.')
             }
 
             if (targetJid === sock.user.id) {
-                return await m.reply('❌ *Cannot Ban Bot*\nYou cannot ban the bot.')
+                return await m.reply('❌ *Tidak Dapat Membanned Bot*\nAnda tidak dapat membanned bot.')
             }
 
-            // Check if target is admin
-            const participants = await sock.groupMetadata(m.chat)
-            const targetParticipant = participants.participants.find(p => p.id === targetJid)
-            
+            // Get group metadata to check if target is admin
+            const groupMetadata = await sock.groupMetadata(m.chat)
+            const targetParticipant = groupMetadata.participants.find(p => p.id === targetJid)
+
             if (targetParticipant?.admin) {
-                return await m.reply('❌ *Cannot Ban Admin*\nYou cannot ban an admin.')
+                return await m.reply('❌ *Tidak Dapat Membanned Admin*\nAnda tidak dapat membanned admin.')
             }
 
-            const reason = args.split(' ').slice(1).join(' ') || 'No reason provided'
+            // Extract reason from args (everything after the mention)
+            const reason = args.split().filter(arg => !arg.startsWith('@')).join(' ') || 'Tidak ada alasan'
             const groupId = m.chat
 
-            // Check if already banned
-            if (await Group.isMemberBanned(groupId, targetJid)) {
-                return await m.reply('❌ *Already Banned*\nThis member is already banned from the group.')
+            // Check if already banned in database
+            if (await UnifiedGroup.isMemberBanned(groupId, targetJid)) {
+                return await m.reply('❌ *Sudah Dibanned*\nAnggota ini sudah dibanned dari grup.')
             }
 
-            // Add reaction
+            // Add loading reaction
             await sock.sendMessage(m.chat, {
                 react: { text: '⏳', key: m.key }
             })
 
             try {
-                // Ban the member
-                await Group.banMember(groupId, targetJid, reason)
+                // Ban member in database
+                await UnifiedGroup.banMember(groupId, targetJid, reason)
                 
-                // Kick them from the group
-                await sock.groupParticipantsUpdate(groupId, [targetJid], 'remove')
+                // Get target user name for better display
+                const targetName = targetParticipant?.notify || targetParticipant?.name || targetJid.split('@')[0]
+                const adminName = m.pushName || m.sender.split('@')[0]
                 
-                const banMsg = `🚫 *Member Banned Successfully*
-                
-👤 *User:* @${targetJid.split('@')[0]}
-👮 *Banned by:* @${m.sender.split('@')[0]}
-📝 *Reason:* ${reason}
-🕒 *Time:* ${new Date().toLocaleString('id-ID')}
+                const banMsg = `┌───「 *ANGGOTA DIBANNED* 」
+│
+├ 👤 *User:* @${targetJid.split('@')[0]}
+├ 📛 *Nama:* ${targetName}
+├ 👮 *Dibanned oleh:* @${m.sender.split('@')[0]}
+├ 📝 *Alasan:* ${reason}
+├ 🕒 *Waktu:* ${new Date().toLocaleString('id-ID')}
+│
+└ Anggota telah dibanned.
+  Pesan mereka akan otomatis dihapus sampai di-unban oleh admin.
 
-The member has been banned and removed from the group.
-They cannot rejoin unless unbanned by an admin.`
+🤖 _Powered by Kachina-MD_`
 
-                await m.reply(banMsg)
+                await m.reply(banMsg, { mentions: [targetJid, m.sender] })
                 
                 // Add success reaction
                 await sock.sendMessage(m.chat, {
@@ -78,17 +83,16 @@ They cannot rejoin unless unbanned by an admin.`
 
             } catch (error) {
                 console.error('Ban error:', error)
-                await m.reply('❌ *Ban Failed*\nUnable to ban the member. They might be an admin or the bot lacks permission.')
+                await m.reply('❌ *Gagal Membanned*\nTidak dapat membanned anggota. Silakan coba lagi.')
                 
                 // Add error reaction
                 await sock.sendMessage(m.chat, {
                     react: { text: '❌', key: m.key }
                 })
             }
-
         } catch (error) {
             console.error('Ban command error:', error)
-            await m.reply('❌ *Error*\nFailed to execute ban command. Please try again.')
+            await m.reply('❌ *Error*\nGagal menjalankan perintah ban. Silakan coba lagi.')
         }
     }
 }

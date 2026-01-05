@@ -3,7 +3,7 @@ import axios from 'axios';
 export const handler = {
     command: ['ig'],
     category: 'downloader',
-    help: 'Download konten Instagram (Reels/Posting). Gunakan .ig <url> atau reply pesan yang berisi URL.',
+    help: 'Download konten Instagram (Reels/Posting).',
     async exec({ sock, m, args }) {
         try {
             // Ambil URL dari argumen atau reply

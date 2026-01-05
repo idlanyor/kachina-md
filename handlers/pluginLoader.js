@@ -16,7 +16,12 @@ export class PluginLoader {
         const pluginsDir = path.join(__dirname, '../plugins');
         const plugins = {};
 
-        const pluginFiles = findJsFiles(pluginsDir);
+        // Get all JS files but exclude disabled folder
+        const allFiles = findJsFiles(pluginsDir);
+        const pluginFiles = allFiles.filter(file => !file.includes(path.sep + 'disabled' + path.sep) && !file.includes('/disabled/'));
+        
+        logger.info(`Loading ${pluginFiles.length} enabled plugins...`);
+        
         for (const file of pluginFiles) {
             try {
                 // Check cache first
@@ -51,6 +56,7 @@ export class PluginLoader {
         }
 
         this.plugins = plugins;
+        logger.info(`Successfully loaded ${Object.keys(plugins).length} command handlers`);
         return plugins;
     }
 
@@ -62,7 +68,10 @@ export class PluginLoader {
         const pluginsDir = path.join(__dirname, '../plugins');
         const categories = {};
 
-        const pluginFiles = findJsFiles(pluginsDir);
+        // Get all JS files but exclude disabled folder
+        const allFiles = findJsFiles(pluginsDir);
+        const pluginFiles = allFiles.filter(file => !file.includes(path.sep + 'disabled' + path.sep) && !file.includes('/disabled/'));
+        
         for (const file of pluginFiles) {
             try {
                 const plugin = await import(pathToFileURL(file).href);

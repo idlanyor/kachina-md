@@ -10,6 +10,7 @@ export const handler = {
         try {
             let userJid
             // Cek jika ada quoted message
+            console.log(m.quoted?.sender)
             if (m.quoted) {
                 userJid = m.quoted.sender
             }
@@ -36,11 +37,11 @@ export const handler = {
                 await m.reply('❌ User sudah menjadi admin!')
                 return
             }
-            await m.reply(`Berhasil menjadikan @${userJid.split('@')[0]} sebagai Admin`, false, true,[userJid])
+            await sock.sendMessage(id, { text: `Berhasil menjadikan @${userJid.split('@')[0]} sebagai Admin`, mentions: [userJid] })
             await sock.groupParticipantsUpdate(id, [userJid], 'promote')
         } catch (error) {
             console.error('Error in promote:', error)
-            await m.reply('❌ Gagal menaikkan pangkat member',error)
+            await m.reply('❌ Gagal menaikkan pangkat member', error)
         }
     }
 }

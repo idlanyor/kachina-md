@@ -3,7 +3,7 @@ import axios from 'axios';
 export const handler = {
     command: ['dl'],
     category: 'downloader',
-    help: 'Download video dari berbagai platform. Gunakan .dl <url> atau reply URL.',
+    help: 'Download video dari berbagai platform.',
     async exec({ sock, m, args }) {
         try {
             let url = typeof args === 'string' ? args.trim() : '';

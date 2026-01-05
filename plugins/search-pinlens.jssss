@@ -1,0 +1,101 @@
+import pinlens from '../helper/pinlens.js';
+
+export const handler = {
+    command: ['pinlens', 'pinsearch', 'reversepinterest'],
+    category: 'search',
+    help: 'Cari gambar serupa di Pinterest menggunakan gambar',
+    exec: async ({ sock, m, args, usedPrefix }) => {
+        try {
+            let buffer = null;
+
+            const qType = m.quoted ? (typeof m.quoted.type === 'object' ? m.quoted.type.type : m.quoted.type) : null;
+            const mType = typeof m.type === 'object' ? m.type.type : m.type;
+
+            if (m.quoted) {
+                if (/image|viewOnce/.test(qType)) {
+                    buffer = await m.quoted.download();
+                }
+            } else if (/image|viewOnce/.test(mType)) {
+                buffer = await m.download();
+            }
+
+            if (!buffer) {
+                await m.reply(`🔍 *PINTEREST LENS*
+
+*Penggunaan:*
+Kirim/reply gambar dengan caption ${usedPrefix}pinlens
+
+*Fitur:*
+• Cari gambar serupa di Pinterest
+• Support gambar & video results
+• Info creator & stats`);
+                return;
+            }
+
+            await sock.sendMessage(m.chat, {
+                react: { text: '🔍', key: m.key }
+            });
+
+            const results = await pinlens(buffer);
+
+            if (!results || results.length === 0) {
+                await m.reply('❌ Tidak ditemukan hasil yang serupa');
+                await sock.sendMessage(m.chat, {
+                    react: { text: '❌', key: m.key }
+                });
+                return;
+            }
+
+            let text = `🔍 *PINTEREST LENS*\n`;
+            text += `📊 Ditemukan ${results.length} hasil\n`;
+            text += `━━━━━━━━━━━━━━━\n\n`;
+
+            const topResults = results.slice(0, 5);
+            
+            for (let i = 0; i < topResults.length; i++) {
+                const pin = topResults[i];
+                text += `*${i + 1}. ${pin.title || 'Untitled'}*\n`;
+                if (pin.description) text += `📝 ${pin.description.slice(0, 100)}${pin.description.length > 100 ? '...' : ''}\n`;
+                text += `📌 Type: ${pin.media.type === 'video' ? '🎬 Video' : '🖼️ Image'}\n`;
+                if (pin.creator) text += `👤 @${pin.creator.username}\n`;
+                text += `💾 ${pin.stats.saves} saves | 💬 ${pin.stats.comments} comments\n`;
+                text += `🔗 ${pin.url}\n\n`;
+            }
+
+            await m.reply(text);
+
+            // Send first 3 media
+            for (let i = 0; i < Math.min(3, topResults.length); i++) {
+                const pin = topResults[i];
+                try {
+                    if (pin.media.type === 'video' && pin.media.url) {
+                        await sock.sendMessage(m.chat, {
+                            video: { url: pin.media.url },
+                            caption: `${i + 1}. ${pin.title || 'Pinterest Video'}\n${pin.url}`
+                        }, { quoted: m });
+                    } else if (pin.media.url) {
+                        await sock.sendMessage(m.chat, {
+                            image: { url: pin.media.url },
+                            caption: `${i + 1}. ${pin.title || 'Pinterest Image'}\n${pin.url}`
+                        }, { quoted: m });
+                    }
+                } catch (e) {
+                    console.error(`Failed to send media ${i + 1}:`, e.message);
+                }
+            }
+
+            await sock.sendMessage(m.chat, {
+                react: { text: '✅', key: m.key }
+            });
+
+        } catch (error) {
+            console.error('Error in pinlens:', error);
+            await sock.sendMessage(m.chat, {
+                react: { text: '❌', key: m.key }
+            });
+            await m.reply('❌ Gagal mencari: ' + error.message);
+        }
+    }
+};
+
+export default handler;

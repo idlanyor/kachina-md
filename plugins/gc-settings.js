@@ -1,4 +1,4 @@
-import Database from '../helper/database.js'
+import UnifiedGroup from '../database/models/UnifiedGroup.js'
 
 export const handler = {
     command: ['groupset', 'setgroup', 'settings'],
@@ -9,7 +9,7 @@ export const handler = {
     isBotAdmin: true,
     exec: async ({ sock, m, args }) => {
         try {
-            const group = await Database.getGroup(m.chat)
+            const group = await UnifiedGroup.getSettings(m.chat)
 
             if (!args) {
                 const status = `╭─「 *GROUP SETTINGS* 」
@@ -73,7 +73,10 @@ export const handler = {
                 antiToxic: feature === 'antitoxic' ? state === 'on' : group.antiToxic
             }
 
-            await Database.updateGroup(m.chat, updateData)
+            // Update each setting individually using the unified model
+            for (const [key, value] of Object.entries(updateData)) {
+                await UnifiedGroup.updateSetting(m.chat, key, value)
+            }
 
             await sock.sendMessage(m.chat, {
                 text: `✅ Berhasil mengubah ${feature} menjadi ${state}`,

@@ -1,31 +1,24 @@
 import axios from "axios";
 import { Sticker, StickerTypes } from "wa-sticker-formatter";
-
 export const handler = {
     command: ["qc", "quotly", "quote"],
     help: "Membuat stiker quote dari teks.",
      category:'sticker',
-
     async exec({ m, args, sock }) {
         try {
             let text = args;
             let name = "User";
             let avatar = "https://i.ibb.co/3Fh9V6p/avatar-default.png"; // default avatar
 
-            // 🔹 Kalau gak ada teks tapi ada reply
             if (!text && m.quoted) {
                 text =
                     m.quoted.text || m.quoted.message?.conversation || "";
-
-                // Ambil nama
                 if (m.quoted.participant) {
                     const contact = await sock.onWhatsApp(m.quoted.participant);
                     name = contact[0]?.notify || m.quoted.pushName || "User";
                 } else {
                     name = m.quoted?.pushName || "User";
                 }
-
-                // Ambil avatar
                 try {
                     const ppUrl = await sock.profilePictureUrl(
                         m.quoted.participant || m.quoted.key.remoteJid,
@@ -34,15 +27,12 @@ export const handler = {
                     if (ppUrl) avatar = ppUrl;
                 } catch { }
             }
-            // 🔹 Kalau gak ada teks dan gak reply, ambil dari pesan sekarang
             else if (text) {
                 if (m.message) {
                     const messageType = Object.keys(m.message)[0];
                     if (messageType === "conversation") {
-                        // Hapus perintah .qc atau !qc dari awal teks
                         text = args.replace(/^[!.]qc\s*/i, "");
                     } else if (messageType === "extendedTextMessage") {
-                        // Hapus perintah .qc atau !qc dari awal teks
                         text = m.message.extendedTextMessage.text.replace(/^[!.]qc\s*/i, "");
                     }
                 }
@@ -57,22 +47,17 @@ export const handler = {
                 } catch { }
             }
 
-            // 🔹 Validasi input
             if (!text || text.trim() === "") {
                 await m.reply(
                     `💬 *QUOTLY STICKER MAKER*\n\nCara pakai:\n1. !qc <teks>\n2. Reply pesan dengan !qc\n\nContoh:\n!qc Hello World!\n!qc Selamat pagi semua\n\n📌 Avatar otomatis dari foto profil.`
                 );
                 return;
             }
-
             text = text.trim();
-
-            // ⏳ Kasih reaksi loading
             await sock.sendMessage(m.chat, {
                 react: { text: "⏳", key: m.key },
             });
             console.log(text, name, avatar)
-            // 🔹 Call API
             const apiUrl = "https://api.ryzumi.vip/api/image/quotly";
             const response = await axios.get(apiUrl, {
                 params: { text, name, avatar },
@@ -83,7 +68,6 @@ export const handler = {
 
             if (!response.data) throw new Error("Gagal membuat quote sticker");
 
-            // 🔹 Bikin stiker
             const sticker = new Sticker(Buffer.from(response.data), {
                 pack: "Quotly Sticker",
                 author: "Kachina Bot",
@@ -97,7 +81,6 @@ export const handler = {
 
             await sock.sendMessage(m.chat, { sticker: stickerBuffer }, { quoted: m });
 
-            // ✅ Reaksi sukses
             await sock.sendMessage(m.chat, {
                 react: { text: "✅", key: m.key },
             });

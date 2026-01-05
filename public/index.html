@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plugin Manager - Kachina Bot</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="output.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="min-h-screen text-slate-100 font-sans relative overflow-x-hidden" x-data="pluginManager()" x-init="init()" x-cloak>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    <!-- Navigation -->
+    <nav class="glass-effect-strong border-b border-ig-pink/30 shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="#" class="flex items-center space-x-2 text-xl font-bold gradient-text animate-shimmer">
+                    <i class="bi bi-plug-fill"></i>
+                    <span>Plugin Manager</span>
+                </a>
+                <div class="flex space-x-2">
+                    <button @click="loadPlugins()" class="px-4 py-2 rounded-xl border border-white/30 backdrop-blur-lg transition-all duration-300 hover:bg-white/10 hover:border-white/50 hover:-translate-y-0.5 shadow-lg font-semibold">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                    </button>
+                    <button @click="showCreateModal()" class="px-6 py-2 rounded-xl gradient-instagram text-white font-semibold shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-ig-pink/40 hover:shadow-2xl btn-ripple relative overflow-hidden">
+                        <i class="bi bi-plus-circle me-1"></i> New Plugin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-6 relative z-10">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="glass-effect border border-ig-purple/20 rounded-2xl p-8 text-center transition-all duration-400 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl hover:shadow-ig-purple/30 hover:border-ig-purple hover:bg-slate-800/80 animate-fade-in-up group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-ig-purple/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <i class="bi bi-collection text-5xl text-ig-purple mb-3 transition-transform duration-400 group-hover:scale-125 group-hover:rotate-12"></i>
+                <div class="text-5xl font-extrabold gradient-text animate-count-up" x-text="stats.total">0</div>
+                <div class="text-slate-400 mt-2">Total Plugins</div>
+            </div>
+            <div class="glass-effect border border-indigo-500/20 rounded-2xl p-8 text-center transition-all duration-400 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/30 hover:border-green-500 hover:bg-slate-800/80 animate-fade-in-up group relative overflow-hidden" style="animation-delay: 0.1s">
+                <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <i class="bi bi-check-circle text-5xl text-green-500 mb-3 transition-transform duration-400 group-hover:scale-125 group-hover:rotate-12"></i>
+                <div class="text-5xl font-extrabold bg-gradient-to-br from-green-500 to-emerald-600 bg-clip-text text-transparent animate-count-up" x-text="stats.enabled">0</div>
+                <div class="text-slate-400 mt-2">Enabled</div>
+            </div>
+            <div class="glass-effect border border-indigo-500/20 rounded-2xl p-8 text-center transition-all duration-400 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/30 hover:border-red-500 hover:bg-slate-800/80 animate-fade-in-up group relative overflow-hidden" style="animation-delay: 0.2s">
+                <div class="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <i class="bi bi-x-circle text-5xl text-red-500 mb-3 transition-transform duration-400 group-hover:scale-125 group-hover:rotate-12"></i>
+                <div class="text-5xl font-extrabold bg-gradient-to-br from-red-500 to-red-600 bg-clip-text text-transparent animate-count-up" x-text="stats.disabled">0</div>
+                <div class="text-slate-400 mt-2">Disabled</div>
+            </div>
+            <div class="glass-effect border border-ig-yellow/20 rounded-2xl p-8 text-center transition-all duration-400 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl hover:shadow-ig-yellow/30 hover:border-ig-yellow hover:bg-slate-800/80 animate-fade-in-up group relative overflow-hidden" style="animation-delay: 0.3s">
+                <div class="absolute inset-0 bg-gradient-to-br from-ig-yellow/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <i class="bi bi-tags text-5xl text-ig-yellow mb-3 transition-transform duration-400 group-hover:scale-125 group-hover:rotate-12"></i>
+                <div class="text-5xl font-extrabold bg-gradient-to-br from-ig-yellow to-ig-orange bg-clip-text text-transparent animate-count-up" x-text="stats.categories">0</div>
+                <div class="text-slate-400 mt-2">Categories</div>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="glass-effect border border-indigo-500/20 rounded-2xl p-6 mb-6 animate-fade-in-up shadow-xl">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div class="md:col-span-6">
+                    <div class="flex">
+                        <span class="inline-flex items-center px-4 bg-slate-900/60 border border-indigo-500/20 border-r-0 rounded-l-xl text-indigo-500">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" x-model="search"
+                               class="flex-1 px-4 py-3 bg-slate-900/60 border border-ig-pink/20 rounded-r-xl text-slate-100 placeholder-slate-400 focus:bg-slate-900/80 focus:border-ig-pink focus:outline-none focus:ring-4 focus:ring-ig-pink/15 focus:-translate-y-0.5 transition-all duration-300 backdrop-blur-lg" 
+                               placeholder="Search plugins by name, command, or category...">
+                    </div>
+                </div>
+                <div class="md:col-span-3">
+                    <select x-model="categoryFilter" class="w-full px-4 py-3 bg-slate-900/60 border border-ig-pink/20 rounded-xl text-slate-100 focus:bg-slate-900/80 focus:border-ig-pink focus:outline-none focus:ring-4 focus:ring-ig-pink/15 focus:-translate-y-0.5 transition-all duration-300 backdrop-blur-lg">
+                        <option value="">All Categories</option>
+                        <template x-for="(category, index) in categories" :key="'cat-' + index">
+                            <option :value="category" x-text="category"></option>
+                        </template>
+                    </select>
+                </div>
+                <div class="md:col-span-3">
+                    <select x-model="statusFilter" class="w-full px-4 py-3 bg-slate-900/60 border border-ig-pink/20 rounded-xl text-slate-100 focus:bg-slate-900/80 focus:border-ig-pink focus:outline-none focus:ring-4 focus:ring-ig-pink/15 focus:-translate-y-0.5 transition-all duration-300 backdrop-blur-lg">
+                        <option value="">All Status</option>
+                        <option value="enabled">Enabled</option>
+                        <option value="disabled">Disabled</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plugins List -->
+        <div class="glass-effect border border-ig-purple/20 rounded-2xl shadow-xl animate-fade-in-up">
+            <div class="flex justify-between items-center p-6 border-b border-ig-pink/30 bg-gradient-to-r from-ig-purple/10 to-ig-pink/5">
+                <h5 class="text-xl font-semibold flex items-center">
+                    <i class="bi bi-plug me-2"></i>Plugins
+                </h5>
+                <span class="px-4 py-2 rounded-lg gradient-instagram text-white text-sm font-semibold shadow-lg" x-text="filteredPlugins.length + ' plugins'">0 plugins</span>
+            </div>
+            <div class="p-6">
+                <div x-show="loading" class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-ig-pink mb-4"></div>
+                    <p class="text-slate-400">Loading plugins...</p>
+                </div>
+                
+                <div x-show="!loading && filteredPlugins.length === 0" class="text-center py-12">
+                    <i class="bi bi-inbox text-6xl text-slate-600 mb-4"></i>
+                    <p class="text-slate-400">No plugins found</p>
+                </div>
+
+                <div x-show="!loading && filteredPlugins.length > 0" class="space-y-3">
+                    <template x-for="plugin in filteredPlugins" :key="plugin.fileName">
+                        <div class="glass-effect border border-ig-purple/20 rounded-xl p-4 hover:border-ig-pink/40 hover:translate-x-2 transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <h6 class="text-lg font-semibold" x-text="plugin.name"></h6>
+                                        <span class="px-2 py-1 rounded-lg text-xs font-semibold" 
+                                              :class="plugin.enabled ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'"
+                                              x-text="plugin.enabled ? 'Enabled' : 'Disabled'"></span>
+                                        <span class="px-2 py-1 rounded-lg text-xs font-semibold bg-ig-purple/20 text-ig-purple border border-ig-purple/30" 
+                                              x-text="plugin.category"></span>
+                                    </div>
+                                    <div class="text-sm text-slate-400" x-show="plugin.command && plugin.command.length > 0">
+                                        <i class="bi bi-terminal mr-1"></i>
+                                        <span x-text="Array.isArray(plugin.command) ? plugin.command.join(', ') : plugin.command"></span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button @click="editPlugin(plugin)" class="px-4 py-2 rounded-lg bg-ig-purple/20 hover:bg-ig-purple/30 text-ig-purple border border-ig-purple/30 transition-all">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button @click="togglePlugin(plugin)" class="px-4 py-2 rounded-lg transition-all"
+                                            :class="plugin.enabled ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30' : 'bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30'">
+                                        <i :class="plugin.enabled ? 'bi bi-toggle-on' : 'bi bi-toggle-off'"></i>
+                                    </button>
+                                    <button @click="deletePlugin(plugin)" class="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 transition-all">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plugin Edit Modal -->
+    <div x-show="editModal.show" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-black/60 backdrop-blur-sm" @click="editModal.show = false"></div>
+            
+            <div class="inline-block align-bottom rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                <div class="glass-effect-strong border border-indigo-500/30 rounded-3xl shadow-2xl overflow-hidden">
+                <div class="flex justify-between items-center p-6 border-b border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-t-3xl">
+                    <h5 class="text-xl font-bold gradient-text flex items-center">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Plugin
+                    </h5>
+                    <button type="button" @click="editModal.show = false" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="bi bi-x-lg text-2xl"></i>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Plugin Name</label>
+                        <input type="text" x-model="editModal.name" class="w-full px-4 py-3 bg-slate-900/60 border border-ig-pink/20 rounded-xl text-slate-100 focus:bg-slate-900/80 focus:border-ig-pink focus:outline-none focus:ring-4 focus:ring-ig-pink/15 transition-all duration-300 backdrop-blur-lg">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Plugin Code</label>
+                        <textarea x-model="editModal.code" rows="20" class="w-full px-4 py-4 bg-slate-900/90 border border-ig-pink/30 rounded-xl text-slate-100 font-mono text-sm focus:border-ig-pink focus:outline-none focus:ring-4 focus:ring-ig-pink/15 transition-all duration-300 shadow-inner"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 p-6 border-t border-ig-pink/30">
+                    <button type="button" @click="editModal.show = false" class="px-6 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-all duration-300 shadow-lg">Cancel</button>
+                    <button type="button" @click="savePlugin()" :disabled="editModal.saving" class="px-6 py-2 rounded-xl gradient-instagram text-white font-semibold shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-ig-pink/40 hover:shadow-2xl btn-ripple relative overflow-hidden disabled:opacity-50">
+                        <span x-show="editModal.saving" class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></span>
+                        <span x-text="editModal.saving ? 'Saving...' : 'Save Changes'">Save Changes</span>
+                    </button>
+                </div>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Plugin Modal -->
+    <div x-show="createModal.show" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-black/60 backdrop-blur-sm" @click="createModal.show = false"></div>
+            
+            <div class="inline-block align-bottom rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                <div class="glass-effect-strong border border-ig-pink/30 rounded-3xl shadow-2xl overflow-hidden">
+                <div class="flex justify-between items-center p-6 border-b border-ig-pink/30 bg-gradient-to-r from-ig-purple/10 to-ig-pink/10 rounded-t-3xl">
+                    <h5 class="text-xl font-bold gradient-text flex items-center">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Plugin
+                    </h5>
+                    <button type="button" @click="createModal.show = false" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="bi bi-x-lg text-2xl"></i>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Plugin Filename</label>
+                        <input type="text" x-model="createModal.name" placeholder="plugin-name.js" class="w-full px-4 py-3 bg-slate-900/60 border border-ig-pink/20 rounded-xl text-slate-100 placeholder-slate-500 focus:bg-slate-900/80 focus:border-ig-pink focus:outline-none focus:ring-4 focus:ring-ig-pink/15 transition-all duration-300 backdrop-blur-lg">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Category</label>
+                        <select x-model="createModal.category" class="w-full px-4 py-3 bg-slate-900/60 border border-ig-pink/20 rounded-xl text-slate-100 focus:bg-slate-900/80 focus:border-ig-pink focus:outline-none focus:ring-4 focus:ring-ig-pink/15 transition-all duration-300 backdrop-blur-lg">
+                            <option value="tool">Tool</option>
+                            <option value="ai">AI</option>
+                            <option value="game">Game</option>
+                            <option value="dl">Downloader</option>
+                            <option value="gc">Group Control</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Commands (comma separated)</label>
+                        <input type="text" x-model="createModal.commands" placeholder="cmd1, cmd2, cmd3" class="w-full px-4 py-3 bg-slate-900/60 border border-ig-pink/20 rounded-xl text-slate-100 placeholder-slate-500 focus:bg-slate-900/80 focus:border-ig-pink focus:outline-none focus:ring-4 focus:ring-ig-pink/15 transition-all duration-300 backdrop-blur-lg">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-slate-300 mb-3">Plugin Template</label>
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-ig-pink/20 hover:border-ig-pink/40 hover:bg-ig-pink/5 transition-all cursor-pointer">
+                                <input type="radio" x-model="createModal.template" value="basic" class="w-4 h-4 text-ig-pink">
+                                <span class="text-slate-200">Basic Plugin</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-ig-pink/20 hover:border-ig-pink/40 hover:bg-ig-pink/5 transition-all cursor-pointer">
+                                <input type="radio" x-model="createModal.template" value="ai" class="w-4 h-4 text-ig-pink">
+                                <span class="text-slate-200">AI Plugin</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-ig-pink/20 hover:border-ig-pink/40 hover:bg-ig-pink/5 transition-all cursor-pointer">
+                                <input type="radio" x-model="createModal.template" value="downloader" class="w-4 h-4 text-ig-pink">
+                                <span class="text-slate-200">Downloader Plugin</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 p-6 border-t border-ig-pink/30">
+                    <button type="button" @click="createModal.show = false" class="px-6 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-all duration-300 shadow-lg">Cancel</button>
+                    <button type="button" @click="createPlugin()" :disabled="createModal.saving" class="px-6 py-2 rounded-xl gradient-instagram text-white font-semibold shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-ig-pink/40 hover:shadow-2xl btn-ripple relative overflow-hidden disabled:opacity-50">
+                        <span x-show="createModal.saving" class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></span>
+                        <span x-text="createModal.saving ? 'Creating...' : 'Create Plugin'">Create Plugin</span>
+                    </button>
+                </div>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function pluginManager() {
+            return {
+                plugins: [],
+                loading: true,
+                search: '',
+                categoryFilter: '',
+                statusFilter: '',
+                editModal: {
+                    show: false,
+                    name: '',
+                    code: '',
+                    saving: false
+                },
+                createModal: {
+                    show: false,
+                    name: '',
+                    category: 'tool',
+                    commands: '',
+                    template: 'basic',
+                    saving: false
+                },
+                
+                get stats() {
+                    return {
+                        total: this.plugins.length,
+                        enabled: this.plugins.filter(p => p.enabled).length,
+                        disabled: this.plugins.filter(p => !p.enabled).length,
+                        categories: [...new Set(this.plugins.map(p => p.category))].length
+                    };
+                },
+                
+                get categories() {
+                    return [...new Set(this.plugins.map(p => p.category))].sort();
+                },
+                
+                get filteredPlugins() {
+                    return this.plugins.filter(plugin => {
+                        const commandsStr = Array.isArray(plugin.command) ? plugin.command.join(', ') : '';
+                        const matchSearch = !this.search || 
+                            plugin.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                            plugin.fileName.toLowerCase().includes(this.search.toLowerCase()) ||
+                            commandsStr.toLowerCase().includes(this.search.toLowerCase()) ||
+                            plugin.category.toLowerCase().includes(this.search.toLowerCase());
+                        
+                        const matchCategory = !this.categoryFilter || plugin.category === this.categoryFilter;
+                        const matchStatus = !this.statusFilter || 
+                            (this.statusFilter === 'enabled' && plugin.enabled) ||
+                            (this.statusFilter === 'disabled' && !plugin.enabled);
+                        
+                        return matchSearch && matchCategory && matchStatus;
+                    });
+                },
+                
+                async init() {
+                    console.log('🚀 Initializing Plugin Manager...');
+                    console.log('🔧 Alpine.js version:', Alpine ? Alpine.version : 'not loaded');
+                    await this.loadPlugins();
+                    console.log('✨ Init complete');
+                },
+                
+                async loadPlugins() {
+                    console.log('🔄 Loading plugins...');
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/plugins');
+                        console.log('📡 Response status:', response.status);
+                        const result = await response.json();
+                        console.log('📦 API Result:', result);
+                        if (result.success) {
+                            this.plugins = result.data || [];
+                            console.log('✅ Plugins loaded:', this.plugins.length);
+                            console.log('📋 First plugin:', this.plugins[0]);
+                        } else {
+                            console.error('❌ Failed to load plugins:', result.error);
+                            this.plugins = [];
+                        }
+                    } catch (error) {
+                        console.error('💥 Error loading plugins:', error);
+                        this.plugins = [];
+                    } finally {
+                        this.loading = false;
+                        console.log('🏁 Loading finished. Plugins:', this.plugins.length, 'Loading:', this.loading);
+                    }
+                },
+                
+                showCreateModal() {
+                    this.createModal = {
+                        show: true,
+                        name: '',
+                        category: 'tool',
+                        commands: '',
+                        template: 'basic',
+                        saving: false
+                    };
+                },
+                
+                async createPlugin() {
+                    if (!this.createModal.name) {
+                        alert('Please enter a plugin name');
+                        return;
+                    }
+                    
+                    this.createModal.saving = true;
+                    try {
+                        const response = await fetch('/api/plugins', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                name: this.createModal.name,
+                                category: this.createModal.category,
+                                commands: this.createModal.commands,
+                                template: this.createModal.template
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            this.createModal.show = false;
+                            await this.loadPlugins();
+                        } else {
+                            alert('Failed to create plugin');
+                        }
+                    } catch (error) {
+                        console.error('Error creating plugin:', error);
+                        alert('Error creating plugin');
+                    } finally {
+                        this.createModal.saving = false;
+                    }
+                },
+                
+                editPlugin(plugin) {
+                    this.editModal = {
+                        show: true,
+                        name: plugin.fileName,
+                        code: 'Loading...',
+                        saving: false
+                    };
+                    
+                    // Load plugin code
+                    fetch(`/api/plugins/${plugin.fileName}/content`)
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result.success) {
+                                this.editModal.code = result.data.content || '';
+                            } else {
+                                this.editModal.code = 'Error loading plugin content';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading plugin:', error);
+                            this.editModal.code = 'Error loading plugin content';
+                        });
+                },
+                
+                async savePlugin() {
+                    this.editModal.saving = true;
+                    try {
+                        const response = await fetch(`/api/plugins/${this.editModal.name}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ content: this.editModal.code })
+                        });
+                        
+                        const result = await response.json();
+                        if (result.success) {
+                            this.editModal.show = false;
+                            await this.loadPlugins();
+                        } else {
+                            alert('Failed to save plugin: ' + result.error);
+                        }
+                    } catch (error) {
+                        console.error('Error saving plugin:', error);
+                        alert('Error saving plugin');
+                    } finally {
+                        this.editModal.saving = false;
+                    }
+                },
+                
+                async togglePlugin(plugin) {
+                    try {
+                        const response = await fetch(`/api/plugins/${plugin.fileName}/toggle`, {
+                            method: 'POST'
+                        });
+                        
+                        const result = await response.json();
+                        if (result.success) {
+                            await this.loadPlugins();
+                        } else {
+                            alert('Failed to toggle plugin: ' + result.error);
+                        }
+                    } catch (error) {
+                        console.error('Error toggling plugin:', error);
+                        alert('Error toggling plugin');
+                    }
+                },
+                
+                async deletePlugin(plugin) {
+                    if (!confirm(`Are you sure you want to delete ${plugin.name} (${plugin.fileName})?`)) {
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch(`/api/plugins/${plugin.fileName}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        const result = await response.json();
+                        if (result.success) {
+                            await this.loadPlugins();
+                        } else {
+                            alert('Failed to delete plugin: ' + result.error);
+                        }
+                    } catch (error) {
+                        console.error('Error deleting plugin:', error);
+                        alert('Error deleting plugin');
+                    }
+                }
+            };
+        }
+    </script>
+</body>
+</html>

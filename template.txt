@@ -1,0 +1,32 @@
+🎉 PESANAN ANDA TELAH SELESAI!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PTERODACTYL PANEL
+📦 Produk: {VPS-NAT/Panel}
+Harga {narga}/bulan
+Spesifikasi :
+- CPU {cpuSpecs}
+- RAM {ramSpecs}
+- Storage {storageGB}
+
+🖥️ DETAIL AKSES PANEL:
+🌐 URL Panel: https://client.antidonasi.web.id/auth/login
+👤 Username: {username}
+📧 Email: {username}@kanata.web.id
+🔑 Password: 1
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ Server Anda sudah siap digunakan!
+
+💡 Panduan Login:
+1. Buka link panel di atas
+2. Login dengan email dan password yang diberikan
+3. Server Anda akan muncul di dashboard
+
+⚠️Perhatian : 
+* Paket sudah termasuk Garansi 30 hari 
+* Dilarang menggunakan panel untuk DDOS,Mining, dan aktivitas Ilegal lainnya
+* Jaga keamanan akun anda, segera ganti password default setelah login pertama berhasil
+* disarankan melakukan backup database secara berkala (Jika ada)
+
+🆘 Butuh bantuan? Hubungi admin  https://wa.me/62895395590009
