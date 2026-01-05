@@ -20,7 +20,6 @@ export const handler = {
             let trackData;
             let downloadUrl;
 
-            // Cek apakah input adalah URL Spotify atau kata kunci pencarian
             if (input.includes('open.spotify.com')) {
                 // Proses URL Spotify
                 const encodedUrl = encodeURIComponent(input);

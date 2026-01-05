@@ -48,10 +48,7 @@ export const handler = {
 .alice create 38 1 24 - Buat VPS Micro dengan Debian 12 selama 24 jam`,
     exec: async ({ sock, m, args }) => {
         try {
-             if (!m.isOwner()) {
-                await m.reply('❌ Perintah ini hanya untuk owner bot!');
-                return;
-            }
+            
             if (!getApiKey()) {
                 await m.reply('❌ API Key Alice belum dikonfigurasi. Silakan tambahkan di global.js:\nglobalThis.apiKey.alice = "client_id:secret"');
                 return;
