@@ -1,0 +1,1251 @@
+HTTP/2 200 
+date: Tue, 13 Jan 2026 01:33:19 GMT
+content-type: text/html; charset=UTF-8
+cache-control: max-age=600, public
+set-cookie: XSRF-TOKEN=eyJpdiI6Ik5IRndRRDRRZTJvM0E0WFljU202OVE9PSIsInZhbHVlIjoiT0V1ZHJROVZ0VnpVc2VhNlpkS2pqUkdBSFdmSDJ0aXV6b1F6eFE1R0NkREJkV1hZWVNSNWx0UURrK1VaaGJPOHltSzB5ZDQ2cXFHcytsYWd4a3VhWXFCM3BPek1obitJVnZrbTFQOE43VVVhTmpCd1Rlbk1RV3dnRFNxbE5rcVUiLCJtYWMiOiJjZTNhNzQyOWM0YjAyZjU0Y2UwMGYzYWY5NzJjNGQyMDcwYTUyNDJkNjk5YTMyNTAzZGVhNmQyNjIzOGM4OGU1IiwidGFnIjoiIn0%3D; expires=Tue, 13 Jan 2026 03:33:18 GMT; Max-Age=7200; path=/; samesite=lax
+set-cookie: spotmateonline_session=eyJpdiI6Ikc0V1ZXdytnM1UzTjM3Qk5lc2hLYXc9PSIsInZhbHVlIjoiT0M2a2p0dy9MRVUrWjVJeVprWExJRGRVUGNyT1UzVTBGVkNDL3pXelRjanJMTlM4b2l2Q3FDOW90RjJBUGhuNlBYRHYzcUd4ZjErNWZRTjZhdjJHZ2czL2ltWnlNcGt5M2lmSlRUZGRtZkFmaURnNUNXUGJteEIyc1lOU1lBc28iLCJtYWMiOiIyOTQyNGQ4YjQ2ZmY3NzJmMDdjYzk0OWQwNGM4NzFlNTRiOTJmYjJlYTA2MjEyZDc0ODBhZmJiNDMwOTA3YmZjIiwidGFnIjoiIn0%3D; expires=Tue, 13 Jan 2026 03:33:18 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: SITE_TOTAL_ID=aWWg3g3hgTb6sPiRWljopgAAAQs; Path=/; Max-Age=31536000; HttpOnly;
+vary: Cookie,Accept-Encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=OyNUjJFGEYmzc9AVGnf7kHh6lw1ihXU2CGJ7kurbyz00WbFN%2BIH9T%2FJJdHD8i68iLhK%2FZaaqrJ%2FCsDNUmnXfXljKXpE3zkBdyrCWGkpMzCftE%2FyuHUmwNPwMdw%3D%3D"}]}
+server: cloudflare
+cf-cache-status: DYNAMIC
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cf-ray: 9bd1250d7d4f6cc1-SIN
+alt-svc: h3=":443"; ma=86400
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <title>Free Spotify Song Downloader Online - SpotMate</title>
+    <link rel="canonical" href="https://spotmate.online/en1">
+    <meta name="description"
+        content="Spotmate is a FREE Spotify song downloader that instantly downloads your favorite tracks, playlists, and albums from Spotify in MP3 format.">
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+<link rel="manifest" href="/assets/img/manifest.json">
+<link rel="mask-icon" href="/assets/img/safari-pinned-tab.svg" color="#1db954">
+<link rel="shortcut icon" href="/assets/img/favicon.ico">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-config" content="/assets/img/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Free Spotify Song Downloader Online - SpotMate" />
+    <meta name="twitter:description"
+        content="Spotmate is a FREE Spotify song downloader that instantly downloads your favorite tracks, playlists, and albums from Spotify in MP3 format." />
+    <meta name="twitter:image:src" content="https://spotmate.online/assets/img/social-thumbnail.png" />
+    <meta property="og:title" content="Free Spotify Song Downloader Online - SpotMate" />
+    <meta property="og:description"
+        content="Spotmate is a FREE Spotify song downloader that instantly downloads your favorite tracks, playlists, and albums from Spotify in MP3 format." />
+    <meta property="og:image" content="https://spotmate.online/assets/img/social-thumbnail.png" />
+        <meta property="og:url" content="https://spotmate.online/en1" />
+    <meta name="og:site_name" content="Free Spotify Song Downloader Online - SpotMate" />
+    <meta name="og:locale" content="en" />
+    <meta property="og:type" content="website" />
+    <meta name="csrf-token" content="5a83my1EoOPf3aQuRfKSlgxNaot5LTDaYs05z8KE" />
+    <link href="https://spotmate.online/assets/css/style.css" rel="stylesheet" />
+   
+
+
+    
+  
+</head>
+    <body class="bg-black text-white">
+                <div class="border-bottom border-white">
+                <nav class="navbar navbar-expand-lg py-lg-0 navbar-dark">
+                    <div class="container">
+                        <a class="navbar-brand fs-3 fw-semibold rounded py-2 text-new" href="https://spotmate.online/en1"><img
+                                width="33px" height="33px" src="https://spotmate.online/assets/img/logo.svg" alt="Logo Icon">
+                            SpotMate</a>
+                            <span id="MobileNav"></span>
+                        <button class="navbar-toggler btn-new outline-0" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav me-auto"></ul>
+                            <ul class="navbar-nav align-items-md-center">
+                                <li class="nav-item">
+                                    <a class="nav-link active text-white fs-5" href="https://spotmate.online/en1">Spotify
+                                        Downloader</a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link text-white fs-5" target="_blank" href="https://spotmate.online/blog/">Blog</a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link text-white fs-5" target="_blank" rel="nofollow" href="https://rapidapi.com/socialdev653/api/spotify-downloader12">API</a>
+                                </li>
+
+                                                                <li class="nav-item">
+                                                                            <a class="nav-link text-white fs-5" href="https://spotmate.online/support">Support</a>
+                                                                    </li>
+
+                                                                    <li class="nav-item">
+                                        <a class="nav-link text-white fs-5" href="https://spotmate.online/login">Login</a>
+                                    </li>
+                                                                
+                                <!-- <li class="nav-item">
+                          <a
+                            class="nav-link fs-5 text-white"
+                            href="https://spotmate.online/spotify-to-mp3.html"
+                            >Spotify to Mp3</a
+                          >
+                        </li> -->
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link fs-5 dropdown-toggle text-white align-items-baseline" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Other Tools
+                                    </a>
+                                    <ul class="dropdown-menu mt-2">
+                                        <li>
+                                            <a class="dropdown-item" target="_blank" rel="nofollow" href="https://ttmate.io/?utm_source=spotmate.online">TikTok Downloader</a>
+                                            <!--<a class="dropdown-item" target="_blank" href="https://pinmatedownloader.com/?utm_source=spotmate.online">Pinterest Downloader</a>-->
+                                            <a class="dropdown-item" target="_blank" rel="nofollow" href="https://thumbload.net/?utm_source=spotmate.online">Thumbnail Downloader</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+    <style>
+        @media (min-width: 786px) {
+            .img-setting {
+                height: 280px !important;
+            }
+        }
+
+        .cta-banner {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2rem;
+            color: #fff;
+        }
+
+        .cta-banner--premium {
+            background:
+                radial-gradient(700px 480px at -10% -10%, rgba(60, 118, 242, 0.35), transparent 55%),
+                radial-gradient(580px 420px at 110% 0%, rgba(25, 230, 140, 0.28), transparent 60%),
+                linear-gradient(135deg, #0b1220, #122040 65%, #101520);
+        }
+
+        .cta-banner--support {
+            background:
+                radial-gradient(620px 460px at -10% -10%, rgba(255, 168, 76, 0.35), transparent 55%),
+                radial-gradient(620px 420px at 120% 0%, rgba(219, 39, 119, 0.25), transparent 55%),
+                linear-gradient(135deg, #26141c, #1a1f35 70%, #111527);
+        }
+
+        .cta-banner__glow {
+            position: absolute;
+            pointer-events: none;
+            filter: blur(40px);
+            opacity: .6;
+            border-radius: 50%;
+        }
+
+        .cta-banner__glow--one {
+            width: 220px;
+            height: 220px;
+            top: -60px;
+            left: -60px;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .cta-banner__glow--two {
+            width: 260px;
+            height: 260px;
+            bottom: -70px;
+            right: -70px;
+        }
+
+        .cta-banner--premium .cta-banner__glow--two {
+            background: rgba(25, 230, 140, 0.35);
+        }
+
+        .cta-banner--support .cta-banner__glow--two {
+            background: rgba(239, 68, 68, 0.35);
+        }
+
+        .cta-banner__btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-banner__btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            transform: translateX(-120%);
+            background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .45) 40%, rgba(255, 255, 255, 0) 80%);
+            animation: ctaShine 3.5s infinite;
+        }
+
+        @keyframes ctaShine {
+            0% {
+                transform: translateX(-120%);
+            }
+
+            55% {
+                transform: translateX(120%);
+            }
+
+            100% {
+                transform: translateX(120%);
+            }
+        }
+
+
+        .archive-mini {
+            background: linear-gradient(135deg, #0f172a 0%, #11203a 55%, #1d2c4d 100%);
+            border-radius: 1.5rem;
+            color: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .archive-mini::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(49, 214, 160, 0.25), transparent 60%);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .archive-mini .card-body {
+            position: relative;
+            z-index: 1;
+        }
+
+        .archive-mini .text-muted {
+            color: rgba(248, 250, 252, 0.75) !important;
+        }
+
+        .archive-mini__icon {
+            width: 68px;
+            height: 68px;
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: grid;
+            place-items: center;
+            color: #7dfcc4;
+        }
+
+        .archive-mini__icon svg {
+            width: 34px;
+            height: 34px;
+        }
+
+        .archive-mini__meta {
+            color: rgba(226, 232, 240, 0.85);
+            letter-spacing: 0.08em;
+        }
+
+        .archive-mini__badge {
+            background: rgba(125, 252, 196, 0.12);
+            color: #7dfcc4;
+            letter-spacing: 0.12em;
+        }
+
+        .archive-mini__count {
+            color: rgba(148, 163, 184, 0.9);
+        }
+
+        .archive-mini__cta {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .archive-mini__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-width: 0;
+            height: 48px;
+            border-radius: 999px;
+            border: 0;
+            color: #ffffff;
+            font-weight: 600;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .archive-mini__btn--build {
+            background: linear-gradient(120deg, #31d6a0, #1a82ff);
+            box-shadow: 0 14px 32px rgba(26, 130, 255, 0.35);
+        }
+
+        .archive-mini__btn--download {
+            background: rgba(15, 23, 42, 0.65);
+            color: #e0f2ff;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            box-shadow: none;
+        }
+
+        .archive-mini__btn:disabled {
+            opacity: 0.7;
+            box-shadow: none;
+        }
+
+        .archive-mini__cta p {
+            color: rgba(248, 250, 252, 0.9);
+        }
+
+        .archive-mini__steps ul {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .archive-mini__steps li {
+            color: rgba(226, 232, 240, 0.85);
+            margin-bottom: 0.25rem;
+        }
+
+        .archive-mini__cta .text-info {
+            color: #93c5fd !important;
+        }
+
+        .archive-mini__cta .text-danger {
+            color: #fecaca !important;
+        }
+    </style>
+    <!-- Hero -->
+
+    <header>
+        <div class="container py-3">
+            <div class="my-4 mx-auto text-center" style="max-width: 856px">
+                
+                <div id="header">
+                    <h1 class="mb-2 pb-1">Spotify Music Downloader</h1>
+                    <h2 class="mb-5 fs-3">Download Spotify Songs in MP3 format.</h2>
+                    <form id="spotifyForm">
+                        <div class="border-2 border-success border rounded bg-white hstack position-relative">
+                            <input class="border-0 form-control py-3 shadow-none rounded-start main_page_text" id="trackUrl"
+                                type="text" placeholder="Paste your link here..." aria-label="Paste your Link here..." />
+                            <div id="loading" style="display: none" class="position-absolute end-50">
+                                <img width="100px" height="100px" src="https://spotmate.online/assets/img/loading.svg"
+                                    alt="Spotify downloader tool is loading" />
+                            </div>
+                            <button id="paste" type="button" onClick="onPaste()" style="display: none">
+                                <img class="zoom" width="30px" height="30px" src="https://spotmate.online/assets/img/paste.svg"
+                                    alt="Paste" />
+                            </button>
+                            <button id="clear" type="button" onClick="onClear()" style="display: none">
+                                <img class="zoom" width="30px" height="30px" src="https://spotmate.online/assets/img/close.svg"
+                                    alt="Close" />
+                            </button>
+                            <button type="submit" id="btnSubmit"
+                                class="btn btn-lg me-1 fw-semibold btn-new text-white d-flex align-items-center">
+                                Start <svg class="mt-1" width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="#ffffff" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                
+
+                <div id="tunecable-section">
+                                            <section class="section m-3">
+                            <div class="container">
+                                <div class="d-flex justify-content-center">
+                                    <a href="https://www.tunecable.com/spotify-flac-downloader.html" target="_blank"
+                                        rel="nofollow noopener"
+                                        class="modern-cta-banner text-decoration-none d-inline-block px-4 py-3 rounded-4 position-relative overflow-hidden"
+                                        style="
+                                                                            background: linear-gradient(135deg, #1a1a2e, #16213e);
+                                                                            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+                                                                            border: 1px solid rgba(255, 215, 0, 0.2);
+                                                                            transition: transform 0.3s ease, box-shadow 0.3s ease;
+                                                                        "
+                                        onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(255, 215, 0, 0.5)'"
+                                        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 6px 20px rgba(255, 215, 0, 0.3)'">
+
+                                        <span class="d-block text-center fw-bold" style="
+                                                                                    font-size: 1.35rem;
+                                                                                    background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+                                                                                    -webkit-background-clip: text;
+                                                                                    background-clip: text;
+                                                                                    color: transparent;
+                                                                                    background-size: 200% auto;
+                                                                                    animation: shine 3s infinite linear;
+                                                                                ">
+                                            One-click download Spotify lossless FLAC music, albums, playlists and MP4 MVs with
+                                            TuneCable.
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </section>
+                                    </div>
+
+                <div id="result-banner" style="display: none;">
+                    <section class="section m-3">
+        <div class="container">
+            <div class="cta-banner cta-banner--support d-flex flex-column flex-md-row align-items-center gap-4">
+                <div class="flex-grow-1 text-center text-md-start">
+                    <p class="text-uppercase text-white-50 small mb-2">Support SpotMate</p>
+                    <h2 class="h4 fw-semibold mb-2">Buy us a coffee & unlock premium</h2>
+                    <p class="mb-0 text-white-75">Supporters get unlimited 320kbps MP3 & FLAC downloads, playlist ZIP
+                        archives for 2,000+ tracks, and no rate limits or ads. Every coffee keeps SpotMate online for
+                        everyone.</p>
+                </div>
+                <div class="text-center text-md-end">
+                    <a href="https://ko-fi.com/spotmate" target="_blank" rel="nofollow noopener noreferrer"
+                        class="btn btn-light btn-lg px-4 rounded-pill fw-semibold text-dark cta-banner__btn">Support Us</a>
+                </div>
+                <span class="cta-banner__glow cta-banner__glow--one"></span>
+                <span class="cta-banner__glow cta-banner__glow--two"></span>
+            </div>
+        </div>
+    </section>
+                </div>
+
+                <!-- Premium Modal -->
+                <!-- Premium Modal -->
+                <div class="modal fade" id="premiumModal" tabindex="-1" aria-labelledby="premiumModalLabel"
+                    aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0"
+                            style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 25px 80px -12px rgba(0, 0, 0, 0.7);">
+                            <div class="modal-body p-0 position-relative overflow-hidden">
+                                <!-- Enhanced Glow Effects -->
+                                <div
+                                    style="position: absolute; top: -150px; left: -100px; width: 450px; height: 450px; background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%); filter: blur(60px); pointer-events: none;">
+                                </div>
+                                <div
+                                    style="position: absolute; bottom: -150px; right: -100px; width: 450px; height: 450px; background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%); filter: blur(60px); pointer-events: none;">
+                                </div>
+
+                                <div class="px-3 py-3 p-md-4 position-relative z-1">
+                                    <div class="text-center mb-3 mb-md-4">
+                                        <div
+                                            class="d-none d-md-inline-flex align-items-center justify-content-center bg-white bg-opacity-10 rounded-pill px-3 py-1 mb-3 border border-white border-opacity-10">
+                                            <span class="text-success me-2">●</span>
+                                            <span
+                                                class="text-white-75 small fw-semibold text-uppercase tracking-wider">Infrastructure
+                                                Support</span>
+                                        </div>
+                                        <h2 class="h4 display-md-6 fw-bold text-white mb-1 mb-md-2">Keep SpotMate Online
+                                        </h2>
+                                        <p class="text-white-50 small fs-md-5 mb-0"
+                                            style="max-width: 500px; margin: 0 auto;">Your support keeps servers fast for
+                                            everyone.</p>
+                                    </div>
+
+                                    <!-- Comparison Grid: Side-by-side on mobile (col-6) -->
+                                    <div class="row g-2 g-md-3 mb-3 mb-md-4 align-items-stretch">
+                                        <!-- Free Tier -->
+                                        <div class="col-6 col-md-6">
+                                            <div class="card h-100 bg-transparent border-0">
+                                                <div class="p-2 p-md-4 rounded-4 h-100 d-flex flex-column"
+                                                    style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06);">
+                                                    <div class="mb-2 mb-md-4 text-center text-md-start">
+                                                        <h3 class="h6 h5-md fw-bold text-white-50 mb-0 mb-md-1">Free</h3>
+                                                        <p class="d-none d-md-block small text-white-50 mb-0">Basic access
+                                                        </p>
+                                                    </div>
+                                                    <ul class="list-unstyled d-flex flex-column gap-1 gap-md-3 mb-auto">
+                                                        <li
+                                                            class="d-flex align-items-center align-items-md-start gap-2 gap-md-3">
+                                                            <div
+                                                                class="d-none d-md-block rounded-circle bg-white bg-opacity-10 p-1 mt-1">
+                                                                <svg width="14" height="14" fill="none"
+                                                                    class="text-white-50" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-white-75 small text-md-base"
+                                                                style="font-size: 0.75rem;">Standard Speed</span>
+                                                        </li>
+                                                        <li
+                                                            class="d-flex align-items-center align-items-md-start gap-2 gap-md-3">
+                                                            <div
+                                                                class="d-none d-md-block rounded-circle bg-white bg-opacity-10 p-1 mt-1">
+                                                                <svg width="14" height="14" fill="none"
+                                                                    class="text-white-50" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-white-75 small text-md-base"
+                                                                style="font-size: 0.75rem;">MP3 Only</span>
+                                                        </li>
+                                                        <li
+                                                            class="d-flex align-items-center align-items-md-start gap-2 gap-md-3">
+                                                            <div
+                                                                class="d-none d-md-block rounded-circle bg-danger bg-opacity-10 p-1 mt-1">
+                                                                <svg width="14" height="14" fill="none" class="text-danger"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                                    </path>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-white-75 small text-md-base"
+                                                                style="font-size: 0.75rem;">Queue Wait</span>
+                                                        </li>
+                                                        <li
+                                                            class="d-flex align-items-center align-items-md-start gap-2 gap-md-3">
+                                                            <div
+                                                                class="d-none d-md-block rounded-circle bg-danger bg-opacity-10 p-1 mt-1">
+                                                                <svg width="14" height="14" fill="none" class="text-danger"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-white-75 small text-md-base"
+                                                                style="font-size: 0.75rem;">Manual DL</span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Premium Tier -->
+                                        <div class="col-6 col-md-6 order-last order-md-last">
+                                            <div class="card h-100 bg-transparent border-0 position-relative">
+                                                <!-- Badge moved / resized for mobile -->
+                                                <div class="position-absolute top-0 start-50 translate-middle z-2 w-100 text-center"
+                                                    style="margin-top: -8px;">
+                                                    <span
+                                                        class="badge bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm px-2 px-md-3 py-1 py-md-2 rounded-pill text-uppercase tracking-wide fw-bold"
+                                                        style="font-size: 0.65rem; background: linear-gradient(90deg, #10b981 0%, #0d9488 100%);">Recommended</span>
+                                                </div>
+                                                <div class="p-2 p-md-4 pt-4 pt-md-4 rounded-4 h-100 d-flex flex-column position-relative overflow-hidden"
+                                                    style="background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(6, 78, 59, 0.15) 100%); border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.2);">
+
+                                                    <div class="mb-2 mb-md-4 text-center text-md-start mt-2 mt-md-0">
+                                                        <h3 class="h6 h5-md fw-bold text-white mb-0 mb-md-1">Supporter</h3>
+                                                        <p class="d-none d-md-block small text-emerald-400 mb-0"
+                                                            style="color: #6ee7b7;">Full power unlocked</p>
+                                                    </div>
+                                                    <ul class="list-unstyled d-flex flex-column gap-1 gap-md-3 mb-auto">
+                                                        <li
+                                                            class="d-flex align-items-center align-items-md-start gap-2 gap-md-3">
+                                                            <div class="d-none d-md-flex rounded-circle flex-shrink-0 align-items-center justify-content-center p-1 mt-1"
+                                                                style="background: rgba(16, 185, 129, 0.2); width: 24px; height: 24px;">
+                                                                <svg width="14" height="14" fill="none" class="text-white"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-white fw-medium small text-md-base"
+                                                                style="font-size: 0.75rem;">Fast MP3/FLAC</span>
+                                                        </li>
+                                                        <li
+                                                            class="d-flex align-items-center align-items-md-start gap-2 gap-md-3">
+                                                            <div class="d-none d-md-flex rounded-circle flex-shrink-0 align-items-center justify-content-center p-1 mt-1"
+                                                                style="background: rgba(16, 185, 129, 0.2); width: 24px; height: 24px;">
+                                                                <svg width="14" height="14" fill="none" class="text-white"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-white fw-medium small text-md-base"
+                                                                style="font-size: 0.75rem;">1-Click ZIPs</span>
+                                                        </li>
+                                                        <li
+                                                            class="d-flex align-items-center align-items-md-start gap-2 gap-md-3">
+                                                            <div class="d-none d-md-flex rounded-circle flex-shrink-0 align-items-center justify-content-center p-1 mt-1"
+                                                                style="background: rgba(16, 185, 129, 0.2); width: 24px; height: 24px;">
+                                                                <svg width="14" height="14" fill="none" class="text-white"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z">
+                                                                    </path>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-white fw-medium small text-md-base"
+                                                                style="font-size: 0.75rem;">Instant Queue</span>
+                                                        </li>
+                                                        <li
+                                                            class="d-flex align-items-center align-items-md-start gap-2 gap-md-3">
+                                                            <div class="d-none d-md-flex rounded-circle flex-shrink-0 align-items-center justify-content-center p-1 mt-1"
+                                                                style="background: rgba(16, 185, 129, 0.2); width: 24px; height: 24px;">
+                                                                <svg width="14" height="14" fill="none" class="text-white"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2.5"
+                                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                                    </path>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-white fw-medium small text-md-base"
+                                                                style="font-size: 0.75rem;">No Captchas</span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Community Powered Box: Visible on Desktop Only -->
+                                    <div class="text-center mb-4 mb-md-4 d-none d-md-block">
+                                        <div class="d-inline-flex align-items-center justify-content-center px-4 py-2 rounded-4 mb-2"
+                                            style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); max-width: 90%;">
+                                            <svg class="flex-shrink-0 me-3 text-success" width="28" height="28" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                                </path>
+                                            </svg>
+                                            <div class="text-start">
+                                                <p class="mb-0 fw-bold text-white fs-6">Community Powered</p>
+                                                <p class="mb-0 text-white-50 small">Just 1 supporter funds the
+                                                    infrastructure for over 2000 free users.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- CTA Section -->
+                                    <div
+                                        class="d-flex flex-column gap-2 justify-content-center align-items-center position-relative z-2">
+                                        <a rel="nofollow noopener noreferrer" href="https://ko-fi.com/spotmate"
+                                            target="_blank"
+                                            class="btn btn-success btn-lg px-4 px-md-5 py-3 rounded-pill fw-bold w-100 position-relative overflow-hidden group-hover-shine"
+                                            style="font-size: 1.1rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4); max-width: 420px; transition: transform 0.2s;">
+                                            <span class="position-relative z-1">Get Premium & Support Us</span>
+                                        </a>
+
+                                        <!-- Mobile stats caption (moved from hidden box) -->
+                                        <p class="d-md-none text-white-50 text-center mb-0"
+                                            style="font-size: 0.7rem; max-width: 250px;">
+                                            <span class="text-success fw-bold">1 supporter</span> funds downloads for <span
+                                                class="text-white">2000+ users</span>.
+                                        </p>
+
+                                        <button type="button"
+                                            class="btn btn-link text-white-50 text-decoration-none small mt-1 hover-text-white transition-colors p-2"
+                                            id="continueFreeBtn" data-bs-dismiss="modal" disabled
+                                            style="transition: color 0.2s;">
+                                            No thanks, continue with Free Version <span id="timerText"
+                                                class="fw-bold text-white">(6s)</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <style>
+                    @keyframes shine {
+                        0% {
+                            background-position: 200% center;
+                        }
+
+                        100% {
+                            background-position: -200% center;
+                        }
+                    }
+                </style>
+
+
+
+
+                <section class="section m-3">
+                    <div class="container">
+                        <div id="error" style="display: none;" class="caption text-left">
+                            <div id="error-text" role="alert" class="alert alert-danger text-center">
+                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div id="trackData" class="container mt-3" style="display: none">
+                </div>
+
+                <!-- End Input Card -->
+            </div>
+        </div>
+    </header>
+    <main class="container">
+        <div class="container">
+            <div class="card text-center bg-black">
+                <div class="card-body row align-items-center">
+                    <div class="col-12 col-lg-9">
+                        <h2 class="card-title text-start">Download SpotMate App</h2>
+                        <p class="card-text mb-2 text-start">Now we provide an Android app for downloading Spotify Songs,
+                            Playlist, Albums, and Tracks quickly in mp3 format.</p>
+                    </div>
+                    <a rel="nofollow" target="_blank"
+                        href="https://play.google.com/store/apps/details?id=com.spotmate.spotmatesongdownloader"
+                        class="col-12 col-lg-3"><svg width="166" height="48" viewBox="0 0 166 48" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M159.78 48H6.14539C2.76696 48 0 45.2985 0 42V6C0 2.7015 2.76696 -2.1874e-06 6.14539 -2.1874e-06H159.78C163.158 -2.1874e-06 165.925 2.7015 165.925 6V42C165.925 45.2985 163.158 48 159.78 48Z"
+                                fill="black" />
+                            <path
+                                d="M159.78 0.961498C162.625 0.961498 164.941 3.222 164.941 6V42C164.941 44.778 162.625 47.0385 159.78 47.0385H6.14539C3.30007 47.0385 0.984798 44.778 0.984798 42V6C0.984798 3.222 3.30007 0.961498 6.14539 0.961498H159.78ZM159.78 -2.1874e-06H6.14539C2.76696 -2.1874e-06 0 2.7015 0 6V42C0 45.2985 2.76696 48 6.14539 48H159.78C163.158 48 165.925 45.2985 165.925 42V6C165.925 2.7015 163.158 -2.1874e-06 159.78 -2.1874e-06Z"
+                                fill="#F1F1F2" />
+                            <path
+                                d="M58.2795 12.2928C58.2795 13.2948 57.9723 14.0973 57.367 14.6958C56.671 15.4053 55.7645 15.7623 54.6538 15.7623C53.5922 15.7623 52.6857 15.3993 51.9421 14.6838C51.197 13.9578 50.8252 13.0668 50.8252 12.0003C50.8252 10.9338 51.197 10.0428 51.9421 9.32278C52.6857 8.60128 53.5922 8.23828 54.6538 8.23828C55.1823 8.23828 55.6862 8.34478 56.1671 8.54278C56.6464 8.74228 57.0366 9.01228 57.3193 9.34528L56.6771 9.97828C56.184 9.40978 55.5126 9.12928 54.6538 9.12928C53.8795 9.12928 53.2081 9.39328 52.6381 9.92578C52.0742 10.4598 51.7916 11.1513 51.7916 12.0003C51.7916 12.8493 52.0742 13.5468 52.6381 14.0808C53.2081 14.6073 53.8795 14.8773 54.6538 14.8773C55.4757 14.8773 56.1671 14.6073 56.7125 14.0748C57.072 13.7223 57.2763 13.2363 57.3301 12.6153H54.6538V11.7483H58.2242C58.2673 11.9358 58.2795 12.1173 58.2795 12.2928Z"
+                                fill="white" stroke="white" stroke-width="0.16" stroke-miterlimit="10" />
+                            <path
+                                d="M63.9444 9.28648H60.5906V11.5665H63.6141V12.4335H60.5906V14.7135H63.9444V15.597H59.6411V8.40298H63.9444V9.28648Z"
+                                fill="white" stroke="white" stroke-width="0.16" stroke-miterlimit="10" />
+                            <path d="M67.9417 15.597H66.9922V9.28648H64.9351V8.40298H70.0004V9.28648H67.9417V15.597Z"
+                                fill="white" stroke="white" stroke-width="0.16" stroke-miterlimit="10" />
+                            <path d="M73.6665 15.597V8.40298H74.6144V15.597H73.6665Z" fill="white" stroke="white"
+                                stroke-width="0.16" stroke-miterlimit="10" />
+                            <path d="M78.8162 15.5969H77.8744V9.28642H75.8096V8.40292H80.881V9.28642H78.8162V15.5969Z"
+                                fill="white" stroke="white" stroke-width="0.16" stroke-miterlimit="10" />
+                            <path
+                                d="M90.4707 14.6718C89.744 15.3993 88.8437 15.7623 87.7698 15.7623C86.6897 15.7623 85.7895 15.3993 85.0628 14.6718C84.3376 13.9458 83.9766 13.0548 83.9766 12.0003C83.9766 10.9458 84.3376 10.0548 85.0628 9.32878C85.7895 8.60128 86.6897 8.23828 87.7698 8.23828C88.8376 8.23828 89.7379 8.60128 90.4646 9.33478C91.1959 10.0668 91.5569 10.9518 91.5569 12.0003C91.5569 13.0548 91.1959 13.9458 90.4707 14.6718ZM85.7649 14.0688C86.3118 14.6073 86.977 14.8773 87.7698 14.8773C88.5564 14.8773 89.2278 14.6073 89.7686 14.0688C90.314 13.5303 90.5905 12.8388 90.5905 12.0003C90.5905 11.1618 90.314 10.4703 89.7686 9.93178C89.2278 9.39328 88.5564 9.12328 87.7698 9.12328C86.977 9.12328 86.3118 9.39328 85.7649 9.93178C85.2195 10.4703 84.9429 11.1618 84.9429 12.0003C84.9429 12.8388 85.2195 13.5303 85.7649 14.0688Z"
+                                fill="white" stroke="white" stroke-width="0.16" stroke-miterlimit="10" />
+                            <path
+                                d="M92.8892 15.5969V8.40292H94.0414L97.6242 13.9979H97.6657L97.6242 12.6149V8.40292H98.5721V15.5969H97.5827L93.8309 9.72592H93.7895L93.8309 11.1149V15.5969H92.8892Z"
+                                fill="white" stroke="white" stroke-width="0.16" stroke-miterlimit="10" />
+                            <path
+                                d="M83.7433 26.1032C80.8565 26.1032 78.4982 28.2482 78.4982 31.2077C78.4982 34.1432 80.8565 36.3107 83.7433 36.3107C86.6362 36.3107 88.9945 34.1432 88.9945 31.2077C88.9945 28.2482 86.6362 26.1032 83.7433 26.1032ZM83.7433 34.3007C82.1593 34.3007 80.7965 33.0242 80.7965 31.2077C80.7965 29.3672 82.1593 28.1132 83.7433 28.1132C85.3272 28.1132 86.6961 29.3672 86.6961 31.2077C86.6961 33.0242 85.3272 34.3007 83.7433 34.3007ZM72.299 26.1032C69.4061 26.1032 67.0539 28.2482 67.0539 31.2077C67.0539 34.1432 69.4061 36.3107 72.299 36.3107C75.1904 36.3107 77.5441 34.1432 77.5441 31.2077C77.5441 28.2482 75.1904 26.1032 72.299 26.1032ZM72.299 34.3007C70.7135 34.3007 69.3462 33.0242 69.3462 31.2077C69.3462 29.3672 70.7135 28.1132 72.299 28.1132C73.883 28.1132 75.2457 29.3672 75.2457 31.2077C75.2457 33.0242 73.883 34.3007 72.299 34.3007ZM58.6808 27.6677V29.8367H63.9858C63.8307 31.0487 63.4159 31.9397 62.7798 32.5607C62.0055 33.3107 60.7995 34.1432 58.6808 34.1432C55.4161 34.1432 52.8596 31.5707 52.8596 28.3832C52.8596 25.1957 55.4161 22.6232 58.6808 22.6232C60.4461 22.6232 61.7305 23.2967 62.6784 24.1697L64.2439 22.6412C62.9181 21.4052 61.1543 20.4557 58.6808 20.4557C54.2039 20.4557 50.4414 24.0122 50.4414 28.3832C50.4414 32.7542 54.2039 36.3107 58.6808 36.3107C61.1006 36.3107 62.9181 35.5367 64.3469 34.0847C65.811 32.6552 66.2673 30.6452 66.2673 29.0222C66.2673 28.5182 66.2243 28.0547 66.1475 27.6677H58.6808ZM114.367 29.3492C113.936 28.2077 112.604 26.1032 109.89 26.1032C107.202 26.1032 104.963 28.1717 104.963 31.2077C104.963 34.0667 107.179 36.3107 110.148 36.3107C112.55 36.3107 113.936 34.8812 114.506 34.0487L112.723 32.8892C112.129 33.7382 111.319 34.3007 110.148 34.3007C108.985 34.3007 108.151 33.7802 107.617 32.7542L114.608 29.9297L114.367 29.3492ZM107.239 31.0487C107.179 29.0807 108.804 28.0727 109.969 28.0727C110.881 28.0727 111.656 28.5182 111.914 29.1557L107.239 31.0487ZM101.556 36.0002H103.854V21.0002H101.556V36.0002ZM97.7916 27.2402H97.7148C97.1986 26.6432 96.2138 26.1032 94.9663 26.1032C92.3483 26.1032 89.9547 28.3472 89.9547 31.2242C89.9547 34.0847 92.3483 36.3107 94.9663 36.3107C96.2138 36.3107 97.1986 35.7662 97.7148 35.1512H97.7916V35.8832C97.7916 37.8347 96.7238 38.8832 95.0016 38.8832C93.5974 38.8832 92.7263 37.8932 92.3668 37.0607L90.368 37.8752C90.9441 39.2282 92.4697 40.8932 95.0016 40.8932C97.6964 40.8932 99.9701 39.3452 99.9701 35.5787V26.4137H97.7916V27.2402ZM95.1629 34.3007C93.5789 34.3007 92.2531 33.0062 92.2531 31.2242C92.2531 29.4257 93.5789 28.1132 95.1629 28.1132C96.7238 28.1132 97.9545 29.4257 97.9545 31.2242C97.9545 33.0062 96.7238 34.3007 95.1629 34.3007ZM125.128 21.0002H119.631V36.0002H121.923V30.3167H125.128C127.674 30.3167 130.17 28.5182 130.17 25.6577C130.17 22.7987 127.667 21.0002 125.128 21.0002ZM125.188 28.2302H121.923V23.0867H125.188C126.899 23.0867 127.876 24.4742 127.876 25.6577C127.876 26.8187 126.899 28.2302 125.188 28.2302ZM139.357 26.0747C137.701 26.0747 135.979 26.7887 135.271 28.3712L137.305 29.2037C137.743 28.3712 138.548 28.1012 139.399 28.1012C140.588 28.1012 141.794 28.7987 141.813 30.0302V30.1877C141.398 29.9537 140.51 29.6072 139.417 29.6072C137.227 29.6072 134.994 30.7847 134.994 32.9822C134.994 34.9922 136.789 36.2867 138.806 36.2867C140.348 36.2867 141.2 35.6072 141.734 34.8167H141.813V35.9762H144.026V30.2222C144.026 27.5627 141.992 26.0747 139.357 26.0747ZM139.081 34.2947C138.331 34.2947 137.286 33.9317 137.286 33.0242C137.286 31.8632 138.589 31.4177 139.717 31.4177C140.726 31.4177 141.2 31.6352 141.813 31.9217C141.633 33.3107 140.408 34.2947 139.081 34.2947ZM152.092 26.4032L149.457 32.9057H149.379L146.655 26.4032H144.183L148.276 35.4902L145.941 40.5467H148.336L154.643 26.4032H152.092ZM131.43 36.0002H133.728V21.0002H131.43V36.0002Z"
+                                fill="white" />
+                            <path
+                                d="M12.8254 9.0465C12.4643 9.4155 12.2554 9.98999 12.2554 10.734V37.272C12.2554 38.016 12.4643 38.5905 12.8254 38.9595L12.9145 39.0405L28.1458 24.1755V23.8245L12.9145 8.9595L12.8254 9.0465Z"
+                                fill="url(#paint0_linear_27_382)" />
+                            <path
+                                d="M33.2175 29.1328L28.146 24.1753V23.8243L33.2236 18.8668L33.3373 18.9313L39.3506 22.2718C41.0667 23.2198 41.0667 24.7798 39.3506 25.7338L33.3373 29.0683L33.2175 29.1328Z"
+                                fill="url(#paint1_linear_27_382)" />
+                            <path
+                                d="M33.3374 29.0688L28.1461 24.0003L12.8257 38.9598C13.3957 39.5448 14.3252 39.6153 15.3822 39.0303L33.3374 29.0688Z"
+                                fill="url(#paint2_linear_27_382)" />
+                            <path
+                                d="M33.3374 18.9315L15.3822 8.97C14.3252 8.391 13.3957 8.4615 12.8257 9.0465L28.1461 24L33.3374 18.9315Z"
+                                fill="url(#paint3_linear_27_382)" />
+                            <defs>
+                                <linearGradient id="paint0_linear_27_382" x1="26.7934" y1="37.5484" x2="6.66034"
+                                    y2="16.9274" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#00A0FF" />
+                                    <stop offset="0.0066" stop-color="#00A1FF" />
+                                    <stop offset="0.2601" stop-color="#00BEFF" />
+                                    <stop offset="0.5122" stop-color="#00D2FF" />
+                                    <stop offset="0.7604" stop-color="#00DFFF" />
+                                    <stop offset="1" stop-color="#00E3FF" />
+                                </linearGradient>
+                                <linearGradient id="paint1_linear_27_382" x1="41.5852" y1="23.9981" x2="11.8454"
+                                    y2="23.9981" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#FFE000" />
+                                    <stop offset="0.4087" stop-color="#FFBD00" />
+                                    <stop offset="0.7754" stop-color="#FFA500" />
+                                    <stop offset="1" stop-color="#FF9C00" />
+                                </linearGradient>
+                                <linearGradient id="paint2_linear_27_382" x1="30.5146" y1="21.245" x2="3.21243"
+                                    y2="-6.71874" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#FF3A44" />
+                                    <stop offset="1" stop-color="#C31162" />
+                                </linearGradient>
+                                <linearGradient id="paint3_linear_27_382" x1="8.96921" y1="47.7886" x2="21.1608"
+                                    y2="35.3016" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#32A071" />
+                                    <stop offset="0.0685" stop-color="#2DA771" />
+                                    <stop offset="0.4762" stop-color="#15CF74" />
+                                    <stop offset="0.8009" stop-color="#06E775" />
+                                    <stop offset="1" stop-color="#00F076" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="h3">
+                How to use Our Spotify to MP3 Downloader
+            </h2>
+            <p class="text-justify">
+                Are you looking to Convert and Download your favorite Spotify playlists, tracks, or albums into MP3 format?
+                SpotMate is the best choice available online. Try our easy-to-use online Spotify converter by following
+                these steps.
+            </p>
+            <div class="row justify-content-evenly">
+                <div class="col-sm-6 col-lg-2 p-3 mt-3 rounded btn-new shadow">
+                    <div class="">
+                        <span class="h2 rounded-circle px-3 bg-dark">1</span>
+                    </div>
+                    <h3 class="h5 font-weight-bolder mt-2">Find Your Track</h3>
+                    <p class="text-justify">
+                        Open <b class="text-black">Spotify</b> and select the track you wish to download.
+                    </p>
+                </div>
+                <div class="col-sm-6 col-lg-2 p-3 mt-3 rounded btn-new shadow">
+                    <span class="h2 rounded-circle px-3 bg-dark">2</span>
+                    <h3 class="h5 font-weight-bolder mt-2">
+                        Copy the URL
+                    </h3>
+                    <p class="text-justify">
+                        Copy the track's <b class="text-black">URL</b> from Spotify, ensuring you have your desired song or
+                        playlist.
+                    </p>
+                </div>
+                <div class="col-sm-6 col-lg-2 p-3 mt-3 rounded btn-new shadow">
+                    <span class="h2 rounded-circle px-3 bg-dark">3</span>
+                    <h3 class="h5 font-weight-bolder mt-2">Paste and Start</h3>
+                    <p class="text-justify">
+                        Paste the copied URL into our converter, then click <b class="text-black">Download</b>.
+                    </p>
+                </div>
+                <div class="col-sm-6 col-lg-2 p-3 mt-3 rounded btn-new shadow">
+                    <span class="h2 rounded-circle px-3 bg-dark">4</span>
+                    <h3 class="h5 font-weight-bolder mt-2">Download Your MP3</h3>
+                    <p class="text-justify">
+                        Once the conversion is complete, you can download your <b class="text-black">MP3</b> file.
+
+                    </p>
+                </div>
+                <div class="col-sm-6 col-lg-2 p-3 mt-3 rounded btn-new shadow">
+                    <span class="h2 rounded-circle px-3 bg-dark">5</span>
+                    <h3 class="h5 font-weight-bolder mt-2">Listen Anywhere</h3>
+                    <p class="text-justify">
+                        Transfer your MP3 files to any device and enjoy your Spotify <b class="text-black">playlist</b> on
+                        the go.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="container pb-3"> -->
+        <div class="row py-3">
+            <div class="w-100">
+                <h2 class="mb-3">Why should you use <span class="text-new">SpotMate</span>?
+                </h2>
+                <p class="m-0 text-justify">
+                    SpotMate is an ultra-fast Spotify Downloader that offers a seamless and intuitive way to enhance your
+                    music experience. With this innovative tool, you can effortlessly build a personal collection of your
+                    favorite Spotify songs in a downloadable MP3 format, granting you the freedom to enjoy your most loved
+                    tracks offline, anytime, and anywhere. Imagine the flexibility of having your beloved tunes at your
+                    fingertips, ready to accompany you on your daily adventures, from commutes to workouts. With
+                    SpotMate.online, you can break free from internet connectivity limitations and enjoy your music on the
+                    go. Crafting your personalized MP3 library is a breeze with our user-friendly platform. Paste the
+                    Spotify song URL, and let our converter work its magic. Witness your favorite tunes convert into
+                    high-quality MP3 files, ensuring an exceptional hearing experience. Embark on a revolutionary journey by
+                    trying our Spotify Song Downloader now. The transition from online listening to offline enjoyment is
+                    seamless and intuitive, steering in a new era of music consumption. Imagine the possibilities of road
+                    trips set to your curated soundtrack, tranquil moments enriched by your favorite melodies, and the
+                    empowerment to control your acoustical experience. SpotMate.online is more than just a tool; it's an
+                    invitation to redefine how you consume music. Join us in revolutionizing your music enjoyment, where
+                    your Spotify favorites seamlessly integrate into the rhythm of your life. Embrace the future of music
+                    accessibility and make every moment melodious with our free Spotify Song Downloader.
+                </p>
+            </div>
+        </div>
+
+        <!--Cards-->
+
+        <div class="py-4">
+            <div class="container">
+                <h2 class="h3">
+                    Best Features of our Spotify Music Downloader
+                </h2>
+                <div class="row justify-content-between">
+                    <div class="col-sm-6 col-lg-4 p-3 mt-3 rounded bg-dark shadow">
+                        <svg class="float-start me-2" width="32px" height="32px" version="1.0" viewBox="0 0 1171 1280"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0 1280) scale(.1 -.1)" fill="#059669">
+                                <path
+                                    d="m11555 12694c-1288-888-2591-2076-3945-3594-1475-1656-3026-3783-4315-5918-72-119-115-180-123-177s-716 474-1575 1048-1568 1047-1576 1052c-11 6-10 2 2-16 98-140 3704-5078 3709-5079 3 0 34 66 68 148 1225 2918 2422 5234 3838 7427 1148 1777 2481 3497 3899 5028 91 97 163 177 161 177s-67-43-143-96z" />
+                            </g>
+                        </svg>
+                        <h3 class="h5 font-weight-bolder mt-2">High Quality MP3 Output</h3>
+                        <p class="text-justify">
+                            Dive into the music-rich world with our Online Spotify Downloader. Beyond the quick conversion,
+                            we prioritize the preservation of audio quality. Our high-quality MP3 output guarantees that
+                            every beat, note, and nuance of your favorite Spotify tracks remains intact. Engage yourself in
+                            a listening experience that mirrors the excellence of the original recordings.
+                        </p>
+                    </div>
+                    <div class="col-sm-6 col-lg-4 p-3 mt-3 rounded bg-dark shadow">
+                        <svg class="float-start me-2" width="32px" height="32px" version="1.0" viewBox="0 0 1126 1280"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0 1280) scale(.1 -.1)" fill="#059669">
+                                <path
+                                    d="m3998 12784c-62-33-58 154-58-2439v-2365h-800-800l-31-28c-39-35-43-89-8-136 66-90 3316-4165 3340-4188 22-21 39-28 69-28 29 0 47 7 70 28 16 15 779 968 1695 2117 1163 1460 1667 2099 1671 2121 7 36-8 70-40 96-19 16-78 18-823 18h-803v2375 2375l-29 32-29 33-1699 2c-1488 2-1701 0-1725-13z" />
+                                <path
+                                    d="m1687 4649-288-8-32-27c-17-15-332-286-699-602l-668-575v-1719-1718h5630 5630v1718l-1 1717-1400 1206-252 5c-139 3-267 7-284 9l-33 4v-800-799h-3645c-2423 0-3645-3-3645-10 0-5-3-10-7-10-5 0-7 364-5 810 1 445-1 809-5 808-5 0-137-5-296-9z" />
+                            </g>
+                        </svg>
+                        <h3 class="h5 font-weight-bolder mt-2">
+                            No Software Installation Required
+                        </h3>
+                        <p class="text-justify">
+                            Say goodbye to the complexities of additional installations. Our Online Song Downloader works
+                            seamlessly without the need for any other software. Enjoy the simplicity of converting your
+                            favorite tracks, albums, and playlists to MP3 directly through our online platform, eliminating
+                            unnecessary steps and potential technical headaches.
+                        </p>
+                    </div>
+                    <div class="col-sm-6 col-lg-4 p-3 mt-3 rounded bg-dark shadow">
+                        <svg class="float-start me-2" width="32px" height="32px" version="1.0" viewBox="0 0 1274 1280"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0 1280) scale(.1 -.1)" fill="#059669">
+                                <path
+                                    d="m5985 12794c-1118-66-2129-388-3035-966-642-411-1264-992-1730-1618-563-756-939-1610-1010-2290-9-92-14-472-6-481 2-2 197-1 433 3 1504 23 1902 30 2533 43 661 14 1301 32 1306 38 1 1 9 83 18 182 92 987 317 1618 749 2099 234 260 600 478 992 591 333 96 890 166 1139 144 448-39 887-251 1252-602 259-248 465-562 589-892 43-114 68-195 63-201-2-2-305-8-673-13-369-6-809-13-979-17l-309-7 94-90c759-731 1111-1128 2554-2875 215-260 391-476 393-481 1-4-140-11-315-14-501-11-1292-27-1715-35-213-5-389-10-392-13-2-2-12-83-20-179-22-236-43-410-67-560-155-970-515-1651-1068-2022-317-212-665-321-1122-349-284-17-434 9-656 116-449 215-923 707-1325 1375-97 162-261 470-254 478 6 5 983 20 1456 21l235 1-322 323c-570 571-830 875-2105 2461-194 242-358 441-364 443-12 4-283-280-398-417-384-456-1010-1299-1764-2377l-162-231v-120-119l297-7c163-4 527-4 808 0l511 7 53-154c103-297 222-581 370-879 402-809 918-1466 1567-1998 701-574 1548-964 2366-1089 197-30 584-23 943 18 502 56 996 174 1500 357 101 37 159 60 380 152 157 65 593 291 785 406 555 332 1032 706 1510 1184 236 236 391 407 576 640 602 756 992 1554 1064 2175 11 99 13 302 4 380l-6 50-197-2c-995-10-1963-24-2038-29-51-4-93-2-93 2 0 5 46 61 101 124 241 275 535 688 989 1390 385 596 1227 1967 1215 1979-4 3-414 7-912 8l-906 3-72 217c-275 828-622 1472-1105 2053-199 240-538 562-785 746-671 501-1443 806-2280 900-125 15-534 25-660 18z" />
+                            </g>
+                        </svg>
+                        <h3 class="h5 font-weight-bolder mt-2">Swift and Effortless Conversion</h3>
+                        <p class="text-justify">
+                            Experience the exceptional convenience of a conversion process that prioritizes speed and
+                            ensures a hassle-free journey from selecting your favorite Spotify songs to obtaining them in
+                            MP3 format. Our dedication to swift and effortless conversion means you can seamlessly
+                            transition from discovering music to enjoying it offline in moments.
+                        </p>
+                    </div>
+                    <div class="col-sm-6 col-lg-4 mt-3 p-3 rounded bg-dark shadow">
+                        <svg class="float-start me-2" width="32px" height="32px" version="1.0" viewBox="0 0 973 1280"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0 1280) scale(.1 -.1)" fill="#059669">
+                                <path
+                                    d="m4605 12794c-503-38-801-110-1130-274-202-101-318-183-470-335-134-133-206-224-297-377-278-466-418-1162-418-2079 0-777 185-1435 567-2016 113-173 222-304 387-468 373-371 784-590 1273-676 185-33 511-33 696 0 471 83 880 295 1244 645 525 505 861 1211 958 2016 35 286 30 828-11 1245-63 646-230 1148-500 1513-82 109-282 305-394 385-114 81-376 213-519 262-197 67-405 112-651 140-128 15-621 28-735 19z" />
+                                <path
+                                    d="m3310 6274c-833-164-1370-324-1793-535-211-105-355-195-509-317-362-288-614-686-763-1202-153-531-220-1200-241-2415l-6-360 31-46c222-329 729-666 1351-897 720-267 1539-415 2680-484 273-16 1339-16 1610 0 1140 69 1962 218 2680 484 621 231 1130 569 1351 897l31 46-6 350c-15 827-47 1352-107 1775-219 1539-876 2175-2680 2594-171 39-399 87-558 117l-104 19-84-80c-239-227-599-383-1013-441-124-18-505-18-630 0-410 56-782 218-1016 443-45 43-85 78-90 77-5 0-65-12-134-25z" />
+                            </g>
+                        </svg>
+                        <h3 class="h5 font-weight-bolder mt-2">
+                            NO Login Requirements
+                        </h3>
+                        <p class="text-justify">
+                            Enjoy the freedom to convert your unique Spotify tracks to MP3 without the hassle of creating
+                            accounts or remembering login credentials. Our user-centric approach prioritizes your
+                            convenience, allowing you to descend straight into the music conversion process without any
+                            barriers. Your journey to offline music enjoyment starts seamlessly, eliminating the need for
+                            additional steps or personal information.
+                        </p>
+                    </div>
+                    <div class="col-sm-6 col-lg-4 mt-3 p-3 rounded bg-dark shadow">
+                        <svg class="float-start me-2" width="32px" height="32px" version="1.0" viewBox="0 0 1270 1280"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0 1280) scale(.1 -.1)" fill="#059669">
+                                <path
+                                    d="m5713 11820c-40-17-68-57-429-602-840-1269-686-1036-2314-3498-460-696-842-1275-848-1287-19-35-14-68 16-95 16-15 467-225 1092-508 586-266 1077-491 1092-502 38-27 45-60 20-102-11-19-150-191-308-382-159-192-367-443-462-559-96-115-233-282-306-370s-350-423-616-745-543-657-616-745-212-257-310-375c-775-938-724-873-724-909 0-58 77-131 139-131 45 0-264-173 2656 1483 369 209 1226 695 1905 1080s1669 946 2200 1247 1352 766 1825 1035c473 268 870 496 883 508 29 27 26 64-8 89-14 10-504 236-1090 501-586 266-1084 494-1108 506-50 25-70 60-56 97 9 23 109 146 794 974 166 201 361 437 434 525s307 372 521 630c214 259 491 594 616 745s417 505 649 785c232 281 428 523 436 538 19 35 10 65-23 78-15 5-1168 9-3021 9-2931 0-2998-1-3039-20z" />
+                            </g>
+                        </svg>
+
+                        <h3 class="h5 font-weight-bolder mt-2">Completely Free of Charge</h3>
+                        <p class="text-justify">
+                            In our commitment to making music accessible and enjoyable to everyone, our service is
+                            completely free of charge. There are no credit Cards or premium subscriptions required. Enjoy
+                            the freedom to convert and download your Spotify favorites without breaking the bank. Elevate
+                            your music experience without compromising your budget.
+                        </p>
+                    </div>
+                    <div class="col-sm-6 col-lg-4 mt-3 p-3 rounded bg-dark shadow">
+                        <svg class="float-start me-2" width="32px" height="32px" version="1.0" viewBox="0 0 1280 1280"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0 1280) scale(.1 -.1)" fill="#059669">
+                                <path
+                                    d="m4202 11749c-171-22-300-87-428-214-75-74-99-106-136-182-26-50-55-127-65-170-17-75-18-257-18-4788 0-4487 1-4713 18-4780 10-38 38-113 64-165 39-80 59-108 137-185 76-76 106-99 186-138 183-90-52-82 2440-82s2257-8 2440 82c80 39 110 62 186 138 78 77 98 105 137 185 26 52 54 127 64 165 17 67 18 293 18 4785s-1 4718-18 4785c-10 39-38 113-64 165-39 80-59 108-137 185-103 103-199 160-333 198l-78 22-2175 1c-1196 1-2203-2-2238-7zm2686-701c18-18 15-94-4-112-14-14-71-16-484-16s-470 2-484 16c-19 18-22 94-4 112 17 17 959 17 976 0zm1852-4648v-3810h-2340-2340v3810 3810h2340 2340v-3810zm-2270-4141c196-31 349-185 382-383 37-225-113-452-337-511-260-67-520 103-566 371-41 239 132 483 371 523 76 12 77 12 150 0z" />
+                            </g>
+                        </svg>
+                        <h3 class="h5 font-weight-bolder mt-2">
+                            Universal Device Compatibility
+                        </h3>
+                        <p class="text-justify">
+                            Whether you are using a Computer, Tablet, or Smartphone, our Spotify Playlist Downloader tool,
+                            SpotMate, adapts to your various devices effortlessly. The universal compatibility ensures that
+                            your MP3 library is accessible wherever you go. Seamlessly synchronize your favorite tunes
+                            across all your devices, allowing you to enjoy your curated playlist without any limitations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--FAQs-->
+
+        <div class="accordion accordion-flush" id="accordionFlushExample" itemscope itemtype="https://schema.org/FAQPage">
+            <h2 class="h2" itemprop="name">Frequently Asked Questions</h2>
+            <!--Question 1-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false"
+                        aria-controls="flush-collapseOne" itemprop="name">
+                        Is SpotMate, Our Song Downloader app, free to use?
+                    </button>
+                </h2>
+                <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        Yes, our Spotify Downloader is completely free of charge. Convert and download your favorite tracks
+                        without any cost.
+                    </div>
+                </div>
+            </div>
+            <!--Question 2-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingTwo">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false"
+                        aria-controls="flush-collapseTwo" itemprop="name">
+                        Do I need to create an account to use the downloader?
+                    </button>
+                </h2>
+                <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        No, there's no need for account creation. Our downloader provides a hassle free experience
+                        without requiring login or signup.
+                    </div>
+                </div>
+            </div>
+            <!--Question 3-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingThree">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false"
+                        aria-controls="flush-collapseThree" itemprop="name">
+                        How fast is the conversion process?
+                    </button>
+                </h2>
+                <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        Our Spotify Converter ensures a speedy and seamless process, allowing you to convert and download
+                        your Spotify songs quickly.
+                    </div>
+                </div>
+            </div>
+            <!--Question 4-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingFour">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseFour" aria-expanded="false"
+                        aria-controls="flush-collapseFour" itemprop="name">
+                        Is the Converted MP3 file of high quality?
+                    </button>
+                </h2>
+                <div id="flush-collapseFour" class="accordion-collapse collapse" aria-labelledby="flush-headingFour"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        Absolutely. We prioritize high-quality MP3 output to preserve the audio quality of your Spotify
+                        tracks during the conversion process.
+                    </div>
+                </div>
+            </div>
+            <!--Question 5-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingFive">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseFive" aria-expanded="false"
+                        aria-controls="flush-collapseFive" itemprop="name">
+                        Can I use the SpotMate online app on my smartphone or tablet?
+                    </button>
+                </h2>
+                <div id="flush-collapseFive" class="accordion-collapse collapse" aria-labelledby="flush-headingFive"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        SpotMate is made to be universally compatible with computers, tablets, and smartphones. So, it
+                        doesn't matter what your device is; Spotmate will work on it.
+                    </div>
+                </div>
+            </div>
+            <!--Question 6-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingsix">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapsesix" aria-expanded="false"
+                        aria-controls="flush-collapsesix" itemprop="name">
+                        Are there any software installations required?
+                    </button>
+                </h2>
+                <div id="flush-collapsesix" class="accordion-collapse collapse" aria-labelledby="flush-headingsix"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        No additional software installations are required. Enjoy the convenience of converting your music
+                        directly on our online platform, SpotMate.
+                    </div>
+                </div>
+            </div>
+            <!--Question 7-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingseven">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseseven" aria-expanded="false"
+                        aria-controls="flush-collapseseven" itemprop="name">
+                        Can I convert multiple Spotify songs simultaneously?
+                    </button>
+                </h2>
+                <div id="flush-collapseseven" class="accordion-collapse collapse" aria-labelledby="flush-headingseven"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        Currently, our Spotify converter supports one track at a time for a focused and efficient conversion
+                        process.
+                    </div>
+                </div>
+            </div>
+            <!--Question 8-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingEight">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseEight" aria-expanded="false"
+                        aria-controls="flush-collapseEight" itemprop="name">
+                        Is it legal to convert Spotify songs to MP3?
+                    </button>
+                </h2>
+                <div id="flush-collapseEight" class="accordion-collapse collapse" aria-labelledby="flush-headingEight"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        The user must ensure compliance with Spotify's terms of service and applicable laws regarding the
+                        conversion and downloading of music.
+                    </div>
+                </div>
+            </div>
+            <!--Question 9-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingNine">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseNine" aria-expanded="false"
+                        aria-controls="flush-collapseNine" itemprop="name">
+                        How do I download the MP3 files to my device?
+                    </button>
+                </h2>
+                <div id="flush-collapseNine" class="accordion-collapse collapse" aria-labelledby="flush-headingNine"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        Copy the Spotify link and paste into the input box on Spotmate and click the Convert button; once
+                        the conversion is complete, you can click the <b class="text-new">Download</b> button to save the
+                        newly converted MP3 file to your device for offline listening.
+                    </div>
+                </div>
+            </div>
+            <!--Question 10-->
+            <div class="rounded my-2" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h2 class="accordion-header" id="flush-headingTen">
+                    <button class="accordion-button rounded collapsed h2 bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#flush-collapseTen" aria-expanded="false"
+                        aria-controls="flush-collapseTen" itemprop="name">
+                        Are there any restrictions on the number of songs I can convert?
+                    </button>
+                </h2>
+                <div id="flush-collapseTen" class="accordion-collapse collapse" aria-labelledby="flush-headingTen"
+                    data-bs-parent="#accordionFlushExample" itemscope itemprop="acceptedAnswer"
+                    itemtype="https://schema.org/Answer">
+                    <div class="accordion-body" itemprop="text">
+                        There are no restrictions on the number of songs you can convert. Enjoy unlimited conversions
+                        and build your MP3 library at your own pace.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- </div> -->
+        <div class="row py-3">
+            <div class="w-100">
+                <h2 class="mb-3">
+                    Disclaimer
+                </h2>
+                <p class="m-0 text-justify">
+                    SpotMate.online is an independent platform and is not affiliated with or endorsed by
+                    Spotify AB. The use of the name "Spotify" on this site is solely for contextual purposes and does
+                    not imply any ownership or endorsement. The name "Spotify" remains the property of its copyright
+                    holder.
+
+                    SpotMate.online does not host any copyrighted material. Our platform utilizes third-party services
+                    to achieve its intended goals. Any reference to specific songs, artists, or copyrighted content is
+                    for informational and contextual purposes only.
+
+                    We respect the intellectual property rights of copyright holders. If you believe that your
+                    copyrighted work is being used on SpotMate.online in a way that constitutes copyright infringement,
+                    please contact us, and we will promptly address any valid concerns.
+
+                    By using SpotMate.online, you acknowledge and agree to the terms of this disclaimer. We encourage
+                    users to comply with Spotify's terms of service and all relevant copyright laws when using our
+                    platform.
+
+                    This disclaimer is subject to change, and any updates will be reflected on this page.
+                </p>
+            </div>
+        </div>
+    </main>
+<footer class="border-top border-white">
+    <div class="container py-3">
+        <div class="row align-items-center">
+             <div
+          class="col-sm mb-3 mb-sm-0 text-center text-md-start text-sm-start"
+        >
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item">
+              <a
+                class="link-sm link-dark text-white text-decoration-none"
+                href="https://spotmate.online/privacy"
+                >Privacy Policy</a
+              >
+            </li>
+            <li class="list-inline-item">
+              <a
+                class="link-sm link-dark text-white text-decoration-none"
+                href="https://spotmate.online/tos"
+                >Terms Of Service</a
+              >
+            </li>
+            <li class="list-inline-item">
+              <a
+                class="link-sm link-dark text-white text-decoration-none"
+                href="https://spotmate.online/contact"
+                >Contact Us</a
+              >
+            </li>
+          </ul>
+        </div>
+            <div class="col-sm-auto text-center text-md-end text-sm-end">
+                <p>&copy; 2023 - 2025 SpotMate. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6LS2RMW0TN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'G-6LS2RMW0TN');
+    </script>
+
+<!-- Bootstrap JavaScript Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+</script>
+     <script>
+        window.SpotmatePublic = {
+            supportUrl: "https:\/\/spotmate.online\/support",
+            archiveTasksBase: "https:\/\/spotmate.online\/tasks",
+        };
+    </script>
+    <script src="https://spotmate.online/assets/js/script.js?v1.20"></script>
+    
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bd1250d7d4f6cc1',t:'MTc2ODI2Nzk5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
